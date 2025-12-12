@@ -139,9 +139,12 @@ export const NotificationDropdown = () => {
          
          {/* Footer */}
          <div className="p-2 border-t border-border bg-surface text-center">
-            <Button variant="ghost" size="sm" className="w-full text-xs text-muted-foreground h-7" onClick={() => navigate({ to: '/logs' })}>
+            <div
+                className="w-full text-xs text-muted-foreground h-7 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground cursor-pointer"
+                onClick={() => navigate({ to: '/logs' as any })}
+            >
                 View Notification History
-            </Button>
+            </div>
          </div>
       </DropdownMenuContent>
     </DropdownMenu>

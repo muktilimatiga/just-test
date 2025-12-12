@@ -1,8 +1,6 @@
 
-import { useState, useEffect } from 'react';
-
 // Base API configuration
-const API_BASE_URL = 'http://localhost:8001';
+const API_BASE_URL = 'http://172.16.121.11:8002';
 
 // Generic API response wrapper
 export interface ApiResponse<T> {
@@ -325,33 +323,3 @@ export const ConfigService = {
     detectUnconfiguredOnts: (oltName: string) => withErrorHandling(() => ApiService.config.detectUnconfiguredOnts(oltName)),
     runConfiguration: (oltName: string, request: ConfigurationRequest) => withErrorHandling(() => ApiService.config.runConfiguration(oltName, request)),
 };
-
-// React Hooks
-export const createQueryHook = <T, P extends any[]>(queryFn: (...args: P) => Promise<T>) => {
-    return (...args: P) => {
-        const [state, setState] = useState<{ data?: T; loading: boolean; error?: string }>({ loading: true });
-        useEffect(() => {
-            let isMounted = true;
-            const fetchData = async () => {
-                try {
-                    setState({ loading: true });
-                    const result = await withErrorHandling(() => queryFn(...args));
-                    if (!isMounted) return;
-                    if (result.error) setState({ loading: false, error: result.error });
-                    else setState({ loading: false, data: result.data });
-                } catch (error) {
-                    if (!isMounted) return;
-                    setState({ loading: false, error: handleApiError(error) });
-                }
-            };
-            fetchData();
-            return () => { isMounted = false; };
-        }, args);
-        return state;
-    };
-};
-
-export const useCustomerData = createQueryHook((query: string) => ApiService.customer.getInvoices(query));
-export const useOnuDetails = createQueryHook((payload: OnuTargetPayload) => ApiService.onu.getCustomerDetails(payload));
-export const useTerminalList = createQueryHook(() => ApiService.cli.listRunningTerminals());
-export const useConfigOptions = createQueryHook(() => ApiService.config.getOptions());

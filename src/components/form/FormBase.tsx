@@ -7,9 +7,12 @@ import {
     FieldError,
     FieldLabel
 } from "@/components/ui/field"
+
+// 1. Add 'disabled' to the shared props
 export type FormControlProps = {
     label: string
     description?: string
+    disabled?: boolean 
 }
 
 type FormBaseProps = FormControlProps & {
@@ -24,9 +27,11 @@ export function FormBase({
     description,
     controlFirst,
     horizontal,
+    disabled, // 2. Destructure disabled
 }: FormBaseProps) {
     const field = useFieldContext()
     const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+    
     const labelElement = (
         <>
             <FieldLabel htmlFor={field.name}>{label}</FieldLabel>
@@ -38,6 +43,8 @@ export function FormBase({
     return (
         <Field
             data-invalid={isInvalid}
+            // 3. Pass disabled state to the wrapper for global styling (e.g. opacity)
+            aria-disabled={disabled} 
             orientation={horizontal ? "horizontal" : undefined}
         >
             {controlFirst ? (

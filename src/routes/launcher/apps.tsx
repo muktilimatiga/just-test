@@ -26,7 +26,7 @@ export const APPS_CONFIG: AppItem[] = [
   {
     id: 'new',
     title: 'Add New',
-    subtitle: 'Install app',
+    subtitle: '',
     icon: Plus,
     // Dashed border, solid card background (background or very light grey)
     color: 'bg-background border-2 border-dashed border-border hover:border-primary hover:bg-secondary/50 transition-all',
