@@ -12,7 +12,7 @@ interface MyRouterContext {
   queryClient: QueryClient
 }
 
-import { NotFound } from '../components/NotFound'
+import { ErrorPage } from './errors'
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
   component: () => (
@@ -33,5 +33,5 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       />
     </>
   ),
-  notFoundComponent: NotFound,
+  notFoundComponent: ErrorPage,
 })

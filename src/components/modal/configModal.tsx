@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { RefreshCw, Unlock, User as UserIcon, Search, X, Settings, Scan, DownloadCloud, Network, Trash2, Layers } from 'lucide-react';
 import { Label, Input, Select, Button, Switch, Avatar, AvatarFallback, AvatarImage } from '@/components/ui';
@@ -14,7 +13,6 @@ import { useConfigOptions, usePsbData, useScanOnts } from '@/hooks/useApi';
 // Import Form Components
 import { FormInput } from '@/components/form/FormInput';
 import { FormTextarea } from '@/components/form/FormTextarea';
-import { FormSelect } from '@/components/form/FormSelect';
 import { cn } from '@/lib/utils';
 import { ModalOverlay } from '../ModalOverlay';
 
@@ -28,6 +26,8 @@ interface BatchItem {
 export const ConfigModal = ({ isOpen, onClose, type }: { isOpen: boolean, onClose: () => void, type: 'basic' | 'bridge' | 'batch' }) => {
   const [mode, setMode] = useState<'manual' | 'auto'>('manual');
   const [selectedOlt, setSelectedOlt] = useState<string>('');
+  const [selectedModem, setSelectedModem] = useState<string>('');
+  const [selectedPackage, setSelectedPackage] = useState<string>('');
   const [detectedOnts, setDetectedOnts] = useState<any[]>([]);
   const [batchQueue, setBatchQueue] = useState<BatchItem[]>([]);
 
@@ -245,9 +245,8 @@ export const ConfigModal = ({ isOpen, onClose, type }: { isOpen: boolean, onClos
           }}
         >
           {/* Top Row: OLT, Package, Modem */}
-          <div className="grid grid-cols-3 gap-4 mb-6">
-            <div className="space-y-1.5">
-              <Label className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400">OLT Device</Label>
+          <div className="flex flex-cols-8 gap-4 mb-6">
+            <div className="flex space-y-1.5">
               <div className="relative">
                 <Select
                   value={selectedOlt}
@@ -272,34 +271,55 @@ export const ConfigModal = ({ isOpen, onClose, type }: { isOpen: boolean, onClos
                   </SelectContent>
                 </Select>
               </div>
-            </div>
+              <div>
+                                <Select
+                  value={selectedModem}
+                  onValueChange={setSelectedModem}
+                  disabled={isSubmitting}
+                >
+                  {/* 1. className goes on the Trigger, not the Root */}
+                  <SelectTrigger className="text-xs h-10 bg-white dark:bg-zinc-950 border-slate-200 dark:border-zinc-800 focus:ring-2 focus:ring-indigo-500/20 font-medium">
 
-            <div className="space-y-1.5">
-              <form.Field
-                name="package"
-                // @ts-ignore
-                component={FormSelect}
-                label="Package"
-                disabled={isLoadingOptions || isSubmitting}
-                className="text-xs"
-                items={packageOptions.map((pkg) => (
-                  <SelectItem key={pkg} value={pkg}>{pkg}</SelectItem>
-                ))}
-              />
-            </div>
+                    {/* 2. Handle the "empty" state via the placeholder prop */}
+                    <SelectValue placeholder="-- Modem Type --" />
 
-            <div className="space-y-1.5">
-              <form.Field
-                name="modem_type"
-                // @ts-ignore
-                component={FormSelect}
-                label="Modem Type"
-                disabled={isLoadingOptions || isSubmitting}
-                className="text-xs"
-                items={modemOptions.map((m) => (
-                  <SelectItem key={m} value={m}>{m}</SelectItem>
-                ))}
-              />
+                  </SelectTrigger>
+
+                  <SelectContent>
+                    {/* 3. Use SelectItem instead of <option> */}
+                    {modemOptions.map((m) => (
+                      <SelectItem key={m} value={m}>
+                        {m}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+                            <div>
+                                <Select
+                  value={selectedPackage}
+                  onValueChange={setSelectedPackage}
+                  disabled={isSubmitting}
+                >
+                  {/* 1. className goes on the Trigger, not the Root */}
+                  <SelectTrigger className="relative text-xs h-10 bg-white dark:bg-zinc-950 border-slate-200 dark:border-zinc-800 focus:ring-2 focus:ring-indigo-500/20 font-medium">
+
+                    {/* 2. Handle the "empty" state via the placeholder prop */}
+                    <SelectValue placeholder="-- Select Package --" />
+
+                  </SelectTrigger>
+
+                  <SelectContent>
+                    {/* 3. Use SelectItem instead of <option> */}
+                    {packageOptions.map((pkg) => (
+                      <SelectItem key={pkg} value={pkg}>
+                        {pkg}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
             </div>
           </div>
 
@@ -541,7 +561,7 @@ export const ConfigModal = ({ isOpen, onClose, type }: { isOpen: boolean, onClos
                   {(field) => (
                     <FormInput
                       field={field} // ✅ Pass the field object here
-                      label="Subscriber Name"
+                      label="Customer Name"
                       placeholder="Full Name"
                       className="bg-white dark:bg-zinc-950 h-10 text-sm font-semibold"
                     />
@@ -615,7 +635,7 @@ export const ConfigModal = ({ isOpen, onClose, type }: { isOpen: boolean, onClos
               disabled={isSubmitting}
               className="h-10 px-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-md"
             >
-              {type === 'batch' ? `Provision ${batchQueue.length} Devices` : (isSubmitting ? 'Processing...' : 'Provision Service')}
+              {type === 'batch' ? `Provision ${batchQueue.length} Devices` : (isSubmitting ? 'Processing...' : 'Start Configuration')}
             </Button>
           </div>
         </form>
