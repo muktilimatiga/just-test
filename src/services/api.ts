@@ -1,6 +1,6 @@
 
 // Base API configuration
-const API_BASE_URL = 'http://localhost:8002';
+const API_BASE_URL = 'http://172.16.121.11:8002';
 
 // Generic API response wrapper
 export interface ApiResponse<T> {
