@@ -1,13 +1,15 @@
-import { useFieldContext } from "./hooks"
+
 import { FormBase, type FormControlProps } from "./FormBase"
 import { Checkbox } from "../ui/checkbox"
 
-export function FormCheckbox(props: FormControlProps) {
-  const field = useFieldContext<boolean>()
+export function FormCheckbox({ field, ...props }: FormControlProps & { field: any }) {
+  // Remove useFieldContext
+  // const contextField = useFieldContext<boolean>()
+  // const field = propField || contextField
   const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
 
   return (
-    <FormBase {...props} controlFirst horizontal>
+    <FormBase {...props} controlFirst horizontal field={field}>
       <Checkbox
         id={field.name}
         name={field.name}

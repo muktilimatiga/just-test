@@ -136,3 +136,9 @@ code {
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  .launcher-card {
+    @apply relative flex flex-col items-center justify-center p-8 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-xl shadow-sm hover:shadow-md transition-all group overflow-hidden cursor-pointer;
+  }
+}

@@ -1,24 +1,44 @@
-import { useFieldContext } from "./hooks"
+
 import { FormBase, type FormControlProps } from "./FormBase"
 import type { ReactNode } from "react"
 import { Select, SelectContent, SelectTrigger, SelectValue } from "../ui/select"
 
 export function FormSelect({
     children,
+    items,
+    className, // 1. Destructure className
+    onChange,  // 2. Destructure onChange
+    field,
     ...props
-}: FormControlProps & { children: ReactNode }) {
-    const field = useFieldContext<string>()
+}: FormControlProps & {
+    children?: ReactNode,
+    items?: { value: string, label: string }[],
+    className?: string,                  // 3. Add Type Definition
+    onChange?: (value: string) => void   // 4. Add Type Definition
+    field: any
+}) {
+    // 1. Remove context logic as it throws
+    // const contextField = useFieldContext<string>()
+    // const field = props.field || contextField
+
+    // We assume field is passed.
     const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
 
     return (
-        <FormBase {...props}>
+        <FormBase {...props} field={field}>
             <Select
-                onValueChange={e => field.handleChange(e)}
+                // 5. Chain the custom onChange with the field's handler
+                onValueChange={e => {
+                    field.handleChange(e);
+                    if (onChange) onChange(e);
+                }}
                 value={field.state.value}
             >
                 <SelectTrigger
+                    // 6. Pass className here to style the input box
+                    className={className}
                     aria-invalid={isInvalid}
-                    id={field.name}
+                    name={field.name}
                     onBlur={field.handleBlur}
                 >
                     <SelectValue />
