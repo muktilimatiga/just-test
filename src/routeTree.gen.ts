@@ -10,11 +10,17 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as LogKomplainIndexRouteImport } from './routes/log-komplain/index'
 import { Route as LauncherIndexRouteImport } from './routes/launcher/index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LogKomplainIndexRoute = LogKomplainIndexRouteImport.update({
+  id: '/log-komplain/',
+  path: '/log-komplain/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LauncherIndexRoute = LauncherIndexRouteImport.update({
@@ -26,27 +32,31 @@ const LauncherIndexRoute = LauncherIndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/launcher': typeof LauncherIndexRoute
+  '/log-komplain': typeof LogKomplainIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/launcher': typeof LauncherIndexRoute
+  '/log-komplain': typeof LogKomplainIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/launcher/': typeof LauncherIndexRoute
+  '/log-komplain/': typeof LogKomplainIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/launcher'
+  fullPaths: '/' | '/launcher' | '/log-komplain'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/launcher'
-  id: '__root__' | '/' | '/launcher/'
+  to: '/' | '/launcher' | '/log-komplain'
+  id: '__root__' | '/' | '/launcher/' | '/log-komplain/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LauncherIndexRoute: typeof LauncherIndexRoute
+  LogKomplainIndexRoute: typeof LogKomplainIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -56,6 +66,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/log-komplain/': {
+      id: '/log-komplain/'
+      path: '/log-komplain'
+      fullPath: '/log-komplain'
+      preLoaderRoute: typeof LogKomplainIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/launcher/': {
@@ -71,6 +88,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LauncherIndexRoute: LauncherIndexRoute,
+  LogKomplainIndexRoute: LogKomplainIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

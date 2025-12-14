@@ -207,12 +207,22 @@ const SidebarContent = ({ collapsed, onNavClick }: { collapsed: boolean, onNavCl
             <div className="flex flex-col w-full gap-1 px-2">
                 <SidebarIcon isSidebarCollapsed={collapsed} icon={Home} label="Launcher" to="/" isActive={isActive('/')} onClick={onNavClick} />
                 <SidebarIcon isSidebarCollapsed={collapsed} icon={Activity} label="Overview" to="/overview" isActive={isActive('/overview')} onClick={onNavClick} />
-                <SidebarIcon 
-                    isSidebarCollapsed={collapsed} 
-                    icon={TicketIcon} 
-                    label="Tickets" 
+                <SidebarIcon
+                    isSidebarCollapsed={collapsed}
+                    icon={TicketIcon}
+                    label="Log Komplain"
+                    to="/log-komplain"
+                    isActive={isActive('/log-komplain')}
+                    badgeCount={0}
+                    badgeVariant="destructive"
+                    onClick={onNavClick}
+                />
+                <SidebarIcon
+                    isSidebarCollapsed={collapsed}
+                    icon={TicketIcon}
+                    label="Tickets"
                     to="/tickets"
-                    isActive={isActive('/tickets')} 
+                    isActive={isActive('/tickets')}
                     badgeCount={0}
                     badgeVariant="destructive"
                     onClick={onNavClick}
