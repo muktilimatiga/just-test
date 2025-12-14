@@ -10,7 +10,7 @@ import * as React from 'react';
     id        String   @id @default(uuid())
     name      String
     email     String   @unique
-    role      String   // 'admin', 'agent', 'user'
+    role      String   // 'admin', 'noc', 'user'
     avatarUrl String?
     lat       Float?
     lng       Float?
@@ -47,8 +47,32 @@ export const UserSchema = z.object({
   id: z.string().uuid(),
   name: z.string(),
   email: z.string().email(),
-  role: z.enum(['admin', 'agent', 'user']),
+  role: z.enum(['admin', 'noc', 'manager']),
   avatarUrl: z.string().optional(),
+  coordinates: z.object({
+    lat: z.number(),
+    lng: z.number(),
+  }).optional(),
+});
+
+export const CustomerSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  user_pppoe: z.union([z.string(), z.number()]),
+  pass_pppoe: z.union([z.string(), z.number()]).optional(),
+  alamat: z.string().optional(),
+  onu_sn: z.string().optional(),
+  olt_name: z.string().optional(),
+  olt_port: z.string().optional(),
+  interface: z.string().optional(),
+  paket: z.string().optional(),
+  snmp_status: z.enum(['active', 'inactive', 'dyinggasp']).optional(),
+  rx_power_str: z.string().optional(),
+  modem_type: z.string().optional(),
+  snmp_last_updated: z.string().optional(),
+  latest_kendala: z.string().optional(),
+  latest_ticket: z.string().optional(),
+  latest_action: z.string().optional(),
   coordinates: z.object({
     lat: z.number(),
     lng: z.number(),
@@ -94,6 +118,7 @@ export type Ticket = z.infer<typeof TicketSchema>;
 export type TicketLog = z.infer<typeof TicketLogSchema>;
 export type DashboardStats = z.infer<typeof DashboardStatsSchema>;
 export type TrafficData = z.infer<typeof TrafficDataSchema>;
+export type Customer = z.infer<typeof CustomerSchema>;
 
 export interface Device {
   id: string;
@@ -133,7 +158,7 @@ export type NavItem = {
 };
 
 // --- Realtime Types ---
-export type RealtimeEvent = 
+export type RealtimeEvent =
   | { type: 'NEW_TICKET'; payload: Ticket }
   | { type: 'NEW_LOG'; payload: TicketLog };
 

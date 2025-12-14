@@ -245,8 +245,8 @@ export const ConfigModal = ({ isOpen, onClose, type }: { isOpen: boolean, onClos
           }}
         >
           {/* Top Row: OLT, Package, Modem */}
-          <div className="flex flex-cols-8 gap-4 mb-6">
-            <div className="flex space-y-1.5">
+          <div className="flex gap-4 mb-4">
+            <div className="flex space-y-1 gap-10 justify-between">
               <div className="relative">
                 <Select
                   value={selectedOlt}
@@ -271,8 +271,8 @@ export const ConfigModal = ({ isOpen, onClose, type }: { isOpen: boolean, onClos
                   </SelectContent>
                 </Select>
               </div>
-              <div>
-                                <Select
+              <div className="relative gap-2">
+                <Select
                   value={selectedModem}
                   onValueChange={setSelectedModem}
                   disabled={isSubmitting}
@@ -295,8 +295,8 @@ export const ConfigModal = ({ isOpen, onClose, type }: { isOpen: boolean, onClos
                   </SelectContent>
                 </Select>
               </div>
-                            <div>
-                                <Select
+              <div>
+                <Select
                   value={selectedPackage}
                   onValueChange={setSelectedPackage}
                   disabled={isSubmitting}
@@ -319,7 +319,7 @@ export const ConfigModal = ({ isOpen, onClose, type }: { isOpen: boolean, onClos
                   </SelectContent>
                 </Select>
               </div>
-              
+
             </div>
           </div>
 
@@ -597,7 +597,6 @@ export const ConfigModal = ({ isOpen, onClose, type }: { isOpen: boolean, onClos
                       <FormInput
                         field={field}
                         label="PPPoE Password"
-                        type="password"
                         className="bg-white dark:bg-zinc-950 h-9 text-xs font-mono"
                       />
                     )}

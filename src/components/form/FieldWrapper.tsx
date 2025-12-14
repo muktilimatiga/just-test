@@ -3,10 +3,11 @@ import { FormInput } from "./FormInput";
 import { FormSelect } from "./FormSelect";
 import { FormTextarea } from "./FormTextarea";
 import { FormCheckbox } from "./FormCheckbox";
-import { useAppForm } from "./hooks";
+import { useFormContext } from "./hooks";
 
 type FieldWrapperProps = {
   name: string;
+  label: string;
   component: "Input" | "Select" | "Textarea" | "Checkbox";
   validators?: any;
   children?: React.ReactNode;
@@ -22,17 +23,18 @@ const componentMap = {
 
 export function FieldWrapper({ name, component, validators, children, ...props }: FieldWrapperProps) {
   const Component = componentMap[component];
-  const form = useAppForm();
-  
+  const form = useFormContext() as any;
+
   return (
     <Field name={name} validators={validators} form={form}>
       {(field) => (
         <Component
           {...props}
-          value={field.state.value}
+          value={field.state.value as any}
           onChange={component === "Select" ? field.handleChange : (e: any) => field.handleChange(e.target.value)}
           onBlur={field.handleBlur}
           id={field.name}
+          field={field}
         >
           {children}
         </Component>

@@ -107,7 +107,7 @@ export const useAppStore = create<AppState>((set) => ({
                     id: String(data.id),
                     name: data.full_name || data.username || 'System User',
                     email: data.username || 'user@system.com',
-                    role: data.role || 'admin',
+                    role: data.role || 'noc',
                     avatarUrl: data.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(data.full_name || data.username)}&background=random`,
                     coordinates: { lat: 40.7128, lng: -74.0060 }
                 } 
@@ -121,7 +121,7 @@ export const useAppStore = create<AppState>((set) => ({
                 id: 'u1',
                 name: 'Alex Carter (Offline)',
                 email: 'alex@nexus.com',
-                role: 'admin',
+                role: 'noc',
                 avatarUrl: 'https://i.pravatar.cc/150?u=alex',
             }
         });

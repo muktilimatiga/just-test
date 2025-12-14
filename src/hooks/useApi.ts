@@ -1,6 +1,6 @@
 import { useQuery, useMutation } from "@tanstack/react-query"
 import { ApiService } from '@/services/api';
-import type { OnuTargetPayload } from '@/services/api';
+import type { OnuTargetPayload, TicketCreateAndProcessPayload, TicketForwardPayload, TicketClosePayload } from '@/services/api';
 
 export const useCustomerInvoices = (query: string) => {
   return useQuery({
@@ -47,5 +47,25 @@ export const usePsbData = (enabled: boolean = true) => {
 export const useScanOnts = () => {
   return useMutation({
     mutationFn: (oltName: string) => ApiService.config.detectUnconfiguredOnts(oltName),
+  });
+};
+
+// Ticket
+
+export const useTicketCreate = () => {
+  return useMutation({
+    mutationFn: (payload: TicketCreateAndProcessPayload) => ApiService.ticket.createAndProcess(payload),
+  });
+};
+
+export const useTicketForward = () => {
+  return useMutation({
+    mutationFn: (payload: TicketForwardPayload) => ApiService.ticket.forward(payload),
+  });
+};
+
+export const useTicketClose = () => {
+  return useMutation({
+    mutationFn: (payload: TicketClosePayload) => ApiService.ticket.close(payload),
   });
 };

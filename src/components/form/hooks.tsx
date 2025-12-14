@@ -19,4 +19,6 @@ const { useAppForm } = createFormHook({
     formContext,
 })
 
-export { useAppForm, useFieldContext, useFormContext }
+const FormProvider = formContext.Provider
+
+export { useAppForm, useFieldContext, useFormContext, FormProvider }
