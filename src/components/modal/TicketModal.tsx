@@ -8,6 +8,7 @@ import { useFiberStore, type FiberCustomer } from '@/store/useFiberStore'
 import { CustomerCard } from '../customerCard';
 import { TicketFormFields } from '../form/TicketFromField';
 import { useAppForm, FormProvider } from '../form/hooks';
+import { toast } from 'sonner';
 
 // Create Ticket, Search Customoer -> Create Ticket
 export const CreateTicketModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) => {
@@ -40,7 +41,7 @@ export const CreateTicketModal = ({ isOpen, onClose }: { isOpen: boolean, onClos
             // For now, we update the store as per original logic, assuming store handles the actual API call or next step
             updateFormData(value);
             // Original "Create Ticket" logic could go here
-            console.log("Form Submitted", value);
+            toast.success("Form Submitted", value);
             handleClose();
         }
     });

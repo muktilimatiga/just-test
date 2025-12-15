@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
-import {  Launcher } from './launcher'
+import { Launcher } from './launcher'
+
 export const Route = createFileRoute('/')({
   component: App,
 })

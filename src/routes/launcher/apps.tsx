@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { 
-  Wifi, 
-  Database, 
-  ScrollText, 
-  LayoutTemplate, 
-  Plus, 
+import {
+  Wifi,
+  Database,
+  ScrollText,
+  LayoutTemplate,
+  Plus,
   Loader2,
   Activity,
   Ticket
@@ -50,7 +50,7 @@ export const APPS_CONFIG: AppItem[] = [
     icon: Wifi,
     to: '/monitor',
     color: 'bg-card border border-border shadow-sm hover:border-primary/50 hover:shadow-md transition-all',
-    iconColor: 'text-zinc-500' 
+    iconColor: 'text-zinc-500'
   },
   {
     id: 'database',
@@ -59,7 +59,7 @@ export const APPS_CONFIG: AppItem[] = [
     icon: Database,
     to: '/database',
     color: 'bg-card border border-border shadow-sm hover:border-primary/50 hover:shadow-md transition-all',
-    iconColor: 'text-zinc-500' 
+    iconColor: 'text-zinc-500'
   },
   {
     id: 'logs',
@@ -84,7 +84,7 @@ export const APPS_CONFIG: AppItem[] = [
     title: 'Transactions',
     subtitle: 'Ticket management',
     icon: Ticket,
-    to: '/tickets',
+    to: '/log-komplain',
     color: 'bg-card border border-border shadow-sm hover:border-primary/50 hover:shadow-md transition-all',
     iconColor: 'text-blue-600'
   },

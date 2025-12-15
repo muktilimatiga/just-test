@@ -1,7 +1,8 @@
 
 import { FieldWrapper } from './FieldWrapper';
+import { FormInput } from './FormInput'
 
-export interface TicketFormData {
+export interface CreateTicketFormData {
     name: string;
     address: string;
     contact: string;
@@ -12,6 +13,25 @@ export interface TicketFormData {
     description: string;
 }
 
+export interface ForwardTicketFormData {
+    ticketRef: string;
+    priority: string;
+    type: string;
+    description: string;
+}
+
+export interface CloseTicketFormData {
+    ticketRef: string;
+    priority: string;
+    type: string;
+    description: string;
+}
+
+
+
+
+
+
 export const TicketFormFields = () => {
     return (
         <div className="p-6 space-y-5">
@@ -19,7 +39,7 @@ export const TicketFormFields = () => {
                 <FieldWrapper
                     name="name"
                     label="Full Name"
-                    component="Input"
+                    component={FormInput}
                     placeholder="Enter full name"
                     className="bg-muted/50"
                 />
@@ -29,7 +49,7 @@ export const TicketFormFields = () => {
                 <FieldWrapper
                     name="address"
                     label="Installation Address"
-                    component="Input"
+                    component={FromInput}
                     placeholder="Enter installation address"
                     className="bg-muted/50"
                 />
@@ -40,7 +60,7 @@ export const TicketFormFields = () => {
                     <FieldWrapper
                         name="contact"
                         label="Contact Number"
-                        component="Input"
+                        component={FromInput}
                         placeholder="Enter contact number"
                         className="bg-muted/50"
                     />
@@ -49,7 +69,7 @@ export const TicketFormFields = () => {
                     <FieldWrapper
                         name="noInternet"
                         label="No Internet ID"
-                        component="Input"
+                        component={FromInput}
                         placeholder="Enter No Internet ID"
                         className="bg-muted/50"
                     />
@@ -61,7 +81,7 @@ export const TicketFormFields = () => {
                     <FieldWrapper
                         name="ticketRef"
                         label="Reference"
-                        component="Input"
+                        component={FromInput}
                         readOnly
                         className="bg-muted text-muted-foreground cursor-not-allowed font-mono"
                     />
@@ -70,7 +90,7 @@ export const TicketFormFields = () => {
                     <FieldWrapper
                         name="priority"
                         label="Priority"
-                        component="Select"
+                        component={FromInput}
                     >
                         <option value="">Select...</option>
                         <option value="Low">Low</option>
@@ -83,8 +103,8 @@ export const TicketFormFields = () => {
                     <FieldWrapper
                         name="type"
                         label="Type"
-                        component="Select"
-                    >
+                        component={FromInput}
+                    >   
                         <option value="">Select...</option>
                         <option value="Technical">Technical</option>
                         <option value="Billing">Billing</option>
@@ -98,7 +118,7 @@ export const TicketFormFields = () => {
                 <FieldWrapper
                     name="description"
                     label="Problem Description"
-                    component="Textarea"
+                    component={FromInput}
                     rows={4}
                     className="resize-none bg-muted/50 focus:ring-2 focus:ring-ring"
                     placeholder="Describe the customer's issue in detail..."
