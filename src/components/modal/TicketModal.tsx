@@ -8,10 +8,17 @@ import { useFiberStore, type FiberCustomer } from '@/store/useFiberStore'
 import { CustomerCard } from '../customerCard';
 import { TicketFormFields } from '../form/TicketFromField';
 import { useAppForm, FormProvider } from '../form/hooks';
+import { useAppStore } from '@/store';
 import { toast } from 'sonner';
 
 // Create Ticket, Search Customoer -> Create Ticket
-export const CreateTicketModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) => {
+export const CreateTicketModal = () => {
+    
+    const {
+    isCreateTicketModalOpen,
+    setCreateTicketModalOpen,
+  } = useAppStore();
+    
     // Ticket Store for Wizard State
     const {
         step,
@@ -47,12 +54,12 @@ export const CreateTicketModal = ({ isOpen, onClose }: { isOpen: boolean, onClos
     });
 
     useEffect(() => {
-        if (isOpen) {
+        if (isCreateTicketModalOpen) {
             resetTicketStore();
             resetSearch();
             form.reset(); // Reset form when modal opens
         }
-    }, [isOpen]);
+    }, [isCreateTicketModalOpen]);
 
     // Sync form with store data when step changes to 2 (Customer Selected)
     useEffect(() => {
@@ -64,15 +71,15 @@ export const CreateTicketModal = ({ isOpen, onClose }: { isOpen: boolean, onClos
     // Debounced Search
     useEffect(() => {
         const timer = setTimeout(() => {
-            if (isOpen && step === 1) {
+            if (isCreateTicketModalOpen && step === 1) {
                 searchCustomers(searchTerm);
             }
         }, 400);
         return () => clearTimeout(timer);
-    }, [searchTerm, isOpen, step]);
+    }, [searchTerm, isCreateTicketModalOpen, step]);
 
     const handleClose = () => {
-        onClose();
+        setCreateTicketModalOpen(false);
         setTimeout(() => {
             resetTicketStore();
             resetSearch();
@@ -96,7 +103,7 @@ export const CreateTicketModal = ({ isOpen, onClose }: { isOpen: boolean, onClos
     };
 
     return (
-        <ModalOverlay isOpen={isOpen} onClose={handleClose} className="max-w-2xl max-h-[85vh] flex flex-col p-0 overflow-hidden">
+        <ModalOverlay isOpen={isCreateTicketModalOpen} onClose={handleClose} className="max-w-2xl max-h-[85vh] flex flex-col p-0 overflow-hidden">
             <div className="flex-1 overflow-y-auto">
 
                 {step === 1 && (

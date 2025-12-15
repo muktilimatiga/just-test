@@ -1,6 +1,6 @@
 // pages/tickets/TicketsPage.tsx
 
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { createFileRoute } from '@tanstack/react-router';
 import { AutoTanStackTable } from '@/components/AutoTable';
 import { Button } from '@/components/ui'
@@ -20,18 +20,24 @@ import {
 import { useSupabaseTickets } from '@/hooks/supabase/useSupabaeTicket';
 import { useAppStore } from '@/store'
 
-// Modals
-import { CreateTicketModal } from '@/components/modal/TicketModal'
-
 // --- Helper Components ---
 
 const StatusBadge = ({ status }: { status: string }) => {
-  const styles: Record<string, string> = {
-    open: "bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-900/50",
-    in_progress: "bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-300 dark:border-amber-900/50",
-    resolved: "bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-300 dark:border-emerald-900/50",
-    closed: "bg-slate-100 text-slate-700 border-slate-200 dark:bg-white/10 dark:text-slate-400 dark:border-white/20"
-  };
+const styles: Record<string, string> = {
+  open:
+    "bg-red-100 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-300 dark:border-red-900/50",
+
+  proses:
+    "bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-900/50",
+
+  "fwd teknis":
+    "bg-green-100 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-300 dark:border-green-900/50",
+
+  done:
+    "bg-green-100 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-300 dark:border-green-900/50",
+};
+
+
   // Fallback to 'open' style if status is unknown
   const style = styles[status] || styles['open'];
   
@@ -49,7 +55,7 @@ const StatusBadge = ({ status }: { status: string }) => {
 
 const LogTicketPage = () => {
   // 1. Data Fetching
-  const { data: tickets, loading, refetch } = useSupabaseTickets();
+  const { data: tickets = [], isLoading, isFetching, refetch, error } = useSupabaseTickets();
   const updateTicketStatus = {
     mutate: ({ id, status }: { id: string; status: string }) => {
       console.log(`Updating ticket ${id} to status: ${status}`);
@@ -65,7 +71,7 @@ const LogTicketPage = () => {
   const [forwardTicket, setForwardTicket] = useState<Ticket | null>(null);
 
   // 3. Action Handlers
-  const handleProcessConfirm = (id: string, status: 'in_progress' | 'closed', note: string) => {
+  const handleProcessConfirm = (id: string, status: 'proses' | 'closed', note: string) => {
     updateTicketStatus.mutate({ id, status });
     setProcessTicket(null);
     setTimeout(refetch, 500); 
@@ -79,7 +85,7 @@ const LogTicketPage = () => {
 
   const handleForwardConfirm = (id: string, note: string) => {
     console.log(`Forwarding ticket ${id}: ${note}`);
-    updateTicketStatus.mutate({ id, status: 'in_progress' });
+    updateTicketStatus.mutate({ id, status: 'fwd teknis' });
     setForwardTicket(null);
     setTimeout(refetch, 500);
   };
@@ -133,7 +139,7 @@ const LogTicketPage = () => {
             )}
 
             {/* Action: Forward */}
-            {t.status === 'in_progress' && (
+            {t.status === 'proses' && (
               <Button
                 size="sm"
                 variant="outline"
@@ -145,7 +151,7 @@ const LogTicketPage = () => {
             )}
 
             {/* Action: Close */}
-            {(t.status === 'open' || t.status === 'in_progress') && (
+            {(t.status === 'open' || t.status === 'proses') && (
               <Button
                 size="sm"
                 variant="ghost"
@@ -157,7 +163,7 @@ const LogTicketPage = () => {
             )}
 
             {/* State: Done */}
-            {(t.status === 'resolved' || t.status === 'closed') && (
+            {(t.status === 'fwd teknis' || t.status === 'closed') && (
               <span className="text-[10px] text-slate-400 flex items-center gap-1">
                 <CheckCircle2 className="h-3 w-3" /> Done
               </span>
@@ -169,7 +175,7 @@ const LogTicketPage = () => {
   }), [setProcessTicket, setForwardTicket, setCloseTicket]);
 
   return (
-    <div className="animate-in fade-in duration-500 py-8 space-y-4">
+    <div className="animate-in fade-in duration-500 px-8 py-8 space-y-4">
       
       {/* --- Modals --- */}
       {processTicket && (
@@ -179,7 +185,7 @@ const LogTicketPage = () => {
             <p className="text-sm text-gray-600 mb-4">Are you sure you want to process this ticket?</p>
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => setProcessTicket(null)}>Cancel</Button>
-              <Button onClick={() => handleProcessConfirm(processTicket.id, 'in_progress', '')}>Confirm</Button>
+              <Button onClick={() => handleProcessConfirm(processTicket.ticketId, 'proses', '')}>Confirm</Button>
             </div>
           </div>
         </div>
@@ -192,7 +198,7 @@ const LogTicketPage = () => {
             <p className="text-sm text-gray-600 mb-4">Are you sure you want to close this ticket?</p>
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => setCloseTicket(null)}>Cancel</Button>
-              <Button onClick={() => handleCloseConfirm(closeTicket.id, '')}>Confirm</Button>
+              <Button onClick={() => handleCloseConfirm(closeTicket.ticketId, '')}>Confirm</Button>
             </div>
           </div>
         </div>
@@ -205,7 +211,7 @@ const LogTicketPage = () => {
             <p className="text-sm text-gray-600 mb-4">Are you sure you want to forward this ticket?</p>
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => setForwardTicket(null)}>Cancel</Button>
-              <Button onClick={() => handleForwardConfirm(forwardTicket.id, '')}>Confirm</Button>
+              <Button onClick={() => handleForwardConfirm(forwardTicket.ticketId, '')}>Confirm</Button>
             </div>
           </div>
         </div>
@@ -213,18 +219,18 @@ const LogTicketPage = () => {
 
       {/* --- Header / Toolbar --- */}
       <div className="flex justify-between items-center mb-6">
-         <h1 className="text-2xl font-bold tracking-tight">Support Tickets</h1>
+         <h1 className="text-2xl font-bold tracking-tight">Log Komplain</h1>
          
          <div className="flex gap-2">
-            <Button variant="ghost" onClick={refetch} disabled={loading} className="bg-background">
-              <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-              {loading ? 'Loading...' : 'Refresh'}
+            <Button variant="ghost" onClick={() => refetch()} disabled={isFetching} className="bg-background">
+              <RefreshCw className={`mr-2 h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
+              {isFetching ? 'Loading...' : 'Refresh'}
             </Button>
             <Button variant="outline" className="bg-background">
               <Filter className="mr-2 h-4 w-4" /> Filter
             </Button>
-            <Button onClick={toggleCreateTicketModal} className="md:hidden">
-              <Plus className="mr-2 h-4 w-4" /> New Ticket
+            <Button onClick={toggleCreateTicketModal} className="ml-2">
+              <Plus className="mr-2 h-4 w-4" /> Open Ticket
             </Button>
          </div>
       </div>
@@ -232,7 +238,7 @@ const LogTicketPage = () => {
       <AutoTanStackTable<Ticket>
         data={tickets}
         columnOverrides={columnOverrides}
-        pageSize={10}
+        pageSize={15}
       />
     </div>
   );

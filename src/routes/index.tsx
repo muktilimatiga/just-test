@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { Launcher } from './launcher'
+import { Toaster } from 'sonner'
 
 export const Route = createFileRoute('/')({
   component: App,
@@ -7,6 +8,9 @@ export const Route = createFileRoute('/')({
 
 function App() {
   return (
-    <Launcher />
+    <>
+      <Toaster richColors />
+      <Launcher />
+    </>
   )
 }

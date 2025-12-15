@@ -13,7 +13,14 @@ import * as React from 'react';
     role      String   // 'admin', 'noc', 'user'
     avatarUrl String?
     lat       Float?
-    lng       Float?
+    lng       Float?function App() {
+  return (
+    <>
+      <Toaster richColors />
+      <Launcher />
+    </>
+  )
+}
     tickets   Ticket[]
     logs      TicketLog[]
   }
@@ -79,17 +86,17 @@ export const CustomerSchema = z.object({
   }).optional(),
 });
 
-export const TicketStatusSchema = z.enum(['open', 'in_progress', 'resolved', 'closed']);
-export const TicketPrioritySchema = z.enum(['low', 'medium', 'high', 'critical']);
+export const TicketStatusSchema = z.enum(['open', 'proses', 'fwd teknis', 'closed', 'done']);
 
 export const TicketSchema = z.object({
-  id: z.string(),
-  title: z.string().min(5, "Title must be at least 5 characters"),
+  ticketId: z.string(),        // TN015623
+  kendala: z.string(),         // Issue text
   status: TicketStatusSchema,
-  priority: TicketPrioritySchema,
-  assigneeId: z.string().nullable(),
-  createdAt: z.string().datetime(), // ISO string for frontend
+  nama: z.string(),        // nama
+  PIC: z.string(),
+  createdAt: z.string(),       // ISO or yyyy-mm-dd
 });
+
 
 export const TicketLogSchema = z.object({
   id: z.string(),
@@ -97,7 +104,8 @@ export const TicketLogSchema = z.object({
   userId: z.string(),
   userName: z.string(),
   message: z.string(),
-  createdAt: z.string().datetime(),
+  PIC: z.string(),
+  createdAt: z.string(),
 });
 
 export const DashboardStatsSchema = z.object({
