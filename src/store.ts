@@ -30,7 +30,7 @@ interface AppState {
   isSidebarCollapsed: boolean;
   toggleSidebar: () => void;
   setSidebarCollapsed: (collapsed: boolean) => void;
-  
+
   // Session State
   user: User | null;
   login: (user: User) => void;
@@ -82,49 +82,40 @@ export const useAppStore = create<AppState>((set) => ({
   isSidebarCollapsed: true, // Default to collapsed as requested
   toggleSidebar: () => set((state) => ({ isSidebarCollapsed: !state.isSidebarCollapsed })),
   setSidebarCollapsed: (collapsed) => set({ isSidebarCollapsed: collapsed }),
-  
+
   user: null, // Start with null to allow fetching
-  
+
   login: (user) => set({ user }),
   logout: () => set({ user: null }),
-  updateUser: (updates) => set((state) => ({ 
-    user: state.user ? { ...state.user, ...updates } : null 
+  updateUser: (updates) => set((state) => ({
+    user: state.user ? { ...state.user, ...updates } : null
   })),
   fetchUser: async () => {
     try {
-        // Fetch the first user from the 'users' table to simulate the current session
-        const { data, error } = await supabase
-            .from('users')
-            .select('*')
-            .limit(1)
-            .maybeSingle();
+      // Fetch the first user from the 'users' table to simulate the current session
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .limit(1)
+        .maybeSingle();
 
-        if (error) throw error;
+      if (error) throw error;
 
-        if (data) {
-            set({ 
-                user: {
-                    id: String(data.id),
-                    name: data.full_name || data.username || 'System User',
-                    email: data.username || 'user@system.com',
-                    role: data.role || 'noc',
-                    avatarUrl: data.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(data.full_name || data.username)}&background=random`,
-                    coordinates: { lat: 40.7128, lng: -74.0060 }
-                } 
-            });
-        }
-    } catch (err) {
-        console.error("Failed to fetch user from Supabase:", err);
-        // Fallback mock user if DB fails
+      if (data) {
         set({
-            user: {
-                id: 'u1',
-                name: 'Alex Carter (Offline)',
-                email: 'alex@nexus.com',
-                role: 'noc',
-                avatarUrl: 'https://i.pravatar.cc/150?u=alex',
-            }
+          user: {
+            id: String(data.id),
+            name: data.full_name || data.username || 'System User',
+            email: data.username || 'user@system.com',
+            password: data.password || 'password',
+            role: data.role || 'noc',
+            avatarUrl: data.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(data.full_name || data.username)}&background=random`,
+            coordinates: { lat: 40.7128, lng: -74.0060 }
+          }
         });
+      }
+    } catch (err) {
+      console.error("Failed to fetch user from Supabase:", err);
     }
   },
 
@@ -139,9 +130,9 @@ export const useAppStore = create<AppState>((set) => ({
   isCliOpen: false,
   isCliMinimized: false,
   // When toggling, if we are opening, ensure we aren't minimized
-  toggleCli: () => set((state) => ({ 
+  toggleCli: () => set((state) => ({
     isCliOpen: !state.isCliOpen,
-    isCliMinimized: !state.isCliOpen ? false : state.isCliMinimized 
+    isCliMinimized: !state.isCliOpen ? false : state.isCliMinimized
   })),
   setIsCliMinimized: (minimized) => set({ isCliMinimized: minimized }),
 

@@ -55,6 +55,7 @@ export const UserSchema = z.object({
   name: z.string(),
   email: z.string().email(),
   role: z.enum(['admin', 'noc', 'manager']),
+  password: z.string(),
   avatarUrl: z.string().optional(),
   coordinates: z.object({
     lat: z.number(),
@@ -119,6 +120,17 @@ export const TrafficDataSchema = z.array(z.object({
   name: z.string(),
   value: z.number(),
 }));
+
+// Payload
+export interface CreateTicketPayload {
+  query: string;
+  description: string;
+  priority: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
+  jenis: "FREE" | "PAID";
+  noc_username: string;
+  noc_password: string;
+}
+
 
 // --- TypeScript Interfaces inferred from Zod ---
 export type User = z.infer<typeof UserSchema>;

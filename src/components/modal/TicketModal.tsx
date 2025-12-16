@@ -6,19 +6,19 @@ import { ModalOverlay } from '@/components/ModalOverlay'
 import { useTicketStore } from '@/store/ticketStore';
 import { useFiberStore, type FiberCustomer } from '@/store/useFiberStore'
 import { CustomerCard } from '../customerCard';
-import { TicketFormFields } from '../form/TicketFromField';
+import { CreateTicketFormFields } from '../form/TicketFromField';
 import { useAppForm, FormProvider } from '../form/hooks';
 import { useAppStore } from '@/store';
 import { toast } from 'sonner';
 
 // Create Ticket, Search Customoer -> Create Ticket
 export const CreateTicketModal = () => {
-    
+
     const {
-    isCreateTicketModalOpen,
-    setCreateTicketModalOpen,
-  } = useAppStore();
-    
+        isCreateTicketModalOpen,
+        setCreateTicketModalOpen,
+    } = useAppStore();
+
     // Ticket Store for Wizard State
     const {
         step,
@@ -44,11 +44,8 @@ export const CreateTicketModal = () => {
     const form = useAppForm({
         defaultValues: formData,
         onSubmit: async ({ value }) => {
-            // Trigger updateFormData to sync with store, or directly handle submission here
-            // For now, we update the store as per original logic, assuming store handles the actual API call or next step
             updateFormData(value);
-            // Original "Create Ticket" logic could go here
-            toast.success("Form Submitted", value);
+            toast.success("Ticket Created");
             handleClose();
         }
     });
@@ -169,7 +166,7 @@ export const CreateTicketModal = () => {
                     <div className="animate-in fade-in slide-in-from-right-4 duration-300">
                         <CustomerCard user={selectedUser} onChangeUser={() => setStep(1)} />
                         <FormProvider value={form}>
-                            <TicketFormFields />
+                            <CreateTicketFormFields />
                         </FormProvider>
                     </div>
                 )}

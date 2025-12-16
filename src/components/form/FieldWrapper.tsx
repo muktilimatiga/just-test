@@ -21,9 +21,17 @@ const componentMap = {
   Checkbox: FormCheckbox,
 };
 
-export function FieldWrapper({ name, component, validators, children, ...props }: FieldWrapperProps) {
+export function FieldWrapper({
+  name,
+  component,
+  validators,
+  children,
+  ...props
+}: FieldWrapperProps) {
   const Component = componentMap[component];
   const form = useFormContext() as any;
+
+  const allowChildren = component === "Select";
 
   return (
     <Field name={name} validators={validators} form={form}>
@@ -31,12 +39,16 @@ export function FieldWrapper({ name, component, validators, children, ...props }
         <Component
           {...props}
           value={field.state.value as any}
-          onChange={component === "Select" ? field.handleChange : (e: any) => field.handleChange(e.target.value)}
+          onChange={
+            component === "Select"
+              ? field.handleChange
+              : (e: any) => field.handleChange(e.target.value)
+          }
           onBlur={field.handleBlur}
           id={field.name}
           field={field}
         >
-          {children}
+          {allowChildren ? children : null}
         </Component>
       )}
     </Field>

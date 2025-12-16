@@ -2,48 +2,50 @@
 
 import { useState, useMemo } from 'react';
 import { createFileRoute } from '@tanstack/react-router';
+import type { ColumnDef } from '@tanstack/react-table';
 import { AutoTanStackTable } from '@/components/AutoTable';
 import { Button } from '@/components/ui'
 import { Badge } from '@/components/ui/badge';
 import type { Ticket } from '@/types';
-import { 
-  RefreshCw, 
-  User as UserIcon, 
-  ArrowRight, 
-  CheckCircle2, 
-  Forward, 
-  Plus, 
-  Filter 
+import {
+  RefreshCw,
+  User as UserIcon,
+  ArrowRight,
+  CheckCircle2,
+  Forward,
+  Plus,
+  Filter
 } from 'lucide-react';
 
 // Custom Hooks
 import { useSupabaseTickets } from '@/hooks/supabase/useSupabaeTicket';
 import { useAppStore } from '@/store'
+import { ColumnFilter } from '@/components/ColumnFilter';
 
 // --- Helper Components ---
 
 const StatusBadge = ({ status }: { status: string }) => {
-const styles: Record<string, string> = {
-  open:
-    "bg-red-100 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-300 dark:border-red-900/50",
+  const styles: Record<string, string> = {
+    open:
+      "bg-red-100 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-300 dark:border-red-900/50",
 
-  proses:
-    "bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-900/50",
+    proses:
+      "bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-900/50",
 
-  "fwd teknis":
-    "bg-green-100 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-300 dark:border-green-900/50",
+    "fwd teknis":
+      "bg-green-100 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-300 dark:border-green-900/50",
 
-  done:
-    "bg-green-100 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-300 dark:border-green-900/50",
-};
+    done:
+      "bg-green-100 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-300 dark:border-green-900/50",
+  };
 
 
   // Fallback to 'open' style if status is unknown
   const style = styles[status] || styles['open'];
-  
+
   // Format text: "in_progress" -> "In progress"
-  const label = status.replace(/_/g, ' '); 
-  
+  const label = status.replace(/_/g, ' ');
+
   return (
     <Badge variant="outline" className={`capitalize font-normal border ${style}`}>
       {label}
@@ -74,7 +76,7 @@ const LogTicketPage = () => {
   const handleProcessConfirm = (id: string, status: 'proses' | 'closed', note: string) => {
     updateTicketStatus.mutate({ id, status });
     setProcessTicket(null);
-    setTimeout(refetch, 500); 
+    setTimeout(refetch, 500);
   };
 
   const handleCloseConfirm = (id: string, note: string) => {
@@ -93,13 +95,29 @@ const LogTicketPage = () => {
   // 4. Column Definitions (Overrides)
   // We only define columns that need CUSTOM rendering.
   // The AutoTable will handle 'id', 'title', 'createdAt', etc. automatically.
-  const columnOverrides = useMemo(() => ({
-    
-    // Custom Badge for Status
+  const columnOverrides = useMemo<Partial<Record<keyof Ticket | 'actions', ColumnDef<Ticket>>>>(() => ({
     status: {
-      header: 'Status',
-      accessorKey: 'status',
-      cell: ({ row }: any) => <StatusBadge status={row.getValue('status')} />
+      accessorKey: "status",
+
+      enableSorting: false, // 🔥 IMPORTANT
+      enableColumnFilter: true,
+      filterFn: "equalsString",
+
+      meta: {
+        filterType: "select",
+        filterOptions: ["open", "proses", "fwd teknis", "done"],
+      },
+
+      header: ({ column }) => (
+        <div className="flex items-center gap-1">
+          <span>Status</span>
+          <ColumnFilter column={column} />
+        </div>
+      ),
+
+      cell: ({ row }) => (
+        <StatusBadge status={row.getValue("status")} />
+      ),
     },
 
     // Custom Icon + Text for Assignee
@@ -125,7 +143,7 @@ const LogTicketPage = () => {
         const t = row.original as Ticket; // Cast to Ticket type
         return (
           <div className="flex items-center justify-end gap-2">
-            
+
             {/* Action: Process */}
             {t.status === 'open' && (
               <Button
@@ -151,7 +169,7 @@ const LogTicketPage = () => {
             )}
 
             {/* Action: Close */}
-            {(t.status === 'open' || t.status === 'proses') && (
+            {(t.status === 'proses') && (
               <Button
                 size="sm"
                 variant="ghost"
@@ -176,7 +194,7 @@ const LogTicketPage = () => {
 
   return (
     <div className="animate-in fade-in duration-500 px-8 py-8 space-y-4">
-      
+
       {/* --- Modals --- */}
       {processTicket && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
@@ -190,7 +208,7 @@ const LogTicketPage = () => {
           </div>
         </div>
       )}
-      
+
       {closeTicket && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
@@ -203,7 +221,7 @@ const LogTicketPage = () => {
           </div>
         </div>
       )}
-      
+
       {forwardTicket && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
@@ -219,20 +237,20 @@ const LogTicketPage = () => {
 
       {/* --- Header / Toolbar --- */}
       <div className="flex justify-between items-center mb-6">
-         <h1 className="text-2xl font-bold tracking-tight">Log Komplain</h1>
-         
-         <div className="flex gap-2">
-            <Button variant="ghost" onClick={() => refetch()} disabled={isFetching} className="bg-background">
-              <RefreshCw className={`mr-2 h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
-              {isFetching ? 'Loading...' : 'Refresh'}
-            </Button>
-            <Button variant="outline" className="bg-background">
-              <Filter className="mr-2 h-4 w-4" /> Filter
-            </Button>
-            <Button onClick={toggleCreateTicketModal} className="ml-2">
-              <Plus className="mr-2 h-4 w-4" /> Open Ticket
-            </Button>
-         </div>
+        <h1 className="text-2xl font-bold tracking-tight">Log Komplain</h1>
+
+        <div className="flex gap-2">
+          <Button variant="ghost" onClick={() => refetch()} disabled={isFetching} className="bg-background">
+            <RefreshCw className={`mr-2 h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
+            {isFetching ? 'Loading...' : 'Refresh'}
+          </Button>
+          <Button variant="outline" className="bg-background">
+            <Filter className="mr-2 h-4 w-4" /> Filter
+          </Button>
+          <Button onClick={toggleCreateTicketModal} className="ml-2">
+            <Plus className="mr-2 h-4 w-4" /> Open Ticket
+          </Button>
+        </div>
       </div>
 
       <AutoTanStackTable<Ticket>

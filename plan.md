@@ -1,0 +1,5 @@
+- Create Payload on Ticket and Config
+- Create Api for Ticket and Config
+- Create Form on Ticket and Config
+- Create Modal on Ticket and Config
+- Implement it into pages
