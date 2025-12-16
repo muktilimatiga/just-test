@@ -9,7 +9,7 @@ import {
 
 // 1. Add 'disabled' to the shared props
 export type FormControlProps = {
-    label: string
+    label?: string
     description?: string
     disabled?: boolean
 }

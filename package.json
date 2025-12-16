@@ -9,7 +9,8 @@
     "test": "vitest run",
     "lint": "eslint",
     "format": "prettier",
-    "check": "prettier --write . && eslint --fix"
+    "check": "prettier --write . && eslint --fix",
+    "generated-api": "orval"
   },
   "dependencies": {
     "@faker-js/faker": "^10.0.0",
@@ -61,10 +62,14 @@
     "@vitejs/plugin-react": "^5.0.4",
     "jiti": "^2.6.1",
     "jsdom": "^27.0.0",
+    "orval": "^7.17.0",
     "prettier": "^3.5.3",
     "typescript": "^5.7.2",
     "vite": "^7.1.7",
     "vitest": "^3.0.5",
     "web-vitals": "^5.1.0"
+  },
+  "overrides": {
+    "ajv": "^8.17.1"
   }
 }

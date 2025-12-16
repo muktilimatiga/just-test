@@ -36,7 +36,7 @@ export const useActivityLogger = () => {
             return data;
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['activity_logs'] });
+            queryClient.invalidateQueries({ queryKey: ['log_activity'] });
         },
         onError: (error) => {
             console.error("Failed to save activity log", error);
