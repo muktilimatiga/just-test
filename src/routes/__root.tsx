@@ -2,7 +2,7 @@ import { createRootRouteWithContext } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 import { Outlet } from '@tanstack/react-router'
-import { CreateTicketModal } from '../components/modal/TicketModal'
+import { TicketModal } from '../components/modal/TicketModal'
 
 import { AppLayout } from '../components/Layout'
 
@@ -33,7 +33,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         ]}
       />
       <Outlet />
-      <CreateTicketModal />
+      <TicketModal isOpen={false} onClose={() => { }} mode="create" />
     </>
   ),
   notFoundComponent: ErrorPage,

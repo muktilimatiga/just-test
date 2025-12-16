@@ -14,12 +14,12 @@ export const useActivityLogger = () => {
     const { user } = useAppStore();
     const queryClient = useQueryClient();
 
-    return useMutation({
+    const mutation = useMutation({
         mutationFn: async (entry: LogEntry) => {
             const payload = {
                 ...entry,
-                user_id: user?.id || 'anonymous',
-                user_name: user?.name || 'System',
+                user_id: user?.id ?? 'anonymous',
+                user_name: user?.name ?? 'System',
                 timestamp: new Date().toISOString(),
             };
 
@@ -29,17 +29,17 @@ export const useActivityLogger = () => {
                 .select()
                 .single();
 
-            if (error) {
-                throw error;
-            }
-
+            if (error) throw error;
             return data;
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['log_activity'] });
         },
-        onError: (error) => {
-            console.error("Failed to save activity log", error);
-        }
     });
+
+    return {
+        logActivity: mutation.mutate,
+        logActivityAsync: mutation.mutateAsync,
+        ...mutation,
+    };
 };

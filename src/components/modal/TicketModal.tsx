@@ -1,185 +1,180 @@
 import { useEffect } from 'react';
-import { Search } from 'lucide-react';
-import { Label, Input, Button, Avatar, AvatarFallback } from '@/components/ui'
-import { Badge } from '@/components/ui/badge'
-import { ModalOverlay } from '@/components/ModalOverlay'
+import { Loader2, Search } from 'lucide-react';
+import { Button, Input, Label, Avatar, AvatarFallback } from '@/components/ui';
+import { ModalOverlay } from '@/components/ModalOverlay';
 import { useTicketStore } from '@/store/ticketStore';
-import { useFiberStore, type FiberCustomer } from '@/store/useFiberStore'
+import { useFiberStore } from '@/store/useFiberStore';
 import { CustomerCard } from '../customerCard';
-import { CreateTicketFormFields } from '../form/TicketFromField';
-import { useAppForm, FormProvider } from '../form/hooks';
-import { useAppStore } from '@/store';
+import { useAppForm, FormProvider } from '@/components/form/hooks';
 import { toast } from 'sonner';
+import { useActionSuccess, useActionError } from '@/hooks/useActionLog';
 
-// Create Ticket, Search Customoer -> Create Ticket
-export const CreateTicketModal = () => {
+// Import the Strategy Hook we just created
+import { useTicketFormStrategy, type TicketMode } from '@/store/useTicketForm';
 
+interface TicketModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    mode: TicketMode;
+    ticketData?: any;
+}
+
+export const TicketModal = ({ isOpen, onClose, mode, ticketData }: TicketModalProps) => {
+
+    // 1. Get Store Data (Your Database)
     const {
-        isCreateTicketModalOpen,
-        setCreateTicketModalOpen,
-    } = useAppStore();
-
-    // Ticket Store for Wizard State
-    const {
-        step,
-        setStep,
-        selectUser,
-        selectedUser,
-        formData,
-        updateFormData,
-        reset: resetTicketStore
+        step, setStep, selectUser, selectedUser,
+        formData, initializeFromTicket, reset: resetStore
     } = useTicketStore();
 
-    // Fiber Store for Search State
     const {
-        searchTerm,
-        setSearchTerm,
-        searchResults,
-        isSearching,
-        searchCustomers,
-        resetSearch
+        searchTerm, setSearchTerm, searchResults, isSearching, searchCustomers, resetSearch
     } = useFiberStore();
 
-    // Initialize Form
+    // 2. PARSE STRATEGY (This loads the specific Form + API for the current mode)
+    const { title, FormFields, schema, mutation, submitLabel, variant } = useTicketFormStrategy(mode);
+    const onSuccessAction = useActionSuccess();
+    const onErrorAction = useActionError();
+
+    // 3. Setup Form Engine
     const form = useAppForm({
-        defaultValues: formData,
+        defaultValues: {
+            name: '',
+            address: '',
+            description: '',
+            priority: 'Low',
+            olt_name: '',
+            user_pppoe: '',
+            onu_sn: '',
+            interface: '',
+            ticketRef: '',
+            type: 'FREE',
+            action_ticket: '',
+            action_close: '',
+            last_action: '',
+            service_impact: '',
+            root_cause: '',
+            network_impact: '',
+            person_in_charge: '',
+            recomended_action: '',
+            pic: ''
+        },
+    
+        validators: { onChange: schema },
         onSubmit: async ({ value }) => {
-            updateFormData(value);
-            toast.success("Ticket Created");
-            handleClose();
+            mutation.mutate(
+                { data: value as any },
+                {
+                    onSuccess: () => {
+                        onSuccessAction(value, {
+                            title,
+                            action: "create",
+                            target: "ticket",
+                            onDone: handleClose,
+                        });
+                    },
+                    onError: (err) => {
+                        onErrorAction(err, "create", "ticket");
+                    }
+                }
+
+            );
         }
     });
 
+    // 4. Lifecycle & Init
     useEffect(() => {
-        if (isCreateTicketModalOpen) {
-            resetTicketStore();
+        if (isOpen) {
+            resetStore();
             resetSearch();
-            form.reset(); // Reset form when modal opens
-        }
-    }, [isCreateTicketModalOpen]);
+            form.reset();
 
-    // Sync form with store data when step changes to 2 (Customer Selected)
+            if (mode === 'create') {
+                setStep(1);
+            } else if (ticketData) {
+                // If Open/Forward/Close, pre-fill store
+                initializeFromTicket(ticketData);
+            }
+        }
+    }, [isOpen, mode, ticketData]);
+
+    // Keep form synced with store
     useEffect(() => {
-        if (step === 2 && formData) {
-            form.reset(formData);
-        }
-    }, [step, formData, form]);
+        if (step === 2 && formData) form.reset(formData);
+    }, [step, formData]);
 
-    // Debounced Search
+    // Search Debounce (Create Mode Only)
     useEffect(() => {
         const timer = setTimeout(() => {
-            if (isCreateTicketModalOpen && step === 1) {
-                searchCustomers(searchTerm);
-            }
+            if (isOpen && mode === 'create' && step === 1) searchCustomers(searchTerm);
         }, 400);
         return () => clearTimeout(timer);
-    }, [searchTerm, isCreateTicketModalOpen, step]);
+    }, [searchTerm, isOpen, step, mode]);
 
     const handleClose = () => {
-        setCreateTicketModalOpen(false);
-        setTimeout(() => {
-            resetTicketStore();
-            resetSearch();
-        }, 200);
+        onClose();
+        setTimeout(() => { resetStore(); resetSearch(); }, 200);
     };
 
-    const handleSelectCustomer = (fiberCustomer: FiberCustomer) => {
-        // Map fiber customer to User type expected by ticketStore
-        // Note: casting to any because TicketStore expects Customer type but implementation handles this specific object shape
-        const user = {
-            id: fiberCustomer.id,
-            name: fiberCustomer.name,
-            email: fiberCustomer.user_pppoe,
-            role: 'user' as const,
-            // Store extra fields for form population
-            _address: fiberCustomer.alamat,
-            _pppoe: fiberCustomer.user_pppoe,
-            _sn: fiberCustomer.onu_sn
-        };
-        selectUser(user as any);
+    const handleSelectCustomer = (c: any) => {
+        selectUser({
+            id: c.id, name: c.name, email: c.user_pppoe, role: 'user',
+            _address: c._address, _pppoe: c._pppoe, _sn: c._sn, _olt: c._olt
+        } as any);
     };
 
     return (
-        <ModalOverlay isOpen={isCreateTicketModalOpen} onClose={handleClose} className="max-w-2xl max-h-[85vh] flex flex-col p-0 overflow-hidden">
+        <ModalOverlay isOpen={isOpen} onClose={handleClose} className="max-w-2xl max-h-[60vh] max-w-[60vh] flex flex-col p-0 overflow-hidden">
+            <div className="px-6 py-4 border-b bg-card/50">
+                <h2 className="text-lg font-semibold">{title}</h2>
+            </div>
+
             <div className="flex-1 overflow-y-auto">
-
-                {step === 1 && (
-                    <div className="p-6">
-                        <h2 className="text-lg font-semibold text-foreground mb-4">Create Open Ticket</h2>
-                        <div className="flex items-center gap-2 mb-4">
-                            <div className="h-2 rounded-full flex-1 bg-primary" />
-                            <div className="h-2 rounded-full flex-1 bg-muted" />
+                {/* Search Step (Create Only) */}
+                {step === 1 && mode === 'create' && (
+                    <div className="p-6 space-y-4">
+                        <div className="space-y-2">
+                            <Label>Find Customer</Label>
+                            <div className="relative">
+                                <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                <Input value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-9" placeholder="Search..." autoFocus />
+                            </div>
                         </div>
-
-                        <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
-                            <div className="space-y-2">
-                                <Label htmlFor="customer-search">Find Customer</Label>
-                                <div className="relative">
-                                    <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                                    <Input
-                                        id="customer-search"
-                                        placeholder="Search by name, PPPoE or address..."
-                                        className="pl-9"
-                                        value={searchTerm}
-                                        onChange={(e) => setSearchTerm(e.target.value)}
-                                        autoFocus
-                                    />
+                        <div className="space-y-1">
+                            {isSearching && <div className="text-xs text-center p-4">Searching...</div>}
+                            {searchResults.map((c) => (
+                                <div key={c.id} onClick={() => handleSelectCustomer(c)} className="p-2 hover:bg-muted rounded cursor-pointer flex gap-3 items-center">
+                                    <Avatar className="h-8 w-8 text-xs"><AvatarFallback>{c.name?.[0]}</AvatarFallback></Avatar>
+                                    <div><p className="text-sm font-medium">{c.name}</p><p className="text-xs text-muted-foreground">{c.user_pppoe}</p></div>
                                 </div>
-                            </div>
-                            <div className="min-h-[200px] border border-border rounded-md p-2">
-                                {isSearching && (
-                                    <div className="text-center py-8 text-xs text-muted-foreground">Searching...</div>
-                                )}
-                                {!isSearching && searchResults.length === 0 && searchTerm.length > 1 && (
-                                    <p className="text-xs text-muted-foreground text-center py-8">No customers found.</p>
-                                )}
-                                {!isSearching && searchResults.length === 0 && searchTerm.length <= 1 && (
-                                    <p className="text-xs text-muted-foreground text-center py-8">Start typing to search...</p>
-                                )}
-                                <div className="space-y-1">
-                                    {searchResults.map((customer: FiberCustomer) => (
-                                        <div
-                                            key={customer.id}
-                                            onClick={() => handleSelectCustomer(customer)}
-                                            className="flex items-center gap-3 p-2 hover:bg-muted/50 rounded cursor-pointer transition-colors"
-                                        >
-                                            <Avatar className="h-8 w-8 text-xs">
-                                                <AvatarFallback>{customer.name.charAt(0)}</AvatarFallback>
-                                            </Avatar>
-                                            <div className="overflow-hidden">
-                                                <p className="text-sm font-medium text-foreground truncate">{customer.name}</p>
-                                                <p className="text-xs text-muted-foreground truncate">{customer.user_pppoe} {customer.alamat ? `• ${customer.alamat}` : ''}</p>
-                                            </div>
-                                            <Badge variant="outline" className="ml-auto text-[10px] whitespace-nowrap bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-900/50">Fiber</Badge>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                            <div className="flex justify-end pt-2">
-                                <Button variant="outline" onClick={handleClose}>Cancel</Button>
-                            </div>
+                            ))}
                         </div>
                     </div>
                 )}
 
-                {step === 2 && selectedUser && (
+                {/* Unified Form Step */}
+                {step === 2 && (
                     <div className="animate-in fade-in slide-in-from-right-4 duration-300">
-                        <CustomerCard user={selectedUser} onChangeUser={() => setStep(1)} />
+                        {selectedUser && <CustomerCard user={selectedUser} onChangeUser={mode === 'create' ? () => setStep(1) : undefined} />}
                         <FormProvider value={form}>
-                            <CreateTicketFormFields />
+                            {/* Renders OpenFields, CloseFields, etc. dynamically */}
+                            <FormFields />
                         </FormProvider>
                     </div>
                 )}
             </div>
 
-            {step === 2 && selectedUser && (
-                <div className="flex justify-end gap-2 p-6 pt-4 border-t border-border bg-background sticky bottom-0 z-10 shadow-lg">
-                    <Button variant="outline" onClick={handleClose}>Cancel</Button>
-                    <Button onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        form.handleSubmit();
-                    }} className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-md">Create Ticket</Button>
+            {/* Footer */}
+            {step === 2 && (
+                <div className="flex justify-end gap-2 p-6 pt-4 border-t sticky bottom-0 bg-background shadow-lg">
+                    <Button variant="outline" onClick={handleClose} disabled={mutation.isPending}>Cancel</Button>
+                    <Button
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); form.handleSubmit(); }}
+                        disabled={mutation.isPending}
+                        variant={variant}
+                    >
+                        {mutation.isPending ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Processing...</> : submitLabel}
+                    </Button>
                 </div>
             )}
         </ModalOverlay>

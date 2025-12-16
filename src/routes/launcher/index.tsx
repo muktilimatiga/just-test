@@ -7,7 +7,7 @@ import { Ticket, Layers } from 'lucide-react'
 import { X } from 'lucide-react'
 import { Network } from 'lucide-react'
 import { ConfigModal } from '@/components/modal/configModal'
-import { CreateTicketModal } from '@/components/modal/TicketModal'
+import { TicketModal } from '@/components/modal/TicketModal'
 import { ModalOverlay } from '@/components/ModalOverlay'
 import { useAppStore } from '@/store'
 import { APPS_CONFIG } from './apps'
@@ -37,7 +37,7 @@ export function Launcher() {
       <ConfigModal isOpen={modalType === 'config'} onClose={() => setModalType('none')} type="basic" />
       <ConfigModal isOpen={modalType === 'config_bridge'} onClose={() => setModalType('none')} type="bridge" />
       <ConfigModal isOpen={modalType === 'config_batch'} onClose={() => setModalType('none')} type="batch" />
-      <CreateTicketModal isOpen={isCreateTicketModalOpen} onClose={() => setCreateTicketModalOpen(false)} />
+      <TicketModal isOpen={isCreateTicketModalOpen} onClose={() => setCreateTicketModalOpen(false)} mode="create" />
 
       {/* Add New Item Menu Modal - Restored Size */}
       <ModalOverlay

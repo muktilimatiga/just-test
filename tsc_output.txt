@@ -1,0 +1,28 @@
+orval.config.ts(1,30): error TS2307: Cannot find module 'orval' or its corresponding type declarations.
+src/components/Layout.tsx(294,106): error TS6133: 'logout' is declared but its value is never read.
+src/components/Layout.tsx(304,22): error TS2345: Argument of type '{ id: string; name: any; email: any; role: any; avatarUrl: any; }[]' is not assignable to parameter of type 'SetStateAction<{ id: string; name: string; email: string; role: "admin" | "noc" | "manager"; password: string; avatarUrl?: string | undefined; coordinates?: { lat: number; lng: number; } | undefined; }[]>'.
+  Type '{ id: string; name: any; email: any; role: any; avatarUrl: any; }[]' is not assignable to type '{ id: string; name: string; email: string; role: "admin" | "noc" | "manager"; password: string; avatarUrl?: string | undefined; coordinates?: { lat: number; lng: number; } | undefined; }[]'.
+    Property 'password' is missing in type '{ id: string; name: any; email: any; role: any; avatarUrl: any; }' but required in type '{ id: string; name: string; email: string; role: "admin" | "noc" | "manager"; password: string; avatarUrl?: string | undefined; coordinates?: { lat: number; lng: number; } | undefined; }'.
+src/components/Layout.tsx(433,18): error TS6133: 'isCreateTicketModalOpen' is declared but its value is never read.
+src/components/Layout.tsx(433,43): error TS6133: 'setCreateTicketModalOpen' is declared but its value is never read.
+src/components/modal/configModal.tsx(55,5): error TS6133: 'isLoadingOptions' is declared but its value is never read.
+src/components/modal/invoicesModal.tsx(93,15): error TS6133: 'customerName' is declared but its value is never read.
+src/components/modal/invoicesModal.tsx(94,15): error TS6133: 'formattedAmount' is declared but its value is never read.
+src/components/modal/TicketModal.tsx(118,137): error TS2339: Property 'email' does not exist on type 'FiberCustomer'.
+src/components/NotificationDropdown.tsx(1,16): error TS6133: 'Check' is declared but its value is never read.
+src/hooks/supabase/useQuerries.ts(4,15): error TS6196: 'Ticket' is declared but never used.
+src/hooks/supabase/useQuerries.ts(4,23): error TS6196: 'User' is declared but never used.
+src/hooks/supabase/useQuerries.ts(4,29): error TS6196: 'TicketLog' is declared but never used.
+src/hooks/supabase/useQuerries.ts(4,40): error TS6196: 'DashboardStats' is declared but never used.
+src/hooks/supabase/useQuerries.ts(4,56): error TS6196: 'TrafficData' is declared but never used.
+src/hooks/supabase/useQuerries.ts(4,69): error TS6196: 'Device' is declared but never used.
+src/hooks/supabase/useQuerries.ts(87,20): error TS6133: 'variables' is declared but its value is never read.
+src/lib/supabaseClient.ts(3,50): error TS6196: 'DashboardStats' is declared but never used.
+src/lib/supabaseClient.ts(3,66): error TS6196: 'TrafficData' is declared but never used.
+src/routes/__root.tsx(5,10): error TS2305: Module '"../components/modal/TicketModal"' has no exported member 'CreateTicketModal'.
+src/routes/launcher/index.tsx(10,10): error TS2305: Module '"@/components/modal/TicketModal"' has no exported member 'CreateTicketModal'.
+src/routes/log-komplain/index.tsx(60,31): error TS6133: 'isLoading' is declared but its value is never read.
+src/routes/log-komplain/index.tsx(60,63): error TS6133: 'error' is declared but its value is never read.
+src/routes/log-komplain/index.tsx(76,74): error TS6133: 'note' is declared but its value is never read.
+src/routes/log-komplain/index.tsx(82,43): error TS6133: 'note' is declared but its value is never read.
+src/store/ticketStore.ts(2,25): error TS6196: 'Ticket' is declared but never used.

@@ -132,7 +132,20 @@ code {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer components {
+  .form-content {
+    @apply p-6 space-y-6;
+  }
+  .form-content-grid-2 {
+    @apply grid grid-cols-2 gap-4;
+  }
+  .form-content-grid-3 {
+    @apply grid grid-cols-3 gap-4;
   }
 }

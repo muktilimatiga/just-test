@@ -7,6 +7,7 @@ export const DefaultFormSchema = z.object({
     name: z.string(),
     address: z.string(),
     description: z.string(),
+    PIC: z.string(),
 })
 
 export const TicketFormSchema = DefaultFormSchema.extend({
@@ -15,7 +16,7 @@ export const TicketFormSchema = DefaultFormSchema.extend({
 })
 
 export const CreateTicketFormSchema = DefaultFormSchema.extend({
-    olt_name:z.string(),
+    olt_name: z.string(),
     user_pppoe: z.string(),
     ticketRef: z.string(),
     priority: z.enum(['Low', 'Medium', 'High', 'Critical']),
@@ -28,6 +29,8 @@ export const OpenTicketFormSchema = TicketFormSchema.omit({
     olt_name: z.string(),
     action_ticket: z.string(),
 })
+
+
 
 export const ForwardTicketFormSchema = TicketFormSchema.extend({
     last_action: z.string(),
@@ -43,6 +46,7 @@ export const CloseTicketFormSchema = TicketFormSchema.pick({
     name: true,
     address: true,
     onu_sn: true,
+    PIC: true,
 }).extend({
     action_close: z.string(),
 })
@@ -54,28 +58,18 @@ export type ForwardFormTicketData = z.infer<typeof ForwardTicketFormSchema>;
 export type CloseFormTicketData = z.infer<typeof CloseTicketFormSchema>;
 
 
-export function DefaultFormFields() {
-    return (
-        <div className="space-y-4">
-            <FieldWrapper name="name" label="Full Name" component="Input" />
-            <FieldWrapper name="address" label="Address" component="Input" />
-            <FieldWrapper name="description" label="Description" component="Textarea" />
-        </div>
-    );
-}
-
 export function CreateTicketFormFields() {
     return (
-        <div className="p-6 space-y-5">
+        <div className="form-content">
             <FieldWrapper name="name" label="Customer Name" component="Input" />
             <FieldWrapper name="address" label="Customer Address" component="Input" />
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="form-content-grid-2">
                 <FieldWrapper name="olt_name" label="OLT Name" component="Input" />
                 <FieldWrapper name="user_pppoe" label="User PPPOE" component="Input" />
             </div>
 
-            <div className="grid grid-cols-3 gap-4">
+            <div className="form-content-grid-3">
                 <FieldWrapper name="ticketRef" label="Reference" component="Input" readOnly />
 
                 <FieldWrapper name="priority" label="Priority" component="Select">
@@ -99,17 +93,20 @@ export function CreateTicketFormFields() {
                 component="Textarea"
                 rows={4}
             />
+            <FieldWrapper name="PIC" label="PIC" component="Input" readOnly />
         </div>
     );
 }
 
 export function OpenTicketFormFields() {
     return (
-        <div className="space-y-4">
+        <div className="form-content">
             <FieldWrapper name="name" label="Full Name" component="Input" />
             <FieldWrapper name="address" label="Address" component="Input" />
-            <FieldWrapper name="olt_name" label="OLT Name" component="Input" />
-            <FieldWrapper name="interface" label="Interface" component="Input" />
+            <div className="form-content-grid-2">
+                <FieldWrapper name="olt_name" label="OLT Name" component="Input" />
+                <FieldWrapper name="interface" label="Interface" component="Input" />
+            </div>
             <FieldWrapper name="action_ticket" label="Action Ticket" component="Input" />
             <FieldWrapper name="description" label="Description" component="Textarea" />
         </div>
@@ -118,10 +115,10 @@ export function OpenTicketFormFields() {
 
 export function ForwardTicketFormFields() {
     return (
-        <div className="space-y-4">
-            <FieldWrapper name="name" label="Full Name" component="Input" />
-            <FieldWrapper name="address" label="Address" component="Input" />
-            <div className="grid grid-cols-2 gap-4">
+        <div className="form-content">
+            <FieldWrapper name="name" label="Customer Name" component="Input" />
+            <FieldWrapper name="address" label="Alamat" component="Input" />
+            <div className="form-content-grid-2">
                 <FieldWrapper name="interface" label="Interface" component="Input" />
                 <FieldWrapper name="onu_sn" label="ONU SN" component="Input" />
             </div>
@@ -149,11 +146,16 @@ export function ForwardTicketFormFields() {
 
 export function CloseTicketFormFields() {
     return (
-        <div className="space-y-4">
+        <div className="form-content">
             <FieldWrapper name="name" label="Full Name" component="Input" readOnly />
             <FieldWrapper name="address" label="Address" component="Input" readOnly />
-            <FieldWrapper name="onu_sn" label="ONU SN" component="Input" readOnly />
+            <div className="form-content-grid-2">
+                <FieldWrapper name="olt_name" label="OLT Name" component="Input" readOnly />
+                <FieldWrapper name="onu_sn" label="ONU SN" component="Input" readOnly />
+            </div>
             <FieldWrapper name="action_close" label="Closing Action" component="Textarea" />
+            <FieldWrapper name="PIC" label="PIC" component="Input" readOnly />
         </div>
+
     );
 }
