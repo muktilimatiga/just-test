@@ -26,6 +26,7 @@ type FieldWrapperProps = {
   className?: string;
   readOnly?: boolean;
   rows?: number;
+  items?: { value: string; label: string }[];
 };
 
 export function FieldWrapper({
@@ -37,7 +38,7 @@ export function FieldWrapper({
   placeholder,
   ...props
 }: FieldWrapperProps) {
-  const form = useFormContext() as any; 
+  const form = useFormContext() as any;
 
   return (
     <Field name={name} validators={validators} form={form}>

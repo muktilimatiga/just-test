@@ -1,7 +1,7 @@
 
 import { FormBase, type FormControlProps } from "./FormBase"
 import type { ReactNode } from "react"
-import { Select, SelectContent, SelectTrigger, SelectValue } from "../ui/select"
+import { Select, SelectContent, SelectTrigger, SelectValue, SelectItem } from "../ui/select"
 
 export function FormSelect({
     children,
@@ -43,7 +43,14 @@ export function FormSelect({
                 >
                     <SelectValue />
                 </SelectTrigger>
-                <SelectContent>{children}</SelectContent>
+                <SelectContent>
+                    {children}
+                    {items?.map(item => (
+                        <SelectItem key={item.value} value={item.value}>
+                            {item.label}
+                        </SelectItem>
+                    ))}
+                </SelectContent>
             </Select>
         </FormBase>
     )

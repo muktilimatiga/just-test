@@ -14,7 +14,7 @@ export const useSupabaseTickets = () => {
         .select("*")
         .order("id", { ascending: false })
         .limit(100);
-      
+
       if (error) {
         toast.error("Failed to fetch tickets");
         return [];
@@ -26,10 +26,10 @@ export const useSupabaseTickets = () => {
         status: mapDbStatusToUi(row.status),
         nama: row.nama || null,
         PIC: row.pic || null,
-        createdAt: row.tanggal 
-          ? new Date(row.tanggal).toISOString() 
-          : row.created_at 
-            ? new Date(row.created_at).toISOString() 
+        createdAt: row.tanggal
+          ? new Date(row.tanggal).toISOString()
+          : row.created_at
+            ? new Date(row.created_at).toISOString()
             : new Date().toISOString(),
       }));
     },
@@ -40,11 +40,11 @@ export const useSupabaseTickets = () => {
 
 // Helper to map DB statuses to UI expected values
 const mapDbStatusToUi = (status: string): Ticket['status'] => {
-    const s = (status || '').toLowerCase().trim();
-    if (s === 'open') return 'open';
-    if (s === 'proses') return 'proses';
-    if (s === 'fwd teknis') return 'fwd teknis'; // Map custom status
-    if (s === 'done') return 'done';
-    if (s === 'done/fwd') return 'closed';
-    return 'open'; // Default fallback
+  const s = (status || '').toLowerCase().trim();
+  if (s === 'open') return 'open';
+  if (s === 'proses') return 'proses';
+  if (s === 'fwd teknis') return 'fwd teknis'; // Map custom status
+  if (s === 'done') return 'done';
+  if (s === 'done/fwd') return 'closed';
+  return 'open'; // Default fallback
 };

@@ -72,19 +72,27 @@ export function CreateTicketFormFields() {
             <div className="form-content-grid-3">
                 <FieldWrapper name="ticketRef" label="Reference" component="Input" readOnly />
 
-                <FieldWrapper name="priority" label="Priority" component="Select">
-                    <option value="">Select...</option>
-                    <option value="Low">Low</option>
-                    <option value="Medium">Medium</option>
-                    <option value="High">High</option>
-                    <option value="Critical">Critical</option>
-                </FieldWrapper>
+                <FieldWrapper
+                    name="priority"
+                    label="Priority"
+                    component="Select"
+                    items={[
+                        { value: 'Low', label: 'Low' },
+                        { value: 'Medium', label: 'Medium' },
+                        { value: 'High', label: 'High' },
+                        { value: 'Critical', label: 'Critical' },
+                    ]}
+                />
 
-                <FieldWrapper name="type" label="Type" component="Select">
-                    <option value="">Select...</option>
-                    <option value="FREE">Free</option>
-                    <option value="CHARGED">Charged</option>
-                </FieldWrapper>
+                <FieldWrapper
+                    name="type"
+                    label="Type"
+                    component="Select"
+                    items={[
+                        { value: 'FREE', label: 'Free' },
+                        { value: 'CHARGED', label: 'Charged' },
+                    ]}
+                />
             </div>
 
             <FieldWrapper
@@ -119,27 +127,33 @@ export function ForwardTicketFormFields() {
             <FieldWrapper name="name" label="Customer Name" component="Input" />
             <FieldWrapper name="address" label="Alamat" component="Input" />
             <div className="form-content-grid-2">
+                <FieldWrapper name="description" label="Description" component="Input" readOnly />
+                <FieldWrapper name="last_action" label="Last Action" component="Input" readOnly />
+            </div>
+            <FieldWrapper name="service_impact" label="Service Impact" component="Input" />
+            <div className="form-content-grid-2">
+                <FieldWrapper name="root_cause" label="Root Cause" component="Input" />
+                <FieldWrapper name="network_impact" label="Network Impact" component="Input" />
+            </div>
+            <div className="form-content-grid-2">
                 <FieldWrapper name="interface" label="Interface" component="Input" />
                 <FieldWrapper name="onu_sn" label="ONU SN" component="Input" />
             </div>
-
-            <FieldWrapper name="priority" label="Priority" component="Select">
-                <option value="">Select...</option>
-                <option value="Low">Low</option>
-                <option value="Medium">Medium</option>
-                <option value="High">High</option>
-                <option value="Critical">Critical</option>
-            </FieldWrapper>
-
-            <FieldWrapper name="person_in_charge" label="Person In Charge" component="Input" />
-
-            <FieldWrapper name="last_action" label="Last Action" component="Input" />
-            <FieldWrapper name="service_impact" label="Service Impact" component="Input" />
-            <FieldWrapper name="root_cause" label="Root Cause" component="Input" />
-            <FieldWrapper name="network_impact" label="Network Impact" component="Input" />
+            <div className="form-content-grid-2">
+                <FieldWrapper
+                    name="priority"
+                    label="Priority"
+                    component="Select"
+                    items={[
+                        { value: 'Low', label: 'Low' },
+                        { value: 'Medium', label: 'Medium' },
+                        { value: 'High', label: 'High' },
+                        { value: 'Critical', label: 'Critical' },
+                    ]}
+                />
+                <FieldWrapper name="person_in_charge" label="Person In Charge" component="Input" readOnly />
+            </div>
             <FieldWrapper name="recomended_action" label="Recommended Action" component="Textarea" />
-
-            <FieldWrapper name="description" label="Description" component="Textarea" />
         </div>
     );
 }

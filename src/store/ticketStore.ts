@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import type { Customer, Ticket } from '@/types'; // Adjust imports to your project
 import { supabase } from '@/lib/supabaseClient';
+import { useAppStore } from '@/store'; // Import the main store
 
 export type TicketMode = 'create' | 'open' | 'forward' | 'close';
 // 1. Unified Form Data Interface
@@ -33,7 +34,7 @@ export interface TicketFormData {
     network_impact: string;
     person_in_charge: string;
     recomended_action: string;
-    pic: string;
+    PIC: string;
 }
 
 // 2. Default Values (Clean Slate)
@@ -60,7 +61,7 @@ const INITIAL_FORM_DATA: TicketFormData = {
     network_impact: '',
     person_in_charge: '',
     recomended_action: '',
-    pic: ''
+    PIC: ''
 };
 
 interface TicketStore {
@@ -78,6 +79,7 @@ interface TicketStore {
     setStep: (step: number) => void;
     setSearchQuery: (query: string) => void;
     searchCustomers: (query: string) => Promise<void>;
+    fetchCustomerByName: (name: string) => Promise<void>; // <--- NEW ACTION
     selectUser: (user: Customer) => void;
     updateFormData: (updates: Partial<TicketFormData>) => void;
 
@@ -87,7 +89,7 @@ interface TicketStore {
     reset: () => void;
 }
 
-export const useTicketStore = create<TicketStore>((set) => ({
+export const useTicketStore = create<TicketStore>((set) => ({ // Removed 'get' as it was unused
     // Initial State
     step: 1,
     selectedUser: null,
@@ -137,6 +139,41 @@ export const useTicketStore = create<TicketStore>((set) => ({
         }
     },
 
+    // --- 1.5 Fetch Customer By Name (For initializing existing tickets) ---
+    fetchCustomerByName: async (name: string) => {
+        if (!name) return;
+
+        try {
+            const { data, error } = await supabase
+                .from('data_fiber')
+                .select('*')
+                .ilike('name', name) // Exact name match (case insensitive)
+                .limit(1)
+                .single();
+
+            if (error || !data) {
+                console.log("No fiber data found for:", name);
+                return;
+            }
+
+            // Update form data with found details
+            set((state) => ({
+                formData: {
+                    ...state.formData,
+                    name: data.name || state.formData.name,
+                    address: data.alamat || state.formData.address,
+                    user_pppoe: data.user_pppoe || state.formData.user_pppoe,
+                    onu_sn: data.onu_sn || state.formData.onu_sn,
+                    olt_name: data.olt_name || state.formData.olt_name,
+                    interface: data.interface || state.formData.interface
+                }
+            }));
+
+        } catch (err) {
+            console.error("Failed to enrich ticket data:", err);
+        }
+    },
+
     // --- 2. Select User Logic (For Create Mode) ---
     selectUser: (customer: any) => {
         // Auto-generate a Reference ID for the UI
@@ -156,7 +193,8 @@ export const useTicketStore = create<TicketStore>((set) => ({
 
                 ticketRef: randomRef,
                 priority: 'Low',
-                type: 'CHARGED'
+                type: 'FREE',
+                PIC: useAppStore.getState().user?.name || ''
             }
         });
     },
@@ -176,7 +214,8 @@ export const useTicketStore = create<TicketStore>((set) => ({
                 ticketRef: ticket.ticketRef || ticket.id,
                 name: ticket.name || '',
                 address: ticket.address || '',
-                description: ticket.description || '',
+                description: ticket.kendala || '',
+                last_action: ticket.last_action || 'cek',
 
                 olt_name: ticket.olt_name || '',
                 user_pppoe: ticket.user_pppoe || '',
@@ -185,6 +224,8 @@ export const useTicketStore = create<TicketStore>((set) => ({
 
                 priority: ticket.priority || 'Low',
                 type: ticket.type || 'FREE',
+                person_in_charge: ticket.person_in_charge || 'ALL TECHNICIAN',
+                PIC: useAppStore.getState().user?.name || ticket.PIC || '',
 
                 // Ensure action fields are clean
                 action_close: '',

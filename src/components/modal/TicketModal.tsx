@@ -57,9 +57,9 @@ export const TicketModal = ({ isOpen, onClose, mode, ticketData }: TicketModalPr
             network_impact: '',
             person_in_charge: '',
             recomended_action: '',
-            pic: ''
+            PIC: ''
         },
-    
+
         validators: { onChange: schema },
         onSubmit: async ({ value }) => {
             mutation.mutate(
@@ -94,6 +94,10 @@ export const TicketModal = ({ isOpen, onClose, mode, ticketData }: TicketModalPr
             } else if (ticketData) {
                 // If Open/Forward/Close, pre-fill store
                 initializeFromTicket(ticketData);
+                // Try to fetch deeper data (Address, SN, etc.) from data_fiber
+                if (ticketData.nama || ticketData.name) {
+                    useTicketStore.getState().fetchCustomerByName(ticketData.nama || ticketData.name);
+                }
             }
         }
     }, [isOpen, mode, ticketData]);
