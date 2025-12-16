@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { Customer, Ticket } from '@/types'; // Adjust imports to your project
+import type { Customer } from '@/types'; // Adjust imports to your project
 import { supabase } from '@/lib/supabaseClient';
 import { useAppStore } from '@/store'; // Import the main store
 

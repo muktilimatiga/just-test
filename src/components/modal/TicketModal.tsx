@@ -6,8 +6,8 @@ import { useTicketStore } from '@/store/ticketStore';
 import { useFiberStore } from '@/store/useFiberStore';
 import { CustomerCard } from '../customerCard';
 import { useAppForm, FormProvider } from '@/components/form/hooks';
-import { toast } from 'sonner';
 import { useActionSuccess, useActionError } from '@/hooks/useActionLog';
+import { toast } from 'sonner';
 
 // Import the Strategy Hook we just created
 import { useTicketFormStrategy, type TicketMode } from '@/store/useTicketForm';
@@ -32,7 +32,7 @@ export const TicketModal = ({ isOpen, onClose, mode, ticketData }: TicketModalPr
     } = useFiberStore();
 
     // 2. PARSE STRATEGY (This loads the specific Form + API for the current mode)
-    const { title, FormFields, schema, mutation, submitLabel, variant } = useTicketFormStrategy(mode);
+    const { title, FormFields, schema, mutation, submitLabel, variant, execute } = useTicketFormStrategy(mode);
     const onSuccessAction = useActionSuccess();
     const onErrorAction = useActionError();
 
@@ -62,23 +62,20 @@ export const TicketModal = ({ isOpen, onClose, mode, ticketData }: TicketModalPr
 
         validators: { onChange: schema },
         onSubmit: async ({ value }) => {
-            mutation.mutate(
-                { data: value as any },
-                {
-                    onSuccess: () => {
-                        onSuccessAction(value, {
-                            title,
-                            action: "create",
-                            target: "ticket",
-                            onDone: handleClose,
-                        });
-                    },
-                    onError: (err) => {
-                        onErrorAction(err, "create", "ticket");
-                    }
-                }
-
-            );
+            try {
+                await execute(value);
+                toast.success(submitLabel + " successful");
+                onSuccessAction(value, {
+                    title,
+                    action: mode === 'create' ? "create" : "update", // Dynamic action logging
+                    target: "ticket",
+                    onDone: handleClose,
+                });
+            } catch (error) {
+                toast.error("An error occurred");
+                console.error(error);
+                onErrorAction(error as any, mode === 'create' ? "create" : "update", "ticket");
+            }
         }
     });
 
