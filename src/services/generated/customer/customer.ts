@@ -20,13 +20,6 @@ import type {
   UseQueryResult
 } from '@tanstack/react-query';
 
-import axios from 'axios';
-import type {
-  AxiosError,
-  AxiosRequestConfig,
-  AxiosResponse
-} from 'axios';
-
 import type {
   CustomerwithInvoices,
   DataPSB,
@@ -34,7 +27,11 @@ import type {
   HTTPValidationError
 } from '.././model';
 
+import { customInstance } from '../../api';
+import type { ErrorType } from '../../api';
 
+
+type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
@@ -42,15 +39,17 @@ import type {
  * @summary Get Psb Data
  */
 export const getPsbDataApiV1CustomerPsbGet = (
-     options?: AxiosRequestConfig
- ): Promise<AxiosResponse<DataPSB[]>> => {
     
-    
-    return axios.get(
-      `/api/v1/customer/psb`,options
-    );
-  }
-
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<DataPSB[]>(
+      {url: `/api/v1/customer/psb`, method: 'GET', signal
+    },
+      options);
+    }
+  
 
 
 
@@ -61,16 +60,16 @@ export const getGetPsbDataApiV1CustomerPsbGetQueryKey = () => {
     }
 
     
-export const getGetPsbDataApiV1CustomerPsbGetQueryOptions = <TData = Awaited<ReturnType<typeof getPsbDataApiV1CustomerPsbGet>>, TError = AxiosError<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPsbDataApiV1CustomerPsbGet>>, TError, TData>>, axios?: AxiosRequestConfig}
+export const getGetPsbDataApiV1CustomerPsbGetQueryOptions = <TData = Awaited<ReturnType<typeof getPsbDataApiV1CustomerPsbGet>>, TError = ErrorType<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPsbDataApiV1CustomerPsbGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
-const {query: queryOptions, axios: axiosOptions} = options ?? {};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetPsbDataApiV1CustomerPsbGetQueryKey();
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPsbDataApiV1CustomerPsbGet>>> = ({ signal }) => getPsbDataApiV1CustomerPsbGet({ signal, ...axiosOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPsbDataApiV1CustomerPsbGet>>> = ({ signal }) => getPsbDataApiV1CustomerPsbGet(requestOptions, signal);
 
       
 
@@ -80,39 +79,39 @@ const {query: queryOptions, axios: axiosOptions} = options ?? {};
 }
 
 export type GetPsbDataApiV1CustomerPsbGetQueryResult = NonNullable<Awaited<ReturnType<typeof getPsbDataApiV1CustomerPsbGet>>>
-export type GetPsbDataApiV1CustomerPsbGetQueryError = AxiosError<unknown>
+export type GetPsbDataApiV1CustomerPsbGetQueryError = ErrorType<unknown>
 
 
-export function useGetPsbDataApiV1CustomerPsbGet<TData = Awaited<ReturnType<typeof getPsbDataApiV1CustomerPsbGet>>, TError = AxiosError<unknown>>(
+export function useGetPsbDataApiV1CustomerPsbGet<TData = Awaited<ReturnType<typeof getPsbDataApiV1CustomerPsbGet>>, TError = ErrorType<unknown>>(
   options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPsbDataApiV1CustomerPsbGet>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getPsbDataApiV1CustomerPsbGet>>,
           TError,
           Awaited<ReturnType<typeof getPsbDataApiV1CustomerPsbGet>>
         > , 'initialData'
-      >, axios?: AxiosRequestConfig}
+      >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetPsbDataApiV1CustomerPsbGet<TData = Awaited<ReturnType<typeof getPsbDataApiV1CustomerPsbGet>>, TError = AxiosError<unknown>>(
+export function useGetPsbDataApiV1CustomerPsbGet<TData = Awaited<ReturnType<typeof getPsbDataApiV1CustomerPsbGet>>, TError = ErrorType<unknown>>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPsbDataApiV1CustomerPsbGet>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getPsbDataApiV1CustomerPsbGet>>,
           TError,
           Awaited<ReturnType<typeof getPsbDataApiV1CustomerPsbGet>>
         > , 'initialData'
-      >, axios?: AxiosRequestConfig}
+      >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetPsbDataApiV1CustomerPsbGet<TData = Awaited<ReturnType<typeof getPsbDataApiV1CustomerPsbGet>>, TError = AxiosError<unknown>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPsbDataApiV1CustomerPsbGet>>, TError, TData>>, axios?: AxiosRequestConfig}
+export function useGetPsbDataApiV1CustomerPsbGet<TData = Awaited<ReturnType<typeof getPsbDataApiV1CustomerPsbGet>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPsbDataApiV1CustomerPsbGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Get Psb Data
  */
 
-export function useGetPsbDataApiV1CustomerPsbGet<TData = Awaited<ReturnType<typeof getPsbDataApiV1CustomerPsbGet>>, TError = AxiosError<unknown>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPsbDataApiV1CustomerPsbGet>>, TError, TData>>, axios?: AxiosRequestConfig}
+export function useGetPsbDataApiV1CustomerPsbGet<TData = Awaited<ReturnType<typeof getPsbDataApiV1CustomerPsbGet>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPsbDataApiV1CustomerPsbGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -132,17 +131,18 @@ export function useGetPsbDataApiV1CustomerPsbGet<TData = Awaited<ReturnType<type
  * @summary Get Fast Customer Details
  */
 export const getFastCustomerDetailsApiV1CustomerInvoicesGet = (
-    params: GetFastCustomerDetailsApiV1CustomerInvoicesGetParams, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<CustomerwithInvoices[]>> => {
-    
-    
-    return axios.get(
-      `/api/v1/customer/invoices`,{
-    ...options,
-        params: {...params, ...options?.params},}
-    );
-  }
-
+    params: GetFastCustomerDetailsApiV1CustomerInvoicesGetParams,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<CustomerwithInvoices[]>(
+      {url: `/api/v1/customer/invoices`, method: 'GET',
+        params, signal
+    },
+      options);
+    }
+  
 
 
 
@@ -153,16 +153,16 @@ export const getGetFastCustomerDetailsApiV1CustomerInvoicesGetQueryKey = (params
     }
 
     
-export const getGetFastCustomerDetailsApiV1CustomerInvoicesGetQueryOptions = <TData = Awaited<ReturnType<typeof getFastCustomerDetailsApiV1CustomerInvoicesGet>>, TError = AxiosError<HTTPValidationError>>(params: GetFastCustomerDetailsApiV1CustomerInvoicesGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getFastCustomerDetailsApiV1CustomerInvoicesGet>>, TError, TData>>, axios?: AxiosRequestConfig}
+export const getGetFastCustomerDetailsApiV1CustomerInvoicesGetQueryOptions = <TData = Awaited<ReturnType<typeof getFastCustomerDetailsApiV1CustomerInvoicesGet>>, TError = ErrorType<HTTPValidationError>>(params: GetFastCustomerDetailsApiV1CustomerInvoicesGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getFastCustomerDetailsApiV1CustomerInvoicesGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
-const {query: queryOptions, axios: axiosOptions} = options ?? {};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetFastCustomerDetailsApiV1CustomerInvoicesGetQueryKey(params);
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getFastCustomerDetailsApiV1CustomerInvoicesGet>>> = ({ signal }) => getFastCustomerDetailsApiV1CustomerInvoicesGet(params, { signal, ...axiosOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getFastCustomerDetailsApiV1CustomerInvoicesGet>>> = ({ signal }) => getFastCustomerDetailsApiV1CustomerInvoicesGet(params, requestOptions, signal);
 
       
 
@@ -172,39 +172,39 @@ const {query: queryOptions, axios: axiosOptions} = options ?? {};
 }
 
 export type GetFastCustomerDetailsApiV1CustomerInvoicesGetQueryResult = NonNullable<Awaited<ReturnType<typeof getFastCustomerDetailsApiV1CustomerInvoicesGet>>>
-export type GetFastCustomerDetailsApiV1CustomerInvoicesGetQueryError = AxiosError<HTTPValidationError>
+export type GetFastCustomerDetailsApiV1CustomerInvoicesGetQueryError = ErrorType<HTTPValidationError>
 
 
-export function useGetFastCustomerDetailsApiV1CustomerInvoicesGet<TData = Awaited<ReturnType<typeof getFastCustomerDetailsApiV1CustomerInvoicesGet>>, TError = AxiosError<HTTPValidationError>>(
+export function useGetFastCustomerDetailsApiV1CustomerInvoicesGet<TData = Awaited<ReturnType<typeof getFastCustomerDetailsApiV1CustomerInvoicesGet>>, TError = ErrorType<HTTPValidationError>>(
  params: GetFastCustomerDetailsApiV1CustomerInvoicesGetParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getFastCustomerDetailsApiV1CustomerInvoicesGet>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getFastCustomerDetailsApiV1CustomerInvoicesGet>>,
           TError,
           Awaited<ReturnType<typeof getFastCustomerDetailsApiV1CustomerInvoicesGet>>
         > , 'initialData'
-      >, axios?: AxiosRequestConfig}
+      >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetFastCustomerDetailsApiV1CustomerInvoicesGet<TData = Awaited<ReturnType<typeof getFastCustomerDetailsApiV1CustomerInvoicesGet>>, TError = AxiosError<HTTPValidationError>>(
+export function useGetFastCustomerDetailsApiV1CustomerInvoicesGet<TData = Awaited<ReturnType<typeof getFastCustomerDetailsApiV1CustomerInvoicesGet>>, TError = ErrorType<HTTPValidationError>>(
  params: GetFastCustomerDetailsApiV1CustomerInvoicesGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getFastCustomerDetailsApiV1CustomerInvoicesGet>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getFastCustomerDetailsApiV1CustomerInvoicesGet>>,
           TError,
           Awaited<ReturnType<typeof getFastCustomerDetailsApiV1CustomerInvoicesGet>>
         > , 'initialData'
-      >, axios?: AxiosRequestConfig}
+      >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetFastCustomerDetailsApiV1CustomerInvoicesGet<TData = Awaited<ReturnType<typeof getFastCustomerDetailsApiV1CustomerInvoicesGet>>, TError = AxiosError<HTTPValidationError>>(
- params: GetFastCustomerDetailsApiV1CustomerInvoicesGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getFastCustomerDetailsApiV1CustomerInvoicesGet>>, TError, TData>>, axios?: AxiosRequestConfig}
+export function useGetFastCustomerDetailsApiV1CustomerInvoicesGet<TData = Awaited<ReturnType<typeof getFastCustomerDetailsApiV1CustomerInvoicesGet>>, TError = ErrorType<HTTPValidationError>>(
+ params: GetFastCustomerDetailsApiV1CustomerInvoicesGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getFastCustomerDetailsApiV1CustomerInvoicesGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Get Fast Customer Details
  */
 
-export function useGetFastCustomerDetailsApiV1CustomerInvoicesGet<TData = Awaited<ReturnType<typeof getFastCustomerDetailsApiV1CustomerInvoicesGet>>, TError = AxiosError<HTTPValidationError>>(
- params: GetFastCustomerDetailsApiV1CustomerInvoicesGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getFastCustomerDetailsApiV1CustomerInvoicesGet>>, TError, TData>>, axios?: AxiosRequestConfig}
+export function useGetFastCustomerDetailsApiV1CustomerInvoicesGet<TData = Awaited<ReturnType<typeof getFastCustomerDetailsApiV1CustomerInvoicesGet>>, TError = ErrorType<HTTPValidationError>>(
+ params: GetFastCustomerDetailsApiV1CustomerInvoicesGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getFastCustomerDetailsApiV1CustomerInvoicesGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 

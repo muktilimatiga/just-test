@@ -24,13 +24,6 @@ import type {
   UseQueryResult
 } from '@tanstack/react-query';
 
-import axios from 'axios';
-import type {
-  AxiosError,
-  AxiosRequestConfig,
-  AxiosResponse
-} from 'axios';
-
 import type {
   BatchConfigResult,
   BatchConfigurationRequest,
@@ -41,7 +34,11 @@ import type {
   UnconfiguredOnt
 } from '.././model';
 
+import { customInstance } from '../../api';
+import type { ErrorType } from '../../api';
 
+
+type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
@@ -49,15 +46,17 @@ import type {
  * @summary Get Options
  */
 export const getOptionsApiV1ConfigApiOptionsGet = (
-     options?: AxiosRequestConfig
- ): Promise<AxiosResponse<OptionsResponse>> => {
     
-    
-    return axios.get(
-      `/api/v1/config/api/options`,options
-    );
-  }
-
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<OptionsResponse>(
+      {url: `/api/v1/config/api/options`, method: 'GET', signal
+    },
+      options);
+    }
+  
 
 
 
@@ -68,16 +67,16 @@ export const getGetOptionsApiV1ConfigApiOptionsGetQueryKey = () => {
     }
 
     
-export const getGetOptionsApiV1ConfigApiOptionsGetQueryOptions = <TData = Awaited<ReturnType<typeof getOptionsApiV1ConfigApiOptionsGet>>, TError = AxiosError<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOptionsApiV1ConfigApiOptionsGet>>, TError, TData>>, axios?: AxiosRequestConfig}
+export const getGetOptionsApiV1ConfigApiOptionsGetQueryOptions = <TData = Awaited<ReturnType<typeof getOptionsApiV1ConfigApiOptionsGet>>, TError = ErrorType<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOptionsApiV1ConfigApiOptionsGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
-const {query: queryOptions, axios: axiosOptions} = options ?? {};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetOptionsApiV1ConfigApiOptionsGetQueryKey();
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getOptionsApiV1ConfigApiOptionsGet>>> = ({ signal }) => getOptionsApiV1ConfigApiOptionsGet({ signal, ...axiosOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getOptionsApiV1ConfigApiOptionsGet>>> = ({ signal }) => getOptionsApiV1ConfigApiOptionsGet(requestOptions, signal);
 
       
 
@@ -87,39 +86,39 @@ const {query: queryOptions, axios: axiosOptions} = options ?? {};
 }
 
 export type GetOptionsApiV1ConfigApiOptionsGetQueryResult = NonNullable<Awaited<ReturnType<typeof getOptionsApiV1ConfigApiOptionsGet>>>
-export type GetOptionsApiV1ConfigApiOptionsGetQueryError = AxiosError<unknown>
+export type GetOptionsApiV1ConfigApiOptionsGetQueryError = ErrorType<unknown>
 
 
-export function useGetOptionsApiV1ConfigApiOptionsGet<TData = Awaited<ReturnType<typeof getOptionsApiV1ConfigApiOptionsGet>>, TError = AxiosError<unknown>>(
+export function useGetOptionsApiV1ConfigApiOptionsGet<TData = Awaited<ReturnType<typeof getOptionsApiV1ConfigApiOptionsGet>>, TError = ErrorType<unknown>>(
   options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOptionsApiV1ConfigApiOptionsGet>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getOptionsApiV1ConfigApiOptionsGet>>,
           TError,
           Awaited<ReturnType<typeof getOptionsApiV1ConfigApiOptionsGet>>
         > , 'initialData'
-      >, axios?: AxiosRequestConfig}
+      >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetOptionsApiV1ConfigApiOptionsGet<TData = Awaited<ReturnType<typeof getOptionsApiV1ConfigApiOptionsGet>>, TError = AxiosError<unknown>>(
+export function useGetOptionsApiV1ConfigApiOptionsGet<TData = Awaited<ReturnType<typeof getOptionsApiV1ConfigApiOptionsGet>>, TError = ErrorType<unknown>>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOptionsApiV1ConfigApiOptionsGet>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getOptionsApiV1ConfigApiOptionsGet>>,
           TError,
           Awaited<ReturnType<typeof getOptionsApiV1ConfigApiOptionsGet>>
         > , 'initialData'
-      >, axios?: AxiosRequestConfig}
+      >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetOptionsApiV1ConfigApiOptionsGet<TData = Awaited<ReturnType<typeof getOptionsApiV1ConfigApiOptionsGet>>, TError = AxiosError<unknown>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOptionsApiV1ConfigApiOptionsGet>>, TError, TData>>, axios?: AxiosRequestConfig}
+export function useGetOptionsApiV1ConfigApiOptionsGet<TData = Awaited<ReturnType<typeof getOptionsApiV1ConfigApiOptionsGet>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOptionsApiV1ConfigApiOptionsGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Get Options
  */
 
-export function useGetOptionsApiV1ConfigApiOptionsGet<TData = Awaited<ReturnType<typeof getOptionsApiV1ConfigApiOptionsGet>>, TError = AxiosError<unknown>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOptionsApiV1ConfigApiOptionsGet>>, TError, TData>>, axios?: AxiosRequestConfig}
+export function useGetOptionsApiV1ConfigApiOptionsGet<TData = Awaited<ReturnType<typeof getOptionsApiV1ConfigApiOptionsGet>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOptionsApiV1ConfigApiOptionsGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -139,15 +138,17 @@ export function useGetOptionsApiV1ConfigApiOptionsGet<TData = Awaited<ReturnType
  * @summary Detect Uncfg Onts
  */
 export const detectUncfgOntsApiV1ConfigApiOltsOltNameDetectOntsGet = (
-    oltName: string, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<UnconfiguredOnt[]>> => {
-    
-    
-    return axios.get(
-      `/api/v1/config/api/olts/${oltName}/detect-onts`,options
-    );
-  }
-
+    oltName: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<UnconfiguredOnt[]>(
+      {url: `/api/v1/config/api/olts/${oltName}/detect-onts`, method: 'GET', signal
+    },
+      options);
+    }
+  
 
 
 
@@ -158,16 +159,16 @@ export const getDetectUncfgOntsApiV1ConfigApiOltsOltNameDetectOntsGetQueryKey = 
     }
 
     
-export const getDetectUncfgOntsApiV1ConfigApiOltsOltNameDetectOntsGetQueryOptions = <TData = Awaited<ReturnType<typeof detectUncfgOntsApiV1ConfigApiOltsOltNameDetectOntsGet>>, TError = AxiosError<HTTPValidationError>>(oltName: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof detectUncfgOntsApiV1ConfigApiOltsOltNameDetectOntsGet>>, TError, TData>>, axios?: AxiosRequestConfig}
+export const getDetectUncfgOntsApiV1ConfigApiOltsOltNameDetectOntsGetQueryOptions = <TData = Awaited<ReturnType<typeof detectUncfgOntsApiV1ConfigApiOltsOltNameDetectOntsGet>>, TError = ErrorType<HTTPValidationError>>(oltName: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof detectUncfgOntsApiV1ConfigApiOltsOltNameDetectOntsGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
-const {query: queryOptions, axios: axiosOptions} = options ?? {};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getDetectUncfgOntsApiV1ConfigApiOltsOltNameDetectOntsGetQueryKey(oltName);
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof detectUncfgOntsApiV1ConfigApiOltsOltNameDetectOntsGet>>> = ({ signal }) => detectUncfgOntsApiV1ConfigApiOltsOltNameDetectOntsGet(oltName, { signal, ...axiosOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof detectUncfgOntsApiV1ConfigApiOltsOltNameDetectOntsGet>>> = ({ signal }) => detectUncfgOntsApiV1ConfigApiOltsOltNameDetectOntsGet(oltName, requestOptions, signal);
 
       
 
@@ -177,39 +178,39 @@ const {query: queryOptions, axios: axiosOptions} = options ?? {};
 }
 
 export type DetectUncfgOntsApiV1ConfigApiOltsOltNameDetectOntsGetQueryResult = NonNullable<Awaited<ReturnType<typeof detectUncfgOntsApiV1ConfigApiOltsOltNameDetectOntsGet>>>
-export type DetectUncfgOntsApiV1ConfigApiOltsOltNameDetectOntsGetQueryError = AxiosError<HTTPValidationError>
+export type DetectUncfgOntsApiV1ConfigApiOltsOltNameDetectOntsGetQueryError = ErrorType<HTTPValidationError>
 
 
-export function useDetectUncfgOntsApiV1ConfigApiOltsOltNameDetectOntsGet<TData = Awaited<ReturnType<typeof detectUncfgOntsApiV1ConfigApiOltsOltNameDetectOntsGet>>, TError = AxiosError<HTTPValidationError>>(
+export function useDetectUncfgOntsApiV1ConfigApiOltsOltNameDetectOntsGet<TData = Awaited<ReturnType<typeof detectUncfgOntsApiV1ConfigApiOltsOltNameDetectOntsGet>>, TError = ErrorType<HTTPValidationError>>(
  oltName: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof detectUncfgOntsApiV1ConfigApiOltsOltNameDetectOntsGet>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof detectUncfgOntsApiV1ConfigApiOltsOltNameDetectOntsGet>>,
           TError,
           Awaited<ReturnType<typeof detectUncfgOntsApiV1ConfigApiOltsOltNameDetectOntsGet>>
         > , 'initialData'
-      >, axios?: AxiosRequestConfig}
+      >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useDetectUncfgOntsApiV1ConfigApiOltsOltNameDetectOntsGet<TData = Awaited<ReturnType<typeof detectUncfgOntsApiV1ConfigApiOltsOltNameDetectOntsGet>>, TError = AxiosError<HTTPValidationError>>(
+export function useDetectUncfgOntsApiV1ConfigApiOltsOltNameDetectOntsGet<TData = Awaited<ReturnType<typeof detectUncfgOntsApiV1ConfigApiOltsOltNameDetectOntsGet>>, TError = ErrorType<HTTPValidationError>>(
  oltName: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof detectUncfgOntsApiV1ConfigApiOltsOltNameDetectOntsGet>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof detectUncfgOntsApiV1ConfigApiOltsOltNameDetectOntsGet>>,
           TError,
           Awaited<ReturnType<typeof detectUncfgOntsApiV1ConfigApiOltsOltNameDetectOntsGet>>
         > , 'initialData'
-      >, axios?: AxiosRequestConfig}
+      >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useDetectUncfgOntsApiV1ConfigApiOltsOltNameDetectOntsGet<TData = Awaited<ReturnType<typeof detectUncfgOntsApiV1ConfigApiOltsOltNameDetectOntsGet>>, TError = AxiosError<HTTPValidationError>>(
- oltName: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof detectUncfgOntsApiV1ConfigApiOltsOltNameDetectOntsGet>>, TError, TData>>, axios?: AxiosRequestConfig}
+export function useDetectUncfgOntsApiV1ConfigApiOltsOltNameDetectOntsGet<TData = Awaited<ReturnType<typeof detectUncfgOntsApiV1ConfigApiOltsOltNameDetectOntsGet>>, TError = ErrorType<HTTPValidationError>>(
+ oltName: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof detectUncfgOntsApiV1ConfigApiOltsOltNameDetectOntsGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Detect Uncfg Onts
  */
 
-export function useDetectUncfgOntsApiV1ConfigApiOltsOltNameDetectOntsGet<TData = Awaited<ReturnType<typeof detectUncfgOntsApiV1ConfigApiOltsOltNameDetectOntsGet>>, TError = AxiosError<HTTPValidationError>>(
- oltName: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof detectUncfgOntsApiV1ConfigApiOltsOltNameDetectOntsGet>>, TError, TData>>, axios?: AxiosRequestConfig}
+export function useDetectUncfgOntsApiV1ConfigApiOltsOltNameDetectOntsGet<TData = Awaited<ReturnType<typeof detectUncfgOntsApiV1ConfigApiOltsOltNameDetectOntsGet>>, TError = ErrorType<HTTPValidationError>>(
+ oltName: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof detectUncfgOntsApiV1ConfigApiOltsOltNameDetectOntsGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -230,28 +231,31 @@ export function useDetectUncfgOntsApiV1ConfigApiOltsOltNameDetectOntsGet<TData =
  */
 export const runConfigurationApiV1ConfigApiOltsOltNameConfigurePost = (
     oltName: string,
-    configurationRequest: ConfigurationRequest, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<ConfigurationResponse>> => {
-    
-    
-    return axios.post(
-      `/api/v1/config/api/olts/${oltName}/configure`,
-      configurationRequest,options
-    );
-  }
+    configurationRequest: ConfigurationRequest,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<ConfigurationResponse>(
+      {url: `/api/v1/config/api/olts/${oltName}/configure`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: configurationRequest, signal
+    },
+      options);
+    }
+  
 
 
-
-export const getRunConfigurationApiV1ConfigApiOltsOltNameConfigurePostMutationOptions = <TError = AxiosError<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof runConfigurationApiV1ConfigApiOltsOltNameConfigurePost>>, TError,{oltName: string;data: ConfigurationRequest}, TContext>, axios?: AxiosRequestConfig}
+export const getRunConfigurationApiV1ConfigApiOltsOltNameConfigurePostMutationOptions = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof runConfigurationApiV1ConfigApiOltsOltNameConfigurePost>>, TError,{oltName: string;data: ConfigurationRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
 ): UseMutationOptions<Awaited<ReturnType<typeof runConfigurationApiV1ConfigApiOltsOltNameConfigurePost>>, TError,{oltName: string;data: ConfigurationRequest}, TContext> => {
 
 const mutationKey = ['runConfigurationApiV1ConfigApiOltsOltNameConfigurePost'];
-const {mutation: mutationOptions, axios: axiosOptions} = options ?
+const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, axios: undefined};
+      : {mutation: { mutationKey, }, request: undefined};
 
       
 
@@ -259,7 +263,7 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof runConfigurationApiV1ConfigApiOltsOltNameConfigurePost>>, {oltName: string;data: ConfigurationRequest}> = (props) => {
           const {oltName,data} = props ?? {};
 
-          return  runConfigurationApiV1ConfigApiOltsOltNameConfigurePost(oltName,data,axiosOptions)
+          return  runConfigurationApiV1ConfigApiOltsOltNameConfigurePost(oltName,data,requestOptions)
         }
 
         
@@ -269,13 +273,13 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
 
     export type RunConfigurationApiV1ConfigApiOltsOltNameConfigurePostMutationResult = NonNullable<Awaited<ReturnType<typeof runConfigurationApiV1ConfigApiOltsOltNameConfigurePost>>>
     export type RunConfigurationApiV1ConfigApiOltsOltNameConfigurePostMutationBody = ConfigurationRequest
-    export type RunConfigurationApiV1ConfigApiOltsOltNameConfigurePostMutationError = AxiosError<HTTPValidationError>
+    export type RunConfigurationApiV1ConfigApiOltsOltNameConfigurePostMutationError = ErrorType<HTTPValidationError>
 
     /**
  * @summary Run Configuration
  */
-export const useRunConfigurationApiV1ConfigApiOltsOltNameConfigurePost = <TError = AxiosError<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof runConfigurationApiV1ConfigApiOltsOltNameConfigurePost>>, TError,{oltName: string;data: ConfigurationRequest}, TContext>, axios?: AxiosRequestConfig}
+export const useRunConfigurationApiV1ConfigApiOltsOltNameConfigurePost = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof runConfigurationApiV1ConfigApiOltsOltNameConfigurePost>>, TError,{oltName: string;data: ConfigurationRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof runConfigurationApiV1ConfigApiOltsOltNameConfigurePost>>,
         TError,
@@ -292,28 +296,31 @@ export const useRunConfigurationApiV1ConfigApiOltsOltNameConfigurePost = <TError
  */
 export const runConfigurationBatchApiV1ConfigApiOltsOltNameConfigureBatchPost = (
     oltName: string,
-    batchConfigurationRequest: BatchConfigurationRequest, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<BatchConfigResult>> => {
-    
-    
-    return axios.post(
-      `/api/v1/config/api/olts/${oltName}/configure-batch`,
-      batchConfigurationRequest,options
-    );
-  }
+    batchConfigurationRequest: BatchConfigurationRequest,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<BatchConfigResult>(
+      {url: `/api/v1/config/api/olts/${oltName}/configure-batch`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: batchConfigurationRequest, signal
+    },
+      options);
+    }
+  
 
 
-
-export const getRunConfigurationBatchApiV1ConfigApiOltsOltNameConfigureBatchPostMutationOptions = <TError = AxiosError<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof runConfigurationBatchApiV1ConfigApiOltsOltNameConfigureBatchPost>>, TError,{oltName: string;data: BatchConfigurationRequest}, TContext>, axios?: AxiosRequestConfig}
+export const getRunConfigurationBatchApiV1ConfigApiOltsOltNameConfigureBatchPostMutationOptions = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof runConfigurationBatchApiV1ConfigApiOltsOltNameConfigureBatchPost>>, TError,{oltName: string;data: BatchConfigurationRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
 ): UseMutationOptions<Awaited<ReturnType<typeof runConfigurationBatchApiV1ConfigApiOltsOltNameConfigureBatchPost>>, TError,{oltName: string;data: BatchConfigurationRequest}, TContext> => {
 
 const mutationKey = ['runConfigurationBatchApiV1ConfigApiOltsOltNameConfigureBatchPost'];
-const {mutation: mutationOptions, axios: axiosOptions} = options ?
+const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, axios: undefined};
+      : {mutation: { mutationKey, }, request: undefined};
 
       
 
@@ -321,7 +328,7 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof runConfigurationBatchApiV1ConfigApiOltsOltNameConfigureBatchPost>>, {oltName: string;data: BatchConfigurationRequest}> = (props) => {
           const {oltName,data} = props ?? {};
 
-          return  runConfigurationBatchApiV1ConfigApiOltsOltNameConfigureBatchPost(oltName,data,axiosOptions)
+          return  runConfigurationBatchApiV1ConfigApiOltsOltNameConfigureBatchPost(oltName,data,requestOptions)
         }
 
         
@@ -331,13 +338,13 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
 
     export type RunConfigurationBatchApiV1ConfigApiOltsOltNameConfigureBatchPostMutationResult = NonNullable<Awaited<ReturnType<typeof runConfigurationBatchApiV1ConfigApiOltsOltNameConfigureBatchPost>>>
     export type RunConfigurationBatchApiV1ConfigApiOltsOltNameConfigureBatchPostMutationBody = BatchConfigurationRequest
-    export type RunConfigurationBatchApiV1ConfigApiOltsOltNameConfigureBatchPostMutationError = AxiosError<HTTPValidationError>
+    export type RunConfigurationBatchApiV1ConfigApiOltsOltNameConfigureBatchPostMutationError = ErrorType<HTTPValidationError>
 
     /**
  * @summary Run Configuration Batch
  */
-export const useRunConfigurationBatchApiV1ConfigApiOltsOltNameConfigureBatchPost = <TError = AxiosError<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof runConfigurationBatchApiV1ConfigApiOltsOltNameConfigureBatchPost>>, TError,{oltName: string;data: BatchConfigurationRequest}, TContext>, axios?: AxiosRequestConfig}
+export const useRunConfigurationBatchApiV1ConfigApiOltsOltNameConfigureBatchPost = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof runConfigurationBatchApiV1ConfigApiOltsOltNameConfigureBatchPost>>, TError,{oltName: string;data: BatchConfigurationRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof runConfigurationBatchApiV1ConfigApiOltsOltNameConfigureBatchPost>>,
         TError,

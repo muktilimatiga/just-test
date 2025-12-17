@@ -15,13 +15,6 @@ import type {
   UseMutationResult
 } from '@tanstack/react-query';
 
-import axios from 'axios';
-import type {
-  AxiosError,
-  AxiosRequestConfig,
-  AxiosResponse
-} from 'axios';
-
 import type {
   HTTPValidationError,
   SearchPayload,
@@ -34,7 +27,11 @@ import type {
   TicketProcessPayload
 } from '.././model';
 
+import { customInstance } from '../../api';
+import type { ErrorType } from '../../api';
 
+
+type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
@@ -42,28 +39,31 @@ import type {
  * @summary Create Ticket Only
  */
 export const createTicketOnlyApiV1TicketCreatePost = (
-    ticketCreateOnlyPayload: TicketCreateOnlyPayload, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<TicketOperationResponse>> => {
-    
-    
-    return axios.post(
-      `/api/v1/ticket/create`,
-      ticketCreateOnlyPayload,options
-    );
-  }
+    ticketCreateOnlyPayload: TicketCreateOnlyPayload,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<TicketOperationResponse>(
+      {url: `/api/v1/ticket/create`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: ticketCreateOnlyPayload, signal
+    },
+      options);
+    }
+  
 
 
-
-export const getCreateTicketOnlyApiV1TicketCreatePostMutationOptions = <TError = AxiosError<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createTicketOnlyApiV1TicketCreatePost>>, TError,{data: TicketCreateOnlyPayload}, TContext>, axios?: AxiosRequestConfig}
+export const getCreateTicketOnlyApiV1TicketCreatePostMutationOptions = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createTicketOnlyApiV1TicketCreatePost>>, TError,{data: TicketCreateOnlyPayload}, TContext>, request?: SecondParameter<typeof customInstance>}
 ): UseMutationOptions<Awaited<ReturnType<typeof createTicketOnlyApiV1TicketCreatePost>>, TError,{data: TicketCreateOnlyPayload}, TContext> => {
 
 const mutationKey = ['createTicketOnlyApiV1TicketCreatePost'];
-const {mutation: mutationOptions, axios: axiosOptions} = options ?
+const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, axios: undefined};
+      : {mutation: { mutationKey, }, request: undefined};
 
       
 
@@ -71,7 +71,7 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof createTicketOnlyApiV1TicketCreatePost>>, {data: TicketCreateOnlyPayload}> = (props) => {
           const {data} = props ?? {};
 
-          return  createTicketOnlyApiV1TicketCreatePost(data,axiosOptions)
+          return  createTicketOnlyApiV1TicketCreatePost(data,requestOptions)
         }
 
         
@@ -81,13 +81,13 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
 
     export type CreateTicketOnlyApiV1TicketCreatePostMutationResult = NonNullable<Awaited<ReturnType<typeof createTicketOnlyApiV1TicketCreatePost>>>
     export type CreateTicketOnlyApiV1TicketCreatePostMutationBody = TicketCreateOnlyPayload
-    export type CreateTicketOnlyApiV1TicketCreatePostMutationError = AxiosError<HTTPValidationError>
+    export type CreateTicketOnlyApiV1TicketCreatePostMutationError = ErrorType<HTTPValidationError>
 
     /**
  * @summary Create Ticket Only
  */
-export const useCreateTicketOnlyApiV1TicketCreatePost = <TError = AxiosError<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createTicketOnlyApiV1TicketCreatePost>>, TError,{data: TicketCreateOnlyPayload}, TContext>, axios?: AxiosRequestConfig}
+export const useCreateTicketOnlyApiV1TicketCreatePost = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createTicketOnlyApiV1TicketCreatePost>>, TError,{data: TicketCreateOnlyPayload}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof createTicketOnlyApiV1TicketCreatePost>>,
         TError,
@@ -103,28 +103,31 @@ export const useCreateTicketOnlyApiV1TicketCreatePost = <TError = AxiosError<HTT
  * @summary Create And Process Ticket
  */
 export const createAndProcessTicketApiV1TicketCreateAndProcessPost = (
-    ticketCreateAndProcessPayload: TicketCreateAndProcessPayload, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<TicketOperationResponse>> => {
-    
-    
-    return axios.post(
-      `/api/v1/ticket/create-and-process`,
-      ticketCreateAndProcessPayload,options
-    );
-  }
+    ticketCreateAndProcessPayload: TicketCreateAndProcessPayload,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<TicketOperationResponse>(
+      {url: `/api/v1/ticket/create-and-process`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: ticketCreateAndProcessPayload, signal
+    },
+      options);
+    }
+  
 
 
-
-export const getCreateAndProcessTicketApiV1TicketCreateAndProcessPostMutationOptions = <TError = AxiosError<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAndProcessTicketApiV1TicketCreateAndProcessPost>>, TError,{data: TicketCreateAndProcessPayload}, TContext>, axios?: AxiosRequestConfig}
+export const getCreateAndProcessTicketApiV1TicketCreateAndProcessPostMutationOptions = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAndProcessTicketApiV1TicketCreateAndProcessPost>>, TError,{data: TicketCreateAndProcessPayload}, TContext>, request?: SecondParameter<typeof customInstance>}
 ): UseMutationOptions<Awaited<ReturnType<typeof createAndProcessTicketApiV1TicketCreateAndProcessPost>>, TError,{data: TicketCreateAndProcessPayload}, TContext> => {
 
 const mutationKey = ['createAndProcessTicketApiV1TicketCreateAndProcessPost'];
-const {mutation: mutationOptions, axios: axiosOptions} = options ?
+const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, axios: undefined};
+      : {mutation: { mutationKey, }, request: undefined};
 
       
 
@@ -132,7 +135,7 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof createAndProcessTicketApiV1TicketCreateAndProcessPost>>, {data: TicketCreateAndProcessPayload}> = (props) => {
           const {data} = props ?? {};
 
-          return  createAndProcessTicketApiV1TicketCreateAndProcessPost(data,axiosOptions)
+          return  createAndProcessTicketApiV1TicketCreateAndProcessPost(data,requestOptions)
         }
 
         
@@ -142,13 +145,13 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
 
     export type CreateAndProcessTicketApiV1TicketCreateAndProcessPostMutationResult = NonNullable<Awaited<ReturnType<typeof createAndProcessTicketApiV1TicketCreateAndProcessPost>>>
     export type CreateAndProcessTicketApiV1TicketCreateAndProcessPostMutationBody = TicketCreateAndProcessPayload
-    export type CreateAndProcessTicketApiV1TicketCreateAndProcessPostMutationError = AxiosError<HTTPValidationError>
+    export type CreateAndProcessTicketApiV1TicketCreateAndProcessPostMutationError = ErrorType<HTTPValidationError>
 
     /**
  * @summary Create And Process Ticket
  */
-export const useCreateAndProcessTicketApiV1TicketCreateAndProcessPost = <TError = AxiosError<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAndProcessTicketApiV1TicketCreateAndProcessPost>>, TError,{data: TicketCreateAndProcessPayload}, TContext>, axios?: AxiosRequestConfig}
+export const useCreateAndProcessTicketApiV1TicketCreateAndProcessPost = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAndProcessTicketApiV1TicketCreateAndProcessPost>>, TError,{data: TicketCreateAndProcessPayload}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof createAndProcessTicketApiV1TicketCreateAndProcessPost>>,
         TError,
@@ -164,28 +167,31 @@ export const useCreateAndProcessTicketApiV1TicketCreateAndProcessPost = <TError 
  * @summary Process Ticket Only
  */
 export const processTicketOnlyApiV1TicketProcessPost = (
-    ticketProcessPayload: TicketProcessPayload, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<TicketOperationResponse>> => {
-    
-    
-    return axios.post(
-      `/api/v1/ticket/process`,
-      ticketProcessPayload,options
-    );
-  }
+    ticketProcessPayload: TicketProcessPayload,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<TicketOperationResponse>(
+      {url: `/api/v1/ticket/process`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: ticketProcessPayload, signal
+    },
+      options);
+    }
+  
 
 
-
-export const getProcessTicketOnlyApiV1TicketProcessPostMutationOptions = <TError = AxiosError<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof processTicketOnlyApiV1TicketProcessPost>>, TError,{data: TicketProcessPayload}, TContext>, axios?: AxiosRequestConfig}
+export const getProcessTicketOnlyApiV1TicketProcessPostMutationOptions = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof processTicketOnlyApiV1TicketProcessPost>>, TError,{data: TicketProcessPayload}, TContext>, request?: SecondParameter<typeof customInstance>}
 ): UseMutationOptions<Awaited<ReturnType<typeof processTicketOnlyApiV1TicketProcessPost>>, TError,{data: TicketProcessPayload}, TContext> => {
 
 const mutationKey = ['processTicketOnlyApiV1TicketProcessPost'];
-const {mutation: mutationOptions, axios: axiosOptions} = options ?
+const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, axios: undefined};
+      : {mutation: { mutationKey, }, request: undefined};
 
       
 
@@ -193,7 +199,7 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof processTicketOnlyApiV1TicketProcessPost>>, {data: TicketProcessPayload}> = (props) => {
           const {data} = props ?? {};
 
-          return  processTicketOnlyApiV1TicketProcessPost(data,axiosOptions)
+          return  processTicketOnlyApiV1TicketProcessPost(data,requestOptions)
         }
 
         
@@ -203,13 +209,13 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
 
     export type ProcessTicketOnlyApiV1TicketProcessPostMutationResult = NonNullable<Awaited<ReturnType<typeof processTicketOnlyApiV1TicketProcessPost>>>
     export type ProcessTicketOnlyApiV1TicketProcessPostMutationBody = TicketProcessPayload
-    export type ProcessTicketOnlyApiV1TicketProcessPostMutationError = AxiosError<HTTPValidationError>
+    export type ProcessTicketOnlyApiV1TicketProcessPostMutationError = ErrorType<HTTPValidationError>
 
     /**
  * @summary Process Ticket Only
  */
-export const useProcessTicketOnlyApiV1TicketProcessPost = <TError = AxiosError<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof processTicketOnlyApiV1TicketProcessPost>>, TError,{data: TicketProcessPayload}, TContext>, axios?: AxiosRequestConfig}
+export const useProcessTicketOnlyApiV1TicketProcessPost = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof processTicketOnlyApiV1TicketProcessPost>>, TError,{data: TicketProcessPayload}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof processTicketOnlyApiV1TicketProcessPost>>,
         TError,
@@ -225,28 +231,31 @@ export const useProcessTicketOnlyApiV1TicketProcessPost = <TError = AxiosError<H
  * @summary Close Ticket
  */
 export const closeTicketApiV1TicketClosePost = (
-    ticketClosePayload: TicketClosePayload, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<TicketOperationResponse>> => {
-    
-    
-    return axios.post(
-      `/api/v1/ticket/close`,
-      ticketClosePayload,options
-    );
-  }
+    ticketClosePayload: TicketClosePayload,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<TicketOperationResponse>(
+      {url: `/api/v1/ticket/close`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: ticketClosePayload, signal
+    },
+      options);
+    }
+  
 
 
-
-export const getCloseTicketApiV1TicketClosePostMutationOptions = <TError = AxiosError<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof closeTicketApiV1TicketClosePost>>, TError,{data: TicketClosePayload}, TContext>, axios?: AxiosRequestConfig}
+export const getCloseTicketApiV1TicketClosePostMutationOptions = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof closeTicketApiV1TicketClosePost>>, TError,{data: TicketClosePayload}, TContext>, request?: SecondParameter<typeof customInstance>}
 ): UseMutationOptions<Awaited<ReturnType<typeof closeTicketApiV1TicketClosePost>>, TError,{data: TicketClosePayload}, TContext> => {
 
 const mutationKey = ['closeTicketApiV1TicketClosePost'];
-const {mutation: mutationOptions, axios: axiosOptions} = options ?
+const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, axios: undefined};
+      : {mutation: { mutationKey, }, request: undefined};
 
       
 
@@ -254,7 +263,7 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof closeTicketApiV1TicketClosePost>>, {data: TicketClosePayload}> = (props) => {
           const {data} = props ?? {};
 
-          return  closeTicketApiV1TicketClosePost(data,axiosOptions)
+          return  closeTicketApiV1TicketClosePost(data,requestOptions)
         }
 
         
@@ -264,13 +273,13 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
 
     export type CloseTicketApiV1TicketClosePostMutationResult = NonNullable<Awaited<ReturnType<typeof closeTicketApiV1TicketClosePost>>>
     export type CloseTicketApiV1TicketClosePostMutationBody = TicketClosePayload
-    export type CloseTicketApiV1TicketClosePostMutationError = AxiosError<HTTPValidationError>
+    export type CloseTicketApiV1TicketClosePostMutationError = ErrorType<HTTPValidationError>
 
     /**
  * @summary Close Ticket
  */
-export const useCloseTicketApiV1TicketClosePost = <TError = AxiosError<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof closeTicketApiV1TicketClosePost>>, TError,{data: TicketClosePayload}, TContext>, axios?: AxiosRequestConfig}
+export const useCloseTicketApiV1TicketClosePost = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof closeTicketApiV1TicketClosePost>>, TError,{data: TicketClosePayload}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof closeTicketApiV1TicketClosePost>>,
         TError,
@@ -286,28 +295,31 @@ export const useCloseTicketApiV1TicketClosePost = <TError = AxiosError<HTTPValid
  * @summary Forward Ticket
  */
 export const forwardTicketApiV1TicketForwardPost = (
-    ticketForwardPayload: TicketForwardPayload, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<TicketOperationResponse>> => {
-    
-    
-    return axios.post(
-      `/api/v1/ticket/forward`,
-      ticketForwardPayload,options
-    );
-  }
+    ticketForwardPayload: TicketForwardPayload,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<TicketOperationResponse>(
+      {url: `/api/v1/ticket/forward`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: ticketForwardPayload, signal
+    },
+      options);
+    }
+  
 
 
-
-export const getForwardTicketApiV1TicketForwardPostMutationOptions = <TError = AxiosError<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof forwardTicketApiV1TicketForwardPost>>, TError,{data: TicketForwardPayload}, TContext>, axios?: AxiosRequestConfig}
+export const getForwardTicketApiV1TicketForwardPostMutationOptions = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof forwardTicketApiV1TicketForwardPost>>, TError,{data: TicketForwardPayload}, TContext>, request?: SecondParameter<typeof customInstance>}
 ): UseMutationOptions<Awaited<ReturnType<typeof forwardTicketApiV1TicketForwardPost>>, TError,{data: TicketForwardPayload}, TContext> => {
 
 const mutationKey = ['forwardTicketApiV1TicketForwardPost'];
-const {mutation: mutationOptions, axios: axiosOptions} = options ?
+const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, axios: undefined};
+      : {mutation: { mutationKey, }, request: undefined};
 
       
 
@@ -315,7 +327,7 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof forwardTicketApiV1TicketForwardPost>>, {data: TicketForwardPayload}> = (props) => {
           const {data} = props ?? {};
 
-          return  forwardTicketApiV1TicketForwardPost(data,axiosOptions)
+          return  forwardTicketApiV1TicketForwardPost(data,requestOptions)
         }
 
         
@@ -325,13 +337,13 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
 
     export type ForwardTicketApiV1TicketForwardPostMutationResult = NonNullable<Awaited<ReturnType<typeof forwardTicketApiV1TicketForwardPost>>>
     export type ForwardTicketApiV1TicketForwardPostMutationBody = TicketForwardPayload
-    export type ForwardTicketApiV1TicketForwardPostMutationError = AxiosError<HTTPValidationError>
+    export type ForwardTicketApiV1TicketForwardPostMutationError = ErrorType<HTTPValidationError>
 
     /**
  * @summary Forward Ticket
  */
-export const useForwardTicketApiV1TicketForwardPost = <TError = AxiosError<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof forwardTicketApiV1TicketForwardPost>>, TError,{data: TicketForwardPayload}, TContext>, axios?: AxiosRequestConfig}
+export const useForwardTicketApiV1TicketForwardPost = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof forwardTicketApiV1TicketForwardPost>>, TError,{data: TicketForwardPayload}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof forwardTicketApiV1TicketForwardPost>>,
         TError,
@@ -347,28 +359,31 @@ export const useForwardTicketApiV1TicketForwardPost = <TError = AxiosError<HTTPV
  * @summary Search Ticket
  */
 export const searchTicketApiV1TicketSearchPost = (
-    searchPayload: SearchPayload, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<SearchResponse>> => {
-    
-    
-    return axios.post(
-      `/api/v1/ticket/search`,
-      searchPayload,options
-    );
-  }
+    searchPayload: SearchPayload,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<SearchResponse>(
+      {url: `/api/v1/ticket/search`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: searchPayload, signal
+    },
+      options);
+    }
+  
 
 
-
-export const getSearchTicketApiV1TicketSearchPostMutationOptions = <TError = AxiosError<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof searchTicketApiV1TicketSearchPost>>, TError,{data: SearchPayload}, TContext>, axios?: AxiosRequestConfig}
+export const getSearchTicketApiV1TicketSearchPostMutationOptions = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof searchTicketApiV1TicketSearchPost>>, TError,{data: SearchPayload}, TContext>, request?: SecondParameter<typeof customInstance>}
 ): UseMutationOptions<Awaited<ReturnType<typeof searchTicketApiV1TicketSearchPost>>, TError,{data: SearchPayload}, TContext> => {
 
 const mutationKey = ['searchTicketApiV1TicketSearchPost'];
-const {mutation: mutationOptions, axios: axiosOptions} = options ?
+const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, axios: undefined};
+      : {mutation: { mutationKey, }, request: undefined};
 
       
 
@@ -376,7 +391,7 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof searchTicketApiV1TicketSearchPost>>, {data: SearchPayload}> = (props) => {
           const {data} = props ?? {};
 
-          return  searchTicketApiV1TicketSearchPost(data,axiosOptions)
+          return  searchTicketApiV1TicketSearchPost(data,requestOptions)
         }
 
         
@@ -386,13 +401,13 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
 
     export type SearchTicketApiV1TicketSearchPostMutationResult = NonNullable<Awaited<ReturnType<typeof searchTicketApiV1TicketSearchPost>>>
     export type SearchTicketApiV1TicketSearchPostMutationBody = SearchPayload
-    export type SearchTicketApiV1TicketSearchPostMutationError = AxiosError<HTTPValidationError>
+    export type SearchTicketApiV1TicketSearchPostMutationError = ErrorType<HTTPValidationError>
 
     /**
  * @summary Search Ticket
  */
-export const useSearchTicketApiV1TicketSearchPost = <TError = AxiosError<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof searchTicketApiV1TicketSearchPost>>, TError,{data: SearchPayload}, TContext>, axios?: AxiosRequestConfig}
+export const useSearchTicketApiV1TicketSearchPost = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof searchTicketApiV1TicketSearchPost>>, TError,{data: SearchPayload}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof searchTicketApiV1TicketSearchPost>>,
         TError,

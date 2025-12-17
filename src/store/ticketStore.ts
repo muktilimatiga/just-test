@@ -125,11 +125,11 @@ export const useTicketStore = create<TicketStore>((set) => ({ // Removed 'get' a
             const mappedResults: any[] = (data || []).map(row => ({
                 id: row.user_pppoe || `fiber-${Math.random()}`,
                 name: row.name || 'Unknown',
-                _address: row.alamat,
-                _pppoe: row.user_pppoe,
-                _sn: row.onu_sn,
-                _olt: row.olt_name,
-                _interface: row.interface
+                alamat: row.alamat,
+                user_pppoe: row.user_pppoe,
+                onu_sn: row.onu_sn,
+                olt_name: row.olt_name,
+                interface: row.interface
             }));
 
             set({ searchResults: mappedResults, isSearching: false });
@@ -158,6 +158,17 @@ export const useTicketStore = create<TicketStore>((set) => ({ // Removed 'get' a
 
             // Update form data with found details
             set((state) => ({
+                // KEY FIX: Also update selectedUser so the card shows the newly found data!
+                selectedUser: {
+                    id: data.user_pppoe || 'unknown',
+                    name: data.name || 'Unknown',
+                    user_pppoe: data.user_pppoe,
+                    alamat: data.alamat,
+                    onu_sn: data.onu_sn,
+                    olt_name: data.olt_name,
+                    interface: data.interface
+                } as Customer,
+
                 formData: {
                     ...state.formData,
                     name: data.name || state.formData.name,
@@ -185,11 +196,11 @@ export const useTicketStore = create<TicketStore>((set) => ({ // Removed 'get' a
             formData: {
                 ...INITIAL_FORM_DATA,
                 name: customer.name?.toUpperCase() || '',
-                address: customer._address || '',
-                user_pppoe: customer._pppoe || '',
-                onu_sn: customer._sn || '',
-                olt_name: customer._olt || '',
-                interface: customer._interface || '',
+                address: customer.alamat || '',
+                user_pppoe: customer.user_pppoe || '',
+                onu_sn: customer.onu_sn || '',
+                olt_name: customer.olt_name || '',
+                interface: customer.interface || '',
 
                 ticketRef: randomRef,
                 priority: 'Low',

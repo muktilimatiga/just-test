@@ -3,10 +3,9 @@ import { z } from 'zod';
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useAppForm } from '@/components/form/hooks';
-import { ApiService } from '@/services/api';
 // Assuming useConfigOptions is the React Query hook we defined in api.ts
 import { useConfigOptions } from './useApi'
-
+import { AXIOS_INSTANCE as axios } from '@/services/api';
 // --- Schema matches your ConfigurationRequest interface ---
 const ConfigurationSchema = z.object({
   sn: z.string().min(1, "Serial number is required"),
@@ -28,8 +27,9 @@ export const useConfigurationForm = (oltName: string = 'default') => {
 
   // --- MUTATION uses ApiService ---
   const mutation = useMutation({
-    mutationFn: (data: UserFormValues) => {
-      return ApiService.config.runConfiguration(oltName, data);
+    mutationFn: async (data: UserFormValues) => {
+      const response = await axios.post<{ message: string }>(`/api/v1/config/run-configuration`, { olt_name: oltName, ...data });
+      return response.data;
     },
     onSuccess: (data) => {
       toast.success(`Configuration success: ${data.message}`);

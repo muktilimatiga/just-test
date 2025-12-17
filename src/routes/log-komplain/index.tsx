@@ -20,7 +20,7 @@ import { useSupabaseTickets } from '@/hooks/supabase/useSupabaeTicket';
 import { ColumnFilter } from '@/components/ColumnFilter';
 
 // 1. IMPORT THE UNIFIED MODAL & TYPE
-import { TicketModal } from '@/components/modal/TicketModal';
+import { TicketModal } from '@/components/modal/openTicketModal';
 // Adjust this path if your type is exported from elsewhere (e.g. hooks/useTicketFormStrategy)
 import { type TicketMode } from '@/store/ticketStore';
 // --- Helper Components ---
@@ -179,6 +179,7 @@ const LogTicketPage = () => {
         onClose={closeModal}
         mode={modalConfig.mode}
         ticketData={modalConfig.ticketData}
+        
       />
 
       {/* --- Header / Toolbar --- */}

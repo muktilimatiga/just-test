@@ -15,13 +15,6 @@ import type {
   UseMutationResult
 } from '@tanstack/react-query';
 
-import axios from 'axios';
-import type {
-  AxiosError,
-  AxiosRequestConfig,
-  AxiosResponse
-} from 'axios';
-
 import type {
   CustomerOnuDetail,
   HTTPValidationError,
@@ -36,7 +29,11 @@ import type {
   RegistSnResponse
 } from '.././model';
 
+import { customInstance } from '../../api';
+import type { ErrorType } from '../../api';
 
+
+type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
@@ -44,28 +41,31 @@ import type {
  * @summary Get Customer Details
  */
 export const getCustomerDetailsApiV1OnuDetailSearchPost = (
-    onuTargetPayload: OnuTargetPayload, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<CustomerOnuDetail>> => {
-    
-    
-    return axios.post(
-      `/api/v1/onu/detail-search`,
-      onuTargetPayload,options
-    );
-  }
+    onuTargetPayload: OnuTargetPayload,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<CustomerOnuDetail>(
+      {url: `/api/v1/onu/detail-search`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: onuTargetPayload, signal
+    },
+      options);
+    }
+  
 
 
-
-export const getGetCustomerDetailsApiV1OnuDetailSearchPostMutationOptions = <TError = AxiosError<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getCustomerDetailsApiV1OnuDetailSearchPost>>, TError,{data: OnuTargetPayload}, TContext>, axios?: AxiosRequestConfig}
+export const getGetCustomerDetailsApiV1OnuDetailSearchPostMutationOptions = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getCustomerDetailsApiV1OnuDetailSearchPost>>, TError,{data: OnuTargetPayload}, TContext>, request?: SecondParameter<typeof customInstance>}
 ): UseMutationOptions<Awaited<ReturnType<typeof getCustomerDetailsApiV1OnuDetailSearchPost>>, TError,{data: OnuTargetPayload}, TContext> => {
 
 const mutationKey = ['getCustomerDetailsApiV1OnuDetailSearchPost'];
-const {mutation: mutationOptions, axios: axiosOptions} = options ?
+const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, axios: undefined};
+      : {mutation: { mutationKey, }, request: undefined};
 
       
 
@@ -73,7 +73,7 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof getCustomerDetailsApiV1OnuDetailSearchPost>>, {data: OnuTargetPayload}> = (props) => {
           const {data} = props ?? {};
 
-          return  getCustomerDetailsApiV1OnuDetailSearchPost(data,axiosOptions)
+          return  getCustomerDetailsApiV1OnuDetailSearchPost(data,requestOptions)
         }
 
         
@@ -83,13 +83,13 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
 
     export type GetCustomerDetailsApiV1OnuDetailSearchPostMutationResult = NonNullable<Awaited<ReturnType<typeof getCustomerDetailsApiV1OnuDetailSearchPost>>>
     export type GetCustomerDetailsApiV1OnuDetailSearchPostMutationBody = OnuTargetPayload
-    export type GetCustomerDetailsApiV1OnuDetailSearchPostMutationError = AxiosError<HTTPValidationError>
+    export type GetCustomerDetailsApiV1OnuDetailSearchPostMutationError = ErrorType<HTTPValidationError>
 
     /**
  * @summary Get Customer Details
  */
-export const useGetCustomerDetailsApiV1OnuDetailSearchPost = <TError = AxiosError<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getCustomerDetailsApiV1OnuDetailSearchPost>>, TError,{data: OnuTargetPayload}, TContext>, axios?: AxiosRequestConfig}
+export const useGetCustomerDetailsApiV1OnuDetailSearchPost = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getCustomerDetailsApiV1OnuDetailSearchPost>>, TError,{data: OnuTargetPayload}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof getCustomerDetailsApiV1OnuDetailSearchPost>>,
         TError,
@@ -105,28 +105,31 @@ export const useGetCustomerDetailsApiV1OnuDetailSearchPost = <TError = AxiosErro
  * @summary Get State
  */
 export const getStateApiV1OnuOnuStatePost = (
-    portTargetPayload: PortTargetPayload, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<OnuStateRespons>> => {
-    
-    
-    return axios.post(
-      `/api/v1/onu/onu-state`,
-      portTargetPayload,options
-    );
-  }
+    portTargetPayload: PortTargetPayload,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<OnuStateRespons>(
+      {url: `/api/v1/onu/onu-state`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: portTargetPayload, signal
+    },
+      options);
+    }
+  
 
 
-
-export const getGetStateApiV1OnuOnuStatePostMutationOptions = <TError = AxiosError<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getStateApiV1OnuOnuStatePost>>, TError,{data: PortTargetPayload}, TContext>, axios?: AxiosRequestConfig}
+export const getGetStateApiV1OnuOnuStatePostMutationOptions = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getStateApiV1OnuOnuStatePost>>, TError,{data: PortTargetPayload}, TContext>, request?: SecondParameter<typeof customInstance>}
 ): UseMutationOptions<Awaited<ReturnType<typeof getStateApiV1OnuOnuStatePost>>, TError,{data: PortTargetPayload}, TContext> => {
 
 const mutationKey = ['getStateApiV1OnuOnuStatePost'];
-const {mutation: mutationOptions, axios: axiosOptions} = options ?
+const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, axios: undefined};
+      : {mutation: { mutationKey, }, request: undefined};
 
       
 
@@ -134,7 +137,7 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof getStateApiV1OnuOnuStatePost>>, {data: PortTargetPayload}> = (props) => {
           const {data} = props ?? {};
 
-          return  getStateApiV1OnuOnuStatePost(data,axiosOptions)
+          return  getStateApiV1OnuOnuStatePost(data,requestOptions)
         }
 
         
@@ -144,13 +147,13 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
 
     export type GetStateApiV1OnuOnuStatePostMutationResult = NonNullable<Awaited<ReturnType<typeof getStateApiV1OnuOnuStatePost>>>
     export type GetStateApiV1OnuOnuStatePostMutationBody = PortTargetPayload
-    export type GetStateApiV1OnuOnuStatePostMutationError = AxiosError<HTTPValidationError>
+    export type GetStateApiV1OnuOnuStatePostMutationError = ErrorType<HTTPValidationError>
 
     /**
  * @summary Get State
  */
-export const useGetStateApiV1OnuOnuStatePost = <TError = AxiosError<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getStateApiV1OnuOnuStatePost>>, TError,{data: PortTargetPayload}, TContext>, axios?: AxiosRequestConfig}
+export const useGetStateApiV1OnuOnuStatePost = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getStateApiV1OnuOnuStatePost>>, TError,{data: PortTargetPayload}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof getStateApiV1OnuOnuStatePost>>,
         TError,
@@ -166,28 +169,31 @@ export const useGetStateApiV1OnuOnuStatePost = <TError = AxiosError<HTTPValidati
  * @summary Get Rx
  */
 export const getRxApiV1OnuOnuRxPost = (
-    portTargetPayload: PortTargetPayload, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<OnuRxRespons>> => {
-    
-    
-    return axios.post(
-      `/api/v1/onu/onu-rx`,
-      portTargetPayload,options
-    );
-  }
+    portTargetPayload: PortTargetPayload,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<OnuRxRespons>(
+      {url: `/api/v1/onu/onu-rx`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: portTargetPayload, signal
+    },
+      options);
+    }
+  
 
 
-
-export const getGetRxApiV1OnuOnuRxPostMutationOptions = <TError = AxiosError<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getRxApiV1OnuOnuRxPost>>, TError,{data: PortTargetPayload}, TContext>, axios?: AxiosRequestConfig}
+export const getGetRxApiV1OnuOnuRxPostMutationOptions = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getRxApiV1OnuOnuRxPost>>, TError,{data: PortTargetPayload}, TContext>, request?: SecondParameter<typeof customInstance>}
 ): UseMutationOptions<Awaited<ReturnType<typeof getRxApiV1OnuOnuRxPost>>, TError,{data: PortTargetPayload}, TContext> => {
 
 const mutationKey = ['getRxApiV1OnuOnuRxPost'];
-const {mutation: mutationOptions, axios: axiosOptions} = options ?
+const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, axios: undefined};
+      : {mutation: { mutationKey, }, request: undefined};
 
       
 
@@ -195,7 +201,7 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof getRxApiV1OnuOnuRxPost>>, {data: PortTargetPayload}> = (props) => {
           const {data} = props ?? {};
 
-          return  getRxApiV1OnuOnuRxPost(data,axiosOptions)
+          return  getRxApiV1OnuOnuRxPost(data,requestOptions)
         }
 
         
@@ -205,13 +211,13 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
 
     export type GetRxApiV1OnuOnuRxPostMutationResult = NonNullable<Awaited<ReturnType<typeof getRxApiV1OnuOnuRxPost>>>
     export type GetRxApiV1OnuOnuRxPostMutationBody = PortTargetPayload
-    export type GetRxApiV1OnuOnuRxPostMutationError = AxiosError<HTTPValidationError>
+    export type GetRxApiV1OnuOnuRxPostMutationError = ErrorType<HTTPValidationError>
 
     /**
  * @summary Get Rx
  */
-export const useGetRxApiV1OnuOnuRxPost = <TError = AxiosError<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getRxApiV1OnuOnuRxPost>>, TError,{data: PortTargetPayload}, TContext>, axios?: AxiosRequestConfig}
+export const useGetRxApiV1OnuOnuRxPost = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getRxApiV1OnuOnuRxPost>>, TError,{data: PortTargetPayload}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof getRxApiV1OnuOnuRxPost>>,
         TError,
@@ -227,28 +233,31 @@ export const useGetRxApiV1OnuOnuRxPost = <TError = AxiosError<HTTPValidationErro
  * @summary Reboot Onu
  */
 export const rebootOnuApiV1OnuRebootOnuPost = (
-    onuTargetPayload: OnuTargetPayload, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<RebootResponse>> => {
-    
-    
-    return axios.post(
-      `/api/v1/onu/reboot-onu`,
-      onuTargetPayload,options
-    );
-  }
+    onuTargetPayload: OnuTargetPayload,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<RebootResponse>(
+      {url: `/api/v1/onu/reboot-onu`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: onuTargetPayload, signal
+    },
+      options);
+    }
+  
 
 
-
-export const getRebootOnuApiV1OnuRebootOnuPostMutationOptions = <TError = AxiosError<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rebootOnuApiV1OnuRebootOnuPost>>, TError,{data: OnuTargetPayload}, TContext>, axios?: AxiosRequestConfig}
+export const getRebootOnuApiV1OnuRebootOnuPostMutationOptions = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rebootOnuApiV1OnuRebootOnuPost>>, TError,{data: OnuTargetPayload}, TContext>, request?: SecondParameter<typeof customInstance>}
 ): UseMutationOptions<Awaited<ReturnType<typeof rebootOnuApiV1OnuRebootOnuPost>>, TError,{data: OnuTargetPayload}, TContext> => {
 
 const mutationKey = ['rebootOnuApiV1OnuRebootOnuPost'];
-const {mutation: mutationOptions, axios: axiosOptions} = options ?
+const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, axios: undefined};
+      : {mutation: { mutationKey, }, request: undefined};
 
       
 
@@ -256,7 +265,7 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof rebootOnuApiV1OnuRebootOnuPost>>, {data: OnuTargetPayload}> = (props) => {
           const {data} = props ?? {};
 
-          return  rebootOnuApiV1OnuRebootOnuPost(data,axiosOptions)
+          return  rebootOnuApiV1OnuRebootOnuPost(data,requestOptions)
         }
 
         
@@ -266,13 +275,13 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
 
     export type RebootOnuApiV1OnuRebootOnuPostMutationResult = NonNullable<Awaited<ReturnType<typeof rebootOnuApiV1OnuRebootOnuPost>>>
     export type RebootOnuApiV1OnuRebootOnuPostMutationBody = OnuTargetPayload
-    export type RebootOnuApiV1OnuRebootOnuPostMutationError = AxiosError<HTTPValidationError>
+    export type RebootOnuApiV1OnuRebootOnuPostMutationError = ErrorType<HTTPValidationError>
 
     /**
  * @summary Reboot Onu
  */
-export const useRebootOnuApiV1OnuRebootOnuPost = <TError = AxiosError<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rebootOnuApiV1OnuRebootOnuPost>>, TError,{data: OnuTargetPayload}, TContext>, axios?: AxiosRequestConfig}
+export const useRebootOnuApiV1OnuRebootOnuPost = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rebootOnuApiV1OnuRebootOnuPost>>, TError,{data: OnuTargetPayload}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof rebootOnuApiV1OnuRebootOnuPost>>,
         TError,
@@ -288,28 +297,31 @@ export const useRebootOnuApiV1OnuRebootOnuPost = <TError = AxiosError<HTTPValida
  * @summary Remove Onu
  */
 export const removeOnuApiV1OnuNoOnuPost = (
-    noOnuPayload: NoOnuPayload, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<NoOnuResponse>> => {
-    
-    
-    return axios.post(
-      `/api/v1/onu/no-onu`,
-      noOnuPayload,options
-    );
-  }
+    noOnuPayload: NoOnuPayload,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<NoOnuResponse>(
+      {url: `/api/v1/onu/no-onu`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: noOnuPayload, signal
+    },
+      options);
+    }
+  
 
 
-
-export const getRemoveOnuApiV1OnuNoOnuPostMutationOptions = <TError = AxiosError<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof removeOnuApiV1OnuNoOnuPost>>, TError,{data: NoOnuPayload}, TContext>, axios?: AxiosRequestConfig}
+export const getRemoveOnuApiV1OnuNoOnuPostMutationOptions = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof removeOnuApiV1OnuNoOnuPost>>, TError,{data: NoOnuPayload}, TContext>, request?: SecondParameter<typeof customInstance>}
 ): UseMutationOptions<Awaited<ReturnType<typeof removeOnuApiV1OnuNoOnuPost>>, TError,{data: NoOnuPayload}, TContext> => {
 
 const mutationKey = ['removeOnuApiV1OnuNoOnuPost'];
-const {mutation: mutationOptions, axios: axiosOptions} = options ?
+const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, axios: undefined};
+      : {mutation: { mutationKey, }, request: undefined};
 
       
 
@@ -317,7 +329,7 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof removeOnuApiV1OnuNoOnuPost>>, {data: NoOnuPayload}> = (props) => {
           const {data} = props ?? {};
 
-          return  removeOnuApiV1OnuNoOnuPost(data,axiosOptions)
+          return  removeOnuApiV1OnuNoOnuPost(data,requestOptions)
         }
 
         
@@ -327,13 +339,13 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
 
     export type RemoveOnuApiV1OnuNoOnuPostMutationResult = NonNullable<Awaited<ReturnType<typeof removeOnuApiV1OnuNoOnuPost>>>
     export type RemoveOnuApiV1OnuNoOnuPostMutationBody = NoOnuPayload
-    export type RemoveOnuApiV1OnuNoOnuPostMutationError = AxiosError<HTTPValidationError>
+    export type RemoveOnuApiV1OnuNoOnuPostMutationError = ErrorType<HTTPValidationError>
 
     /**
  * @summary Remove Onu
  */
-export const useRemoveOnuApiV1OnuNoOnuPost = <TError = AxiosError<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof removeOnuApiV1OnuNoOnuPost>>, TError,{data: NoOnuPayload}, TContext>, axios?: AxiosRequestConfig}
+export const useRemoveOnuApiV1OnuNoOnuPost = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof removeOnuApiV1OnuNoOnuPost>>, TError,{data: NoOnuPayload}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof removeOnuApiV1OnuNoOnuPost>>,
         TError,
@@ -349,28 +361,31 @@ export const useRemoveOnuApiV1OnuNoOnuPost = <TError = AxiosError<HTTPValidation
  * @summary Register Sn
  */
 export const registerSnApiV1OnuRegistSnPost = (
-    registSnPayload: RegistSnPayload, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<RegistSnResponse>> => {
-    
-    
-    return axios.post(
-      `/api/v1/onu/regist-sn`,
-      registSnPayload,options
-    );
-  }
+    registSnPayload: RegistSnPayload,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<RegistSnResponse>(
+      {url: `/api/v1/onu/regist-sn`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: registSnPayload, signal
+    },
+      options);
+    }
+  
 
 
-
-export const getRegisterSnApiV1OnuRegistSnPostMutationOptions = <TError = AxiosError<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof registerSnApiV1OnuRegistSnPost>>, TError,{data: RegistSnPayload}, TContext>, axios?: AxiosRequestConfig}
+export const getRegisterSnApiV1OnuRegistSnPostMutationOptions = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof registerSnApiV1OnuRegistSnPost>>, TError,{data: RegistSnPayload}, TContext>, request?: SecondParameter<typeof customInstance>}
 ): UseMutationOptions<Awaited<ReturnType<typeof registerSnApiV1OnuRegistSnPost>>, TError,{data: RegistSnPayload}, TContext> => {
 
 const mutationKey = ['registerSnApiV1OnuRegistSnPost'];
-const {mutation: mutationOptions, axios: axiosOptions} = options ?
+const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, axios: undefined};
+      : {mutation: { mutationKey, }, request: undefined};
 
       
 
@@ -378,7 +393,7 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof registerSnApiV1OnuRegistSnPost>>, {data: RegistSnPayload}> = (props) => {
           const {data} = props ?? {};
 
-          return  registerSnApiV1OnuRegistSnPost(data,axiosOptions)
+          return  registerSnApiV1OnuRegistSnPost(data,requestOptions)
         }
 
         
@@ -388,13 +403,13 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
 
     export type RegisterSnApiV1OnuRegistSnPostMutationResult = NonNullable<Awaited<ReturnType<typeof registerSnApiV1OnuRegistSnPost>>>
     export type RegisterSnApiV1OnuRegistSnPostMutationBody = RegistSnPayload
-    export type RegisterSnApiV1OnuRegistSnPostMutationError = AxiosError<HTTPValidationError>
+    export type RegisterSnApiV1OnuRegistSnPostMutationError = ErrorType<HTTPValidationError>
 
     /**
  * @summary Register Sn
  */
-export const useRegisterSnApiV1OnuRegistSnPost = <TError = AxiosError<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof registerSnApiV1OnuRegistSnPost>>, TError,{data: RegistSnPayload}, TContext>, axios?: AxiosRequestConfig}
+export const useRegisterSnApiV1OnuRegistSnPost = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof registerSnApiV1OnuRegistSnPost>>, TError,{data: RegistSnPayload}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof registerSnApiV1OnuRegistSnPost>>,
         TError,

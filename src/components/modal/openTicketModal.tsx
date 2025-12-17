@@ -65,6 +65,7 @@ export const TicketModal = ({ isOpen, onClose, mode, ticketData }: TicketModalPr
             try {
                 await execute(value);
                 toast.success(submitLabel + " successful");
+                console.log(value);
                 onSuccessAction(value, {
                     title,
                     action: mode === 'create' ? "create" : "update", // Dynamic action logging
@@ -117,10 +118,17 @@ export const TicketModal = ({ isOpen, onClose, mode, ticketData }: TicketModalPr
         setTimeout(() => { resetStore(); resetSearch(); }, 200);
     };
 
+    const handleChangeUser = () => {
+  resetStore();   // clears selectedUser + formData + step
+  resetSearch();  // clears searchTerm & results
+  setStep(1);     // explicit, readable
+};
+
+
     const handleSelectCustomer = (c: any) => {
         selectUser({
             id: c.id, name: c.name, email: c.user_pppoe, role: 'user',
-            _address: c._address, _pppoe: c._pppoe, _sn: c._sn, _olt: c._olt
+            alamat: c.alamat, user_pppoe: c.user_pppoe, onu_sn: c.onu_sn, olt_name: c.olt_name
         } as any);
     };
 
@@ -156,7 +164,10 @@ export const TicketModal = ({ isOpen, onClose, mode, ticketData }: TicketModalPr
                 {/* Unified Form Step */}
                 {step === 2 && (
                     <div className="animate-in fade-in slide-in-from-right-4 duration-300">
-                        {selectedUser && <CustomerCard user={selectedUser} onChangeUser={mode === 'create' ? () => setStep(1) : undefined} />}
+                        {selectedUser && <CustomerCard
+  user={selectedUser}
+  onChangeUser={mode === 'create' ? handleChangeUser : undefined}
+/>}
                         <FormProvider value={form}>
                             {/* Renders OpenFields, CloseFields, etc. dynamically */}
                             <FormFields />

@@ -24,13 +24,6 @@ import type {
   UseQueryResult
 } from '@tanstack/react-query';
 
-import axios from 'axios';
-import type {
-  AxiosError,
-  AxiosRequestConfig,
-  AxiosResponse
-} from 'axios';
-
 import type {
   HTTPValidationError,
   ListResponse,
@@ -38,7 +31,11 @@ import type {
   TerminalResponse
 } from '.././model';
 
+import { customInstance } from '../../api';
+import type { ErrorType } from '../../api';
 
+
+type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
@@ -48,27 +45,29 @@ The terminal will run the 'bash' command.
  * @summary Start Terminal
  */
 export const startTerminalApiV1CliStartTerminalPost = (
-     options?: AxiosRequestConfig
- ): Promise<AxiosResponse<TerminalResponse>> => {
     
-    
-    return axios.post(
-      `/api/v1/cli/start_terminal`,undefined,options
-    );
-  }
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<TerminalResponse>(
+      {url: `/api/v1/cli/start_terminal`, method: 'POST', signal
+    },
+      options);
+    }
+  
 
 
-
-export const getStartTerminalApiV1CliStartTerminalPostMutationOptions = <TError = AxiosError<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof startTerminalApiV1CliStartTerminalPost>>, TError,void, TContext>, axios?: AxiosRequestConfig}
+export const getStartTerminalApiV1CliStartTerminalPostMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof startTerminalApiV1CliStartTerminalPost>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
 ): UseMutationOptions<Awaited<ReturnType<typeof startTerminalApiV1CliStartTerminalPost>>, TError,void, TContext> => {
 
 const mutationKey = ['startTerminalApiV1CliStartTerminalPost'];
-const {mutation: mutationOptions, axios: axiosOptions} = options ?
+const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, axios: undefined};
+      : {mutation: { mutationKey, }, request: undefined};
 
       
 
@@ -76,7 +75,7 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof startTerminalApiV1CliStartTerminalPost>>, void> = () => {
           
 
-          return  startTerminalApiV1CliStartTerminalPost(axiosOptions)
+          return  startTerminalApiV1CliStartTerminalPost(requestOptions)
         }
 
         
@@ -86,13 +85,13 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
 
     export type StartTerminalApiV1CliStartTerminalPostMutationResult = NonNullable<Awaited<ReturnType<typeof startTerminalApiV1CliStartTerminalPost>>>
     
-    export type StartTerminalApiV1CliStartTerminalPostMutationError = AxiosError<unknown>
+    export type StartTerminalApiV1CliStartTerminalPostMutationError = ErrorType<unknown>
 
     /**
  * @summary Start Terminal
  */
-export const useStartTerminalApiV1CliStartTerminalPost = <TError = AxiosError<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof startTerminalApiV1CliStartTerminalPost>>, TError,void, TContext>, axios?: AxiosRequestConfig}
+export const useStartTerminalApiV1CliStartTerminalPost = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof startTerminalApiV1CliStartTerminalPost>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof startTerminalApiV1CliStartTerminalPost>>,
         TError,
@@ -109,27 +108,29 @@ export const useStartTerminalApiV1CliStartTerminalPost = <TError = AxiosError<un
  * @summary Stop Terminal
  */
 export const stopTerminalApiV1CliStopTerminalPortPost = (
-    port: number, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<StopResponse>> => {
-    
-    
-    return axios.post(
-      `/api/v1/cli/stop_terminal/${port}`,undefined,options
-    );
-  }
+    port: number,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<StopResponse>(
+      {url: `/api/v1/cli/stop_terminal/${port}`, method: 'POST', signal
+    },
+      options);
+    }
+  
 
 
-
-export const getStopTerminalApiV1CliStopTerminalPortPostMutationOptions = <TError = AxiosError<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof stopTerminalApiV1CliStopTerminalPortPost>>, TError,{port: number}, TContext>, axios?: AxiosRequestConfig}
+export const getStopTerminalApiV1CliStopTerminalPortPostMutationOptions = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof stopTerminalApiV1CliStopTerminalPortPost>>, TError,{port: number}, TContext>, request?: SecondParameter<typeof customInstance>}
 ): UseMutationOptions<Awaited<ReturnType<typeof stopTerminalApiV1CliStopTerminalPortPost>>, TError,{port: number}, TContext> => {
 
 const mutationKey = ['stopTerminalApiV1CliStopTerminalPortPost'];
-const {mutation: mutationOptions, axios: axiosOptions} = options ?
+const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, axios: undefined};
+      : {mutation: { mutationKey, }, request: undefined};
 
       
 
@@ -137,7 +138,7 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof stopTerminalApiV1CliStopTerminalPortPost>>, {port: number}> = (props) => {
           const {port} = props ?? {};
 
-          return  stopTerminalApiV1CliStopTerminalPortPost(port,axiosOptions)
+          return  stopTerminalApiV1CliStopTerminalPortPost(port,requestOptions)
         }
 
         
@@ -147,13 +148,13 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
 
     export type StopTerminalApiV1CliStopTerminalPortPostMutationResult = NonNullable<Awaited<ReturnType<typeof stopTerminalApiV1CliStopTerminalPortPost>>>
     
-    export type StopTerminalApiV1CliStopTerminalPortPostMutationError = AxiosError<HTTPValidationError>
+    export type StopTerminalApiV1CliStopTerminalPortPostMutationError = ErrorType<HTTPValidationError>
 
     /**
  * @summary Stop Terminal
  */
-export const useStopTerminalApiV1CliStopTerminalPortPost = <TError = AxiosError<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof stopTerminalApiV1CliStopTerminalPortPost>>, TError,{port: number}, TContext>, axios?: AxiosRequestConfig}
+export const useStopTerminalApiV1CliStopTerminalPortPost = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof stopTerminalApiV1CliStopTerminalPortPost>>, TError,{port: number}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof stopTerminalApiV1CliStopTerminalPortPost>>,
         TError,
@@ -170,15 +171,17 @@ export const useStopTerminalApiV1CliStopTerminalPortPost = <TError = AxiosError<
  * @summary List Running Terminals
  */
 export const listRunningTerminalsApiV1CliRunningTerminalsGet = (
-     options?: AxiosRequestConfig
- ): Promise<AxiosResponse<ListResponse>> => {
     
-    
-    return axios.get(
-      `/api/v1/cli/running_terminals`,options
-    );
-  }
-
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<ListResponse>(
+      {url: `/api/v1/cli/running_terminals`, method: 'GET', signal
+    },
+      options);
+    }
+  
 
 
 
@@ -189,16 +192,16 @@ export const getListRunningTerminalsApiV1CliRunningTerminalsGetQueryKey = () => 
     }
 
     
-export const getListRunningTerminalsApiV1CliRunningTerminalsGetQueryOptions = <TData = Awaited<ReturnType<typeof listRunningTerminalsApiV1CliRunningTerminalsGet>>, TError = AxiosError<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listRunningTerminalsApiV1CliRunningTerminalsGet>>, TError, TData>>, axios?: AxiosRequestConfig}
+export const getListRunningTerminalsApiV1CliRunningTerminalsGetQueryOptions = <TData = Awaited<ReturnType<typeof listRunningTerminalsApiV1CliRunningTerminalsGet>>, TError = ErrorType<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listRunningTerminalsApiV1CliRunningTerminalsGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
-const {query: queryOptions, axios: axiosOptions} = options ?? {};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getListRunningTerminalsApiV1CliRunningTerminalsGetQueryKey();
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listRunningTerminalsApiV1CliRunningTerminalsGet>>> = ({ signal }) => listRunningTerminalsApiV1CliRunningTerminalsGet({ signal, ...axiosOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listRunningTerminalsApiV1CliRunningTerminalsGet>>> = ({ signal }) => listRunningTerminalsApiV1CliRunningTerminalsGet(requestOptions, signal);
 
       
 
@@ -208,39 +211,39 @@ const {query: queryOptions, axios: axiosOptions} = options ?? {};
 }
 
 export type ListRunningTerminalsApiV1CliRunningTerminalsGetQueryResult = NonNullable<Awaited<ReturnType<typeof listRunningTerminalsApiV1CliRunningTerminalsGet>>>
-export type ListRunningTerminalsApiV1CliRunningTerminalsGetQueryError = AxiosError<unknown>
+export type ListRunningTerminalsApiV1CliRunningTerminalsGetQueryError = ErrorType<unknown>
 
 
-export function useListRunningTerminalsApiV1CliRunningTerminalsGet<TData = Awaited<ReturnType<typeof listRunningTerminalsApiV1CliRunningTerminalsGet>>, TError = AxiosError<unknown>>(
+export function useListRunningTerminalsApiV1CliRunningTerminalsGet<TData = Awaited<ReturnType<typeof listRunningTerminalsApiV1CliRunningTerminalsGet>>, TError = ErrorType<unknown>>(
   options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listRunningTerminalsApiV1CliRunningTerminalsGet>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof listRunningTerminalsApiV1CliRunningTerminalsGet>>,
           TError,
           Awaited<ReturnType<typeof listRunningTerminalsApiV1CliRunningTerminalsGet>>
         > , 'initialData'
-      >, axios?: AxiosRequestConfig}
+      >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useListRunningTerminalsApiV1CliRunningTerminalsGet<TData = Awaited<ReturnType<typeof listRunningTerminalsApiV1CliRunningTerminalsGet>>, TError = AxiosError<unknown>>(
+export function useListRunningTerminalsApiV1CliRunningTerminalsGet<TData = Awaited<ReturnType<typeof listRunningTerminalsApiV1CliRunningTerminalsGet>>, TError = ErrorType<unknown>>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listRunningTerminalsApiV1CliRunningTerminalsGet>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof listRunningTerminalsApiV1CliRunningTerminalsGet>>,
           TError,
           Awaited<ReturnType<typeof listRunningTerminalsApiV1CliRunningTerminalsGet>>
         > , 'initialData'
-      >, axios?: AxiosRequestConfig}
+      >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useListRunningTerminalsApiV1CliRunningTerminalsGet<TData = Awaited<ReturnType<typeof listRunningTerminalsApiV1CliRunningTerminalsGet>>, TError = AxiosError<unknown>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listRunningTerminalsApiV1CliRunningTerminalsGet>>, TError, TData>>, axios?: AxiosRequestConfig}
+export function useListRunningTerminalsApiV1CliRunningTerminalsGet<TData = Awaited<ReturnType<typeof listRunningTerminalsApiV1CliRunningTerminalsGet>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listRunningTerminalsApiV1CliRunningTerminalsGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary List Running Terminals
  */
 
-export function useListRunningTerminalsApiV1CliRunningTerminalsGet<TData = Awaited<ReturnType<typeof listRunningTerminalsApiV1CliRunningTerminalsGet>>, TError = AxiosError<unknown>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listRunningTerminalsApiV1CliRunningTerminalsGet>>, TError, TData>>, axios?: AxiosRequestConfig}
+export function useListRunningTerminalsApiV1CliRunningTerminalsGet<TData = Awaited<ReturnType<typeof listRunningTerminalsApiV1CliRunningTerminalsGet>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listRunningTerminalsApiV1CliRunningTerminalsGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 

@@ -2,7 +2,7 @@ import { createRootRouteWithContext } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 import { Outlet } from '@tanstack/react-router'
-import { TicketModal } from '../components/modal/TicketModal'
+import { TicketModal } from '../components/modal/openTicketModal'
 
 import { AppLayout } from '../components/Layout'
 

@@ -3,6 +3,8 @@
 import { Avatar, AvatarFallback } from '@/components/ui';
 import { Badge } from './ui/badge';
 import type { Customer } from '@/types';
+import { useTicketStore } from '@/store/ticketStore';
+import { cn } from '@/lib/utils';
 
 interface CustomerCardProps {
     user: Customer;
@@ -10,8 +12,12 @@ interface CustomerCardProps {
 }
 
 export const CustomerCard = ({ user, onChangeUser }: CustomerCardProps) => {
+
+    const selectedUser = useTicketStore((state) => state.selectedUser);
+    const isSelected = selectedUser?.user_pppoe === user.user_pppoe;
+
     return (
-        <div className="group relative overflow-hidden rounded-xl border border-slate-200 bg-slate-50/50 p-5 transition-all hover:border-indigo-200 hover:shadow-sm dark:border-zinc-800 dark:bg-white/5 dark:hover:border-indigo-900/50">
+        <div className={cn("group relative overflow-hidden rounded-xl border border-slate-200 bg-slate-50/50 p-5 transition-all hover:border-indigo-200 hover:shadow-sm dark:border-zinc-800 dark:bg-white/5 dark:hover:border-indigo-900/50", isSelected && "border-indigo-200")}>
 
             <div className="flex items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
@@ -35,7 +41,7 @@ export const CustomerCard = ({ user, onChangeUser }: CustomerCardProps) => {
                                 Active
                             </div>
                             <span className="text-slate-300 dark:text-zinc-700">|</span>
-                            <span className="font-mono text-slate-500 dark:text-slate-500">ID: {user.id}</span>
+                            <span className="font-mono text-slate-500 dark:text-slate-500">ID: {user.user_pppoe}</span>
                         </div>
                     </div>
                 </div>

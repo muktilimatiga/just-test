@@ -8,6 +8,12 @@ export default defineConfig({
       schemas: 'src/services/generated/model',
       client: 'react-query',
       mock: false,
+      override: {
+        mutator: {
+          path: 'src/services/api.ts',
+          name: 'customInstance',
+        },
+      },
     },
     input: {
       target: './openapi.json',
