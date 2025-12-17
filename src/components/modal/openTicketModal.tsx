@@ -10,7 +10,7 @@ import { useActionSuccess, useActionError } from '@/hooks/useActionLog';
 import { toast } from 'sonner';
 
 // Import the Strategy Hook we just created
-import { useTicketFormStrategy, type TicketMode } from '@/store/useTicketForm';
+import { useTicketForm, type TicketMode } from '@/store/useTicketForm';
 
 interface TicketModalProps {
     isOpen: boolean;
@@ -32,7 +32,7 @@ export const TicketModal = ({ isOpen, onClose, mode, ticketData }: TicketModalPr
     } = useFiberStore();
 
     // 2. PARSE STRATEGY (This loads the specific Form + API for the current mode)
-    const { title, FormFields, schema, mutation, submitLabel, variant, execute } = useTicketFormStrategy(mode);
+    const { title, FormFields, schema, mutation, submitLabel, variant, execute } = useTicketForm(mode);
     const onSuccessAction = useActionSuccess();
     const onErrorAction = useActionError();
 

@@ -2,10 +2,10 @@ import axios from 'axios';
 import type { AxiosRequestConfig, AxiosError } from 'axios';
 
 // Base API configuration
-export const API_BASE_URL = 'http://localhost:8001';
+export const API_BASE_URL = 'http://localhost:8002';
 
-export const AXIOS_INSTANCE = axios.create({ 
-  baseURL: API_BASE_URL 
+export const AXIOS_INSTANCE = axios.create({
+  baseURL: API_BASE_URL
 });
 
 export const customInstance = <T>(config: AxiosRequestConfig, options?: AxiosRequestConfig): Promise<T> => {

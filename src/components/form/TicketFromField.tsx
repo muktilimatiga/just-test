@@ -3,7 +3,31 @@ import { FieldWrapper } from './FieldWrapper';
 import { z } from 'zod';
 
 
-export const DefaultFormSchema = z.object({
+// Define a base compatibility schema containing ALL possible form fields as optional strings.
+// This ensures that any specific schema is assignable to the generic form state, preventing "missing property" errors.
+export const TicketCompatibilitySchema = z.object({
+    name: z.string(),
+    address: z.string(),
+    description: z.string(),
+    priority: z.string(),
+    olt_name: z.string(),
+    user_pppoe: z.string(),
+    onu_sn: z.string(),
+    interface: z.string(),
+    ticketRef: z.string(),
+    type: z.string(),
+    action_ticket: z.string(),
+    action_close: z.string(),
+    last_action: z.string(),
+    service_impact: z.string(),
+    root_cause: z.string(),
+    network_impact: z.string(),
+    person_in_charge: z.string(),
+    recomended_action: z.string(),
+    PIC: z.string(),
+});
+
+export const DefaultFormSchema = TicketCompatibilitySchema.extend({
     name: z.string(),
     address: z.string(),
     description: z.string(),
@@ -23,14 +47,10 @@ export const CreateTicketFormSchema = DefaultFormSchema.extend({
     type: z.enum(['FREE', 'CHARGED']),
 })
 
-export const OpenTicketFormSchema = TicketFormSchema.omit({
-    onu_sn: true,
-}).extend({
+export const OpenTicketFormSchema = TicketFormSchema.extend({
     olt_name: z.string(),
     action_ticket: z.string(),
 })
-
-
 
 export const ForwardTicketFormSchema = TicketFormSchema.extend({
     last_action: z.string(),
@@ -42,12 +62,16 @@ export const ForwardTicketFormSchema = TicketFormSchema.extend({
     recomended_action: z.string(),
 })
 
-export const CloseTicketFormSchema = TicketFormSchema.pick({
-    name: true,
-    address: true,
-    onu_sn: true,
-    PIC: true,
-}).extend({
+// For CloseTicketFormSchema, we use ticketCompatibilitySchema as base to ensure all props exist,
+// then merge the specific picked fields (making them required), then extend with action_close.
+export const CloseTicketFormSchema = TicketCompatibilitySchema.merge(
+    TicketFormSchema.pick({
+        name: true,
+        address: true,
+        onu_sn: true,
+        PIC: true,
+    })
+).extend({
     action_close: z.string(),
 })
 

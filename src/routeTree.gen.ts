@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LogKomplainIndexRouteImport } from './routes/log-komplain/index'
 import { Route as LauncherIndexRouteImport } from './routes/launcher/index'
+import { Route as LauncherRealIndexRouteImport } from './routes/launcher/realIndex'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -28,33 +29,42 @@ const LauncherIndexRoute = LauncherIndexRouteImport.update({
   path: '/launcher/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LauncherRealIndexRoute = LauncherRealIndexRouteImport.update({
+  id: '/launcher/realIndex',
+  path: '/launcher/realIndex',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/launcher/realIndex': typeof LauncherRealIndexRoute
   '/launcher': typeof LauncherIndexRoute
   '/log-komplain': typeof LogKomplainIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/launcher/realIndex': typeof LauncherRealIndexRoute
   '/launcher': typeof LauncherIndexRoute
   '/log-komplain': typeof LogKomplainIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/launcher/realIndex': typeof LauncherRealIndexRoute
   '/launcher/': typeof LauncherIndexRoute
   '/log-komplain/': typeof LogKomplainIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/launcher' | '/log-komplain'
+  fullPaths: '/' | '/launcher/realIndex' | '/launcher' | '/log-komplain'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/launcher' | '/log-komplain'
-  id: '__root__' | '/' | '/launcher/' | '/log-komplain/'
+  to: '/' | '/launcher/realIndex' | '/launcher' | '/log-komplain'
+  id: '__root__' | '/' | '/launcher/realIndex' | '/launcher/' | '/log-komplain/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  LauncherRealIndexRoute: typeof LauncherRealIndexRoute
   LauncherIndexRoute: typeof LauncherIndexRoute
   LogKomplainIndexRoute: typeof LogKomplainIndexRoute
 }
@@ -82,11 +92,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LauncherIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/launcher/realIndex': {
+      id: '/launcher/realIndex'
+      path: '/launcher/realIndex'
+      fullPath: '/launcher/realIndex'
+      preLoaderRoute: typeof LauncherRealIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  LauncherRealIndexRoute: LauncherRealIndexRoute,
   LauncherIndexRoute: LauncherIndexRoute,
   LogKomplainIndexRoute: LogKomplainIndexRoute,
 }
