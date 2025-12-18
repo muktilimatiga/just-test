@@ -1,14 +1,26 @@
-import { useEffect } from 'react';
-import { Button } from '@/components/ui/button';
+import { useEffect, useState } from 'react';
 import { ModalOverlay } from '@/components/ModalOverlay';
-import { toast } from 'sonner';
-import { RefreshCw, Trash2, Layers, Scan, X } from 'lucide-react';
 
-// Hooks & Store
+// Helper to sync form state to store
+const EffectSync = ({ value, onChange }: { value: any, onChange: (val: any) => void }) => {
+    useEffect(() => {
+        if (value) onChange(value);
+    }, [value, onChange]);
+    return null;
+};
+import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
+
+import { toast } from "sonner"
+import { X, RefreshCw, Trash2, Layers, Scan } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+// Store & Hooks
 import { useConfigStore } from '@/store/configStore';
 import { useConfigFormStrategy } from '@/store/useConfigForm';
 import { useAppForm, FormProvider } from '@/components/form/hooks';
-import { useConfigOptions, useScanOnts } from '@/hooks/useApi';
+import { useConfigOptions, usePsbData, useScanOnts } from '@/hooks/useApi';
+import { useFiberStore } from '@/store/useFiberStore';
 
 interface ConfigModalProps {
     isOpen: boolean;
@@ -18,75 +30,81 @@ interface ConfigModalProps {
 
 export const ConfigModalTest = ({ isOpen, onClose, type }: ConfigModalProps) => {
 
-    // --- STORE ---
+    // UI State
+    const [activeMode, setActiveMode] = useState(type === 'auto' ? 'auto' : 'manual');
+
+    // Store
     const {
         selectedOlt, setSelectedOlt,
-        formData,
-        batchQueue, addToBatch, removeFromBatch,
+        formData, batchQueue, addToBatch, removeFromBatch,
         detectedOnts, setDetectedOnts,
         reset
     } = useConfigStore();
 
-    // --- API ---
-    const { data: optionsData } = useConfigOptions();
+    const {
+        data: psbList,
+        isLoading: isPsbLoading,
+        refetch: refetchPsb,
+        isRefetching: isRefetching,
+    } = usePsbData();
+
+    const {
+        searchTerm,
+        setSearchTerm,
+        searchCustomers,
+        searchResults,
+        resetSearch
+    } = useFiberStore();
+
+    // API
     const { mutateAsync: scanOnts, isPending: isScanning } = useScanOnts();
+    const currentType = type === 'batch' ? 'batch' : type === 'bridge' ? 'bridge' : activeMode;
+    const { title, FormFields, schema, execute, submitLabel } = useConfigFormStrategy(currentType, selectedOlt);
 
-    const oltOptions = optionsData?.olt_options || [];
-
-    // --- STRATEGY ---
-    const { title, FormFields, schema, execute, submitLabel } = useConfigFormStrategy(
-        type === 'batch' ? 'batch' : type,
-        selectedOlt
-    );
-
-    // --- FORM ENGINE ---
+    // Form
     const form = useAppForm({
         defaultValues: {
-            olt_name: '',
-            modem_type: '',
-            onu_sn: '',
+            olt_name: '', modem_type: '', onu_sn: '', package: '',
+            name: '', address: '', user_pppoe: '',
+            pass_pppoe: '123456', // Match Store Default
             eth_locks: [false, false, false, false],
-            package: '',
-            name: '',
-            address: '',
-            user_pppoe: '',
-            pass_pppoe: '',
-            data_psb: '',
-            vlan_id: 0,
+            vlan_id: 100, // Match Store Default
+            data_psb: ''
         },
         validators: { onChange: schema },
         onSubmit: async ({ value }) => {
-            // Ensure OLT is selected (It's part of the form now, so validator handles it, but good to check)
-            if (!value.olt_name) {
-                toast.error("Please select an OLT");
-                return;
-            }
-            // Sync store selectedOlt just in case logic depends on it
-            setSelectedOlt(value.olt_name);
-
+            if (!value.olt_name) return toast.error("Please select an OLT");
             try {
                 await execute(value, batchQueue);
-                toast.success("Configuration started successfully");
+                toast.success("Configuration started");
                 handleClose();
             } catch (error: any) {
-                toast.error(error.message || "Configuration failed");
+                toast.error(error.message || "Failed");
             }
         }
     });
 
-    // --- EFFECTS ---
-    useEffect(() => {
-        if (isOpen) {
-            reset();
-            form.reset(formData);
-        }
-    }, [isOpen]);
+    const handleSelectUser = (user: any) => {
+    form.setFieldValue('customer.name', user.name || '');
+    form.setFieldValue('customer.address', user.alamat || '');
+    form.setFieldValue('customer.pppoe_user', user.user_pppoe || '');
+    form.setFieldValue('customer.pppoe_pass', user.pppoe_password || '123456');
+    resetSearch();
+    setSearchTerm('');
+  };
 
-    // Sync OLT Selection from Form -> Store (So the Strategy knows which OLT to use for mutations)
-    const formOltName = form.state.values.olt_name;
-    useEffect(() => {
-        if (formOltName) setSelectedOlt(formOltName);
-    }, [formOltName, setSelectedOlt]);
+    const handleSelectPsb = (value: string) => { // Changed from (e: any)
+    const selectedId = value; // Use value directly
+    const selected = psbList?.find(p => p.user_pppoe === selectedId);
+
+    if (selected) {
+      form.setFieldValue('customer.name', selected.name || '');
+      form.setFieldValue('customer.address', selected.address || '');
+      form.setFieldValue('customer.pppoe_user', selected.user_pppoe || '');
+      form.setFieldValue('customer.pppoe_pass', selected.pppoe_password || '');
+      if (selected.paket) form.setFieldValue('package', selected.paket);
+    }
+  };
 
 
     const handleClose = () => {
@@ -97,59 +115,68 @@ export const ConfigModalTest = ({ isOpen, onClose, type }: ConfigModalProps) => 
     const handleScan = async () => {
         if (!selectedOlt) return toast.error("Select OLT first");
         try {
-            const results = await scanOnts(selectedOlt);
-            setDetectedOnts(results || []);
-            toast.success(`Found ${results?.length || 0} devices`);
-        } catch (e) {
+            const res = await scanOnts(selectedOlt);
+            setDetectedOnts(res || []);
+            if (currentType !== 'batch' && res?.length) form.setFieldValue('onu_sn', res[0].sn);
+            toast.success(`Found ${res?.length || 0} devices`);
+        } catch {
             toast.error("Scan failed");
         }
     };
 
     return (
-        <ModalOverlay
-            isOpen={isOpen}
-            onClose={handleClose}
-            className="max-w-xl h-auto p-0 overflow-hidden rounded-xl border border-slate-200 dark:border-zinc-800 shadow-2xl bg-white dark:bg-zinc-900"
-            hideCloseButton // We implement custom close
-        >
-            {/* HEADER */}
-            <div className="px-6 py-4 border-b bg-white dark:bg-zinc-900 flex justify-between items-center">
-                <h2 className="text-lg font-bold tracking-tight">{title}</h2>
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500" onClick={handleClose}>
-                    <X className="h-4 w-4" />
-                </Button>
+        <ModalOverlay isOpen={isOpen} onClose={handleClose} hideCloseButton className="max-w-xl h-auto p-0 overflow-hidden rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xl">
+            {/* Header */}
+            <div className="px-6 py-4 border-b flex justify-between items-center bg-white dark:bg-zinc-900">
+                <h2 className="text-lg font-bold">{title}</h2>
+                <div className="flex items-center gap-4">
+                    {/* Mode Toggle */}
+                    {type !== 'batch' && type !== 'bridge' && (
+                        <div className="flex items-center gap-2 bg-slate-100 dark:bg-zinc-800 p-1 pr-3 rounded-full border">
+                            <Switch checked={activeMode === 'auto'} onCheckedChange={(c) => setActiveMode(c ? 'auto' : 'manual')} className="scale-75" />
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">{activeMode === 'auto' ? 'Auto (API)' : 'Manual'}</span>
+                        </div>
+                    )}
+                    <button onClick={handleClose} className="text-slate-400 hover:text-slate-600"><X className="h-5 w-5" /></button>
+                </div>
             </div>
 
-            {/* CONTENT */}
+            {/* Content */}
             <div className="p-5 overflow-y-auto max-h-[75vh]">
                 <FormProvider value={form}>
-                    {/* Pass OLT Options down to the fields */}
-                    <FormFields oltOptions={oltOptions} />
+                    {/* Sync OLT */}
+                    <form.Subscribe
+                        selector={(state) => state.values.olt_name}
+                        children={(olt) => <EffectSync value={olt} onChange={setSelectedOlt} />}
+                    />
+                    {/* THE MAGIC: All complexity is hidden here */}
+                    <FormFields
+                        detectedOnts={detectedOnts}
+                        onScan={handleScan}
+                        isScanning={isScanning}
+                        psbList={psbList}
+                        selectPSBList={selectPSBList}
+                    />
                 </FormProvider>
 
-                {/* EXTRA: Batch Queue UI */}
+                {/* Batch Queue UI (Only for batch mode) */}
                 {type === 'batch' && (
-                    <div className="mt-6 space-y-3 animate-in fade-in slide-in-from-bottom-2">
+                    <div className="mt-6 space-y-3 pt-4 border-t border-slate-100">
                         <div className="flex justify-between items-end">
-                            <h3 className="text-xs font-bold uppercase text-slate-500">Device Queue ({batchQueue.length})</h3>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={handleScan}
-                                disabled={isScanning || !selectedOlt}
-                                className="h-8 text-xs"
-                            >
-                                {isScanning ? <RefreshCw className="h-3 w-3 animate-spin mr-2" /> : <Scan className="h-3 w-3 mr-2" />}
-                                Scan Network
-                            </Button>
+                            <h3 className="text-xs font-bold uppercase text-slate-500">Queue ({batchQueue.length})</h3>
+                            <div className="flex gap-2">
+                                <Button variant="outline" size="sm" onClick={handleScan} disabled={isScanning} className="h-8 text-xs">
+                                    <RefreshCw className={cn("h-3 w-3 mr-2", isScanning && "animate-spin")} />
+                                    Scan
+                                </Button>
+                            </div>
                         </div>
 
-                        {/* Dropdown to Add to Queue */}
+                        {/* Add to Queue Dropdown */}
                         {detectedOnts.length > 0 && (
-                            <div className="p-2 bg-blue-50 border border-blue-200 rounded-lg">
-                                {/* Simple native select for speed, or replace with Shadcn Select */}
+                            <div className="p-2 bg-blue-50 border border-blue-200 rounded-lg animate-in fade-in zoom-in-95 duration-200">
                                 <select
-                                    className="w-full text-xs bg-transparent border-none outline-none text-blue-700 font-medium"
+                                    className="w-full text-xs bg-transparent border-none outline-none text-blue-700 font-medium cursor-pointer"
                                     onChange={(e) => {
                                         const sn = e.target.value;
                                         if (!sn) return;
@@ -158,17 +185,17 @@ export const ConfigModalTest = ({ isOpen, onClose, type }: ConfigModalProps) => 
                                         e.target.value = ""; // reset
                                     }}
                                 >
-                                    <option value="">+ Add Detected Device...</option>
+                                    <option value="">+ Add Detected Device to Queue...</option>
                                     {detectedOnts.map(ont => (
                                         <option key={ont.sn} value={ont.sn} disabled={!!batchQueue.find(b => b.sn === ont.sn)}>
-                                            {ont.sn} (Port {ont.pon_port})
+                                            {ont.sn} (Port {ont.pon_port || '?'})
                                         </option>
                                     ))}
                                 </select>
                             </div>
                         )}
 
-                        {/* The List */}
+                        {/* Queue List */}
                         <div className="border rounded-lg overflow-hidden bg-slate-50/50 min-h-[150px]">
                             {batchQueue.length === 0 ? (
                                 <div className="flex flex-col items-center justify-center py-8 text-slate-400 gap-2">
@@ -176,29 +203,37 @@ export const ConfigModalTest = ({ isOpen, onClose, type }: ConfigModalProps) => 
                                     <p className="text-xs">Queue is empty</p>
                                 </div>
                             ) : (
-                                batchQueue.map(item => (
-                                    <div key={item.sn} className="flex items-center justify-between p-2 border-b last:border-0 bg-white text-xs">
-                                        <div className="font-mono font-bold">{item.sn}</div>
-                                        <div className="text-slate-500">{item.port}</div>
-                                        <button onClick={() => removeFromBatch(item.sn)} className="text-red-400 hover:text-red-600">
-                                            <Trash2 className="h-4 w-4" />
-                                        </button>
-                                    </div>
-                                ))
+                                <div className="divide-y divide-slate-100">
+                                    {batchQueue.map(item => (
+                                        <div key={item.sn} className="flex items-center justify-between p-2.5 bg-white text-xs hover:bg-slate-50 transition-colors">
+                                            <div className="flex items-center gap-3">
+                                                <div className="h-6 w-6 rounded bg-slate-100 flex items-center justify-center text-slate-500 font-bold text-[10px]">
+                                                    {batchQueue.indexOf(item) + 1}
+                                                </div>
+                                                <div>
+                                                    <div className="font-mono font-bold text-slate-700">{item.sn}</div>
+                                                    <div className="text-[10px] text-slate-400">Port {item.port}</div>
+                                                </div>
+                                            </div>
+                                            <button
+                                                onClick={() => removeFromBatch(item.sn)}
+                                                className="h-6 w-6 flex items-center justify-center text-slate-300 hover:text-red-500 hover:bg-red-50 rounded transition-all"
+                                            >
+                                                <Trash2 className="h-4 w-4" />
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
                             )}
                         </div>
                     </div>
                 )}
             </div>
 
-            {/* FOOTER */}
+            {/* Footer */}
             <div className="p-4 border-t flex justify-end gap-3 bg-slate-50/30">
                 <Button variant="outline" onClick={handleClose}>Cancel</Button>
-                <Button
-                    onClick={(e) => { e.preventDefault(); form.handleSubmit(); }}
-                    disabled={form.state.isSubmitting}
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-md"
-                >
+                <Button onClick={(e) => { e.preventDefault(); form.handleSubmit(); }} disabled={form.state.isSubmitting} className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-md">
                     {form.state.isSubmitting ? "Processing..." : submitLabel}
                 </Button>
             </div>
