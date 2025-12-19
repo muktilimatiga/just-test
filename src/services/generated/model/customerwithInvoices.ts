@@ -7,7 +7,7 @@
  */
 import type { CustomerwithInvoicesName } from './customerwithInvoicesName';
 import type { CustomerwithInvoicesUserPppoe } from './customerwithInvoicesUserPppoe';
-import type { InvoiceItem } from './invoiceItem';
+import type { BillingSummary } from './billingSummary';
 
 export interface CustomerwithInvoices {
   id: string;
@@ -18,5 +18,5 @@ export interface CustomerwithInvoices {
    * @maxLength 2083
    */
   detail_url: string;
-  invoices?: InvoiceItem[];
+  invoices?: BillingSummary[];
 }

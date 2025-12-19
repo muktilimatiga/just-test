@@ -8,13 +8,9 @@
 import type { CustomerInfo } from './customerInfo';
 
 export interface ConfigurationRequest {
-  name: string;
-  address: string;
-  pppoe_user: string;
-  pppoe_pass: string;
   sn: string;
   customer: CustomerInfo;
+  package: string;
   modem_type: string;
-  paket: string;
   eth_locks: boolean[];
 }

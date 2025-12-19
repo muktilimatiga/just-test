@@ -16,7 +16,7 @@ export default defineConfig({
       },
     },
     input: {
-      target: './localhost:8002/openapi.json',
+      target: 'http://localhost:8002/openapi.json',
     },
   },
 });

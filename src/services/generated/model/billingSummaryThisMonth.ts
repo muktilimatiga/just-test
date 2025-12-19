@@ -6,10 +6,4 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export interface ConfigurationSummary {
-  serial_number: string;
-  name: string;
-  pppoe_user: string;
-  location: string;
-  profile: string;
-}
+export type BillingSummaryThisMonth = string | null;

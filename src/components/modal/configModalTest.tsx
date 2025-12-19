@@ -17,7 +17,7 @@ import { cn } from '@/lib/utils';
 
 // Store & Hooks
 import { useConfigStore } from '@/store/configStore';
-import { useConfigFormStrategy } from '@/store/useConfigForm';
+import { useConfigFormStrategy } from '@/store/useConfigApi';
 import { useAppForm, FormProvider } from '@/components/form/hooks';
 import { useConfigOptions, usePsbData, useScanOnts } from '@/hooks/useApi';
 import { useFiberStore } from '@/store/useFiberStore';

@@ -6,27 +6,30 @@
  * OpenAPI spec version: 1.0.0
  */
 import {
-  useMutation
+  useMutation,
+  useQuery
 } from '@tanstack/react-query';
 import type {
+  DataTag,
+  DefinedInitialDataOptions,
+  DefinedUseQueryResult,
   MutationFunction,
   QueryClient,
+  QueryFunction,
+  QueryKey,
+  UndefinedInitialDataOptions,
   UseMutationOptions,
-  UseMutationResult
+  UseMutationResult,
+  UseQueryOptions,
+  UseQueryResult
 } from '@tanstack/react-query';
 
 import type {
-  CustomerOnuDetail,
+  ConfigurationRequest,
+  ConfigurationResponse,
   HTTPValidationError,
-  NoOnuPayload,
-  NoOnuResponse,
-  OnuRxRespons,
-  OnuStateRespons,
-  OnuTargetPayload,
-  PortTargetPayload,
-  RebootResponse,
-  RegistSnPayload,
-  RegistSnResponse
+  OptionsResponse,
+  UnconfiguredOnt
 } from '.././model';
 
 import { customInstance } from '../../api';
@@ -38,29 +41,217 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 /**
- * @summary Get Customer Details
+ * Mengembalikan semua opsi yang dibutuhkan untuk form di frontend.
+ * @summary Get Options
  */
-export const getCustomerDetailsApiV1OnuDetailSearchPost = (
-    onuTargetPayload: OnuTargetPayload,
+export const getOptionsApiV1OnuApiOptionsGet = (
+    
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
       
       
-      return customInstance<CustomerOnuDetail>(
-      {url: `/api/v1/onu/detail-search`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: onuTargetPayload, signal
+      return customInstance<OptionsResponse>(
+      {url: `/api/v1/onu/api/options`, method: 'GET', signal
     },
       options);
     }
   
 
 
-export const getGetCustomerDetailsApiV1OnuDetailSearchPostMutationOptions = <TError = ErrorType<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getCustomerDetailsApiV1OnuDetailSearchPost>>, TError,{data: OnuTargetPayload}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof getCustomerDetailsApiV1OnuDetailSearchPost>>, TError,{data: OnuTargetPayload}, TContext> => {
 
-const mutationKey = ['getCustomerDetailsApiV1OnuDetailSearchPost'];
+export const getGetOptionsApiV1OnuApiOptionsGetQueryKey = () => {
+    return [
+    `/api/v1/onu/api/options`
+    ] as const;
+    }
+
+    
+export const getGetOptionsApiV1OnuApiOptionsGetQueryOptions = <TData = Awaited<ReturnType<typeof getOptionsApiV1OnuApiOptionsGet>>, TError = ErrorType<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOptionsApiV1OnuApiOptionsGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetOptionsApiV1OnuApiOptionsGetQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getOptionsApiV1OnuApiOptionsGet>>> = ({ signal }) => getOptionsApiV1OnuApiOptionsGet(requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getOptionsApiV1OnuApiOptionsGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetOptionsApiV1OnuApiOptionsGetQueryResult = NonNullable<Awaited<ReturnType<typeof getOptionsApiV1OnuApiOptionsGet>>>
+export type GetOptionsApiV1OnuApiOptionsGetQueryError = ErrorType<unknown>
+
+
+export function useGetOptionsApiV1OnuApiOptionsGet<TData = Awaited<ReturnType<typeof getOptionsApiV1OnuApiOptionsGet>>, TError = ErrorType<unknown>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOptionsApiV1OnuApiOptionsGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getOptionsApiV1OnuApiOptionsGet>>,
+          TError,
+          Awaited<ReturnType<typeof getOptionsApiV1OnuApiOptionsGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetOptionsApiV1OnuApiOptionsGet<TData = Awaited<ReturnType<typeof getOptionsApiV1OnuApiOptionsGet>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOptionsApiV1OnuApiOptionsGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getOptionsApiV1OnuApiOptionsGet>>,
+          TError,
+          Awaited<ReturnType<typeof getOptionsApiV1OnuApiOptionsGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetOptionsApiV1OnuApiOptionsGet<TData = Awaited<ReturnType<typeof getOptionsApiV1OnuApiOptionsGet>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOptionsApiV1OnuApiOptionsGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get Options
+ */
+
+export function useGetOptionsApiV1OnuApiOptionsGet<TData = Awaited<ReturnType<typeof getOptionsApiV1OnuApiOptionsGet>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOptionsApiV1OnuApiOptionsGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetOptionsApiV1OnuApiOptionsGetQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+/**
+ * Mendeteksi semua unconfigured ONT pada OLT yang dipilih.
+ * @summary Detect Uncfg Onts
+ */
+export const detectUncfgOntsApiV1OnuApiOltsOltNameDetectOntsGet = (
+    oltName: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<UnconfiguredOnt[]>(
+      {url: `/api/v1/onu/api/olts/${oltName}/detect-onts`, method: 'GET', signal
+    },
+      options);
+    }
+  
+
+
+
+export const getDetectUncfgOntsApiV1OnuApiOltsOltNameDetectOntsGetQueryKey = (oltName?: string,) => {
+    return [
+    `/api/v1/onu/api/olts/${oltName}/detect-onts`
+    ] as const;
+    }
+
+    
+export const getDetectUncfgOntsApiV1OnuApiOltsOltNameDetectOntsGetQueryOptions = <TData = Awaited<ReturnType<typeof detectUncfgOntsApiV1OnuApiOltsOltNameDetectOntsGet>>, TError = ErrorType<HTTPValidationError>>(oltName: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof detectUncfgOntsApiV1OnuApiOltsOltNameDetectOntsGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getDetectUncfgOntsApiV1OnuApiOltsOltNameDetectOntsGetQueryKey(oltName);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof detectUncfgOntsApiV1OnuApiOltsOltNameDetectOntsGet>>> = ({ signal }) => detectUncfgOntsApiV1OnuApiOltsOltNameDetectOntsGet(oltName, requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(oltName), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof detectUncfgOntsApiV1OnuApiOltsOltNameDetectOntsGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type DetectUncfgOntsApiV1OnuApiOltsOltNameDetectOntsGetQueryResult = NonNullable<Awaited<ReturnType<typeof detectUncfgOntsApiV1OnuApiOltsOltNameDetectOntsGet>>>
+export type DetectUncfgOntsApiV1OnuApiOltsOltNameDetectOntsGetQueryError = ErrorType<HTTPValidationError>
+
+
+export function useDetectUncfgOntsApiV1OnuApiOltsOltNameDetectOntsGet<TData = Awaited<ReturnType<typeof detectUncfgOntsApiV1OnuApiOltsOltNameDetectOntsGet>>, TError = ErrorType<HTTPValidationError>>(
+ oltName: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof detectUncfgOntsApiV1OnuApiOltsOltNameDetectOntsGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof detectUncfgOntsApiV1OnuApiOltsOltNameDetectOntsGet>>,
+          TError,
+          Awaited<ReturnType<typeof detectUncfgOntsApiV1OnuApiOltsOltNameDetectOntsGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDetectUncfgOntsApiV1OnuApiOltsOltNameDetectOntsGet<TData = Awaited<ReturnType<typeof detectUncfgOntsApiV1OnuApiOltsOltNameDetectOntsGet>>, TError = ErrorType<HTTPValidationError>>(
+ oltName: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof detectUncfgOntsApiV1OnuApiOltsOltNameDetectOntsGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof detectUncfgOntsApiV1OnuApiOltsOltNameDetectOntsGet>>,
+          TError,
+          Awaited<ReturnType<typeof detectUncfgOntsApiV1OnuApiOltsOltNameDetectOntsGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDetectUncfgOntsApiV1OnuApiOltsOltNameDetectOntsGet<TData = Awaited<ReturnType<typeof detectUncfgOntsApiV1OnuApiOltsOltNameDetectOntsGet>>, TError = ErrorType<HTTPValidationError>>(
+ oltName: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof detectUncfgOntsApiV1OnuApiOltsOltNameDetectOntsGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Detect Uncfg Onts
+ */
+
+export function useDetectUncfgOntsApiV1OnuApiOltsOltNameDetectOntsGet<TData = Awaited<ReturnType<typeof detectUncfgOntsApiV1OnuApiOltsOltNameDetectOntsGet>>, TError = ErrorType<HTTPValidationError>>(
+ oltName: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof detectUncfgOntsApiV1OnuApiOltsOltNameDetectOntsGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getDetectUncfgOntsApiV1OnuApiOltsOltNameDetectOntsGetQueryOptions(oltName,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+/**
+ * Menjalankan proses konfigurasi untuk satu ONT.
+ * @summary Run Configuration
+ */
+export const runConfigurationApiV1OnuApiOltsOltNameConfigurePost = (
+    oltName: string,
+    configurationRequest: ConfigurationRequest,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<ConfigurationResponse>(
+      {url: `/api/v1/onu/api/olts/${oltName}/configure`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: configurationRequest, signal
+    },
+      options);
+    }
+  
+
+
+export const getRunConfigurationApiV1OnuApiOltsOltNameConfigurePostMutationOptions = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof runConfigurationApiV1OnuApiOltsOltNameConfigurePost>>, TError,{oltName: string;data: ConfigurationRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof runConfigurationApiV1OnuApiOltsOltNameConfigurePost>>, TError,{oltName: string;data: ConfigurationRequest}, TContext> => {
+
+const mutationKey = ['runConfigurationApiV1OnuApiOltsOltNameConfigurePost'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -70,10 +261,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof getCustomerDetailsApiV1OnuDetailSearchPost>>, {data: OnuTargetPayload}> = (props) => {
-          const {data} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof runConfigurationApiV1OnuApiOltsOltNameConfigurePost>>, {oltName: string;data: ConfigurationRequest}> = (props) => {
+          const {oltName,data} = props ?? {};
 
-          return  getCustomerDetailsApiV1OnuDetailSearchPost(data,requestOptions)
+          return  runConfigurationApiV1OnuApiOltsOltNameConfigurePost(oltName,data,requestOptions)
         }
 
         
@@ -81,343 +272,23 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type GetCustomerDetailsApiV1OnuDetailSearchPostMutationResult = NonNullable<Awaited<ReturnType<typeof getCustomerDetailsApiV1OnuDetailSearchPost>>>
-    export type GetCustomerDetailsApiV1OnuDetailSearchPostMutationBody = OnuTargetPayload
-    export type GetCustomerDetailsApiV1OnuDetailSearchPostMutationError = ErrorType<HTTPValidationError>
+    export type RunConfigurationApiV1OnuApiOltsOltNameConfigurePostMutationResult = NonNullable<Awaited<ReturnType<typeof runConfigurationApiV1OnuApiOltsOltNameConfigurePost>>>
+    export type RunConfigurationApiV1OnuApiOltsOltNameConfigurePostMutationBody = ConfigurationRequest
+    export type RunConfigurationApiV1OnuApiOltsOltNameConfigurePostMutationError = ErrorType<HTTPValidationError>
 
     /**
- * @summary Get Customer Details
+ * @summary Run Configuration
  */
-export const useGetCustomerDetailsApiV1OnuDetailSearchPost = <TError = ErrorType<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getCustomerDetailsApiV1OnuDetailSearchPost>>, TError,{data: OnuTargetPayload}, TContext>, request?: SecondParameter<typeof customInstance>}
+export const useRunConfigurationApiV1OnuApiOltsOltNameConfigurePost = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof runConfigurationApiV1OnuApiOltsOltNameConfigurePost>>, TError,{oltName: string;data: ConfigurationRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof getCustomerDetailsApiV1OnuDetailSearchPost>>,
+        Awaited<ReturnType<typeof runConfigurationApiV1OnuApiOltsOltNameConfigurePost>>,
         TError,
-        {data: OnuTargetPayload},
+        {oltName: string;data: ConfigurationRequest},
         TContext
       > => {
 
-      const mutationOptions = getGetCustomerDetailsApiV1OnuDetailSearchPostMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    /**
- * @summary Get State
- */
-export const getStateApiV1OnuOnuStatePost = (
-    portTargetPayload: PortTargetPayload,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
-      
-      
-      return customInstance<OnuStateRespons>(
-      {url: `/api/v1/onu/onu-state`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: portTargetPayload, signal
-    },
-      options);
-    }
-  
-
-
-export const getGetStateApiV1OnuOnuStatePostMutationOptions = <TError = ErrorType<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getStateApiV1OnuOnuStatePost>>, TError,{data: PortTargetPayload}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof getStateApiV1OnuOnuStatePost>>, TError,{data: PortTargetPayload}, TContext> => {
-
-const mutationKey = ['getStateApiV1OnuOnuStatePost'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof getStateApiV1OnuOnuStatePost>>, {data: PortTargetPayload}> = (props) => {
-          const {data} = props ?? {};
-
-          return  getStateApiV1OnuOnuStatePost(data,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type GetStateApiV1OnuOnuStatePostMutationResult = NonNullable<Awaited<ReturnType<typeof getStateApiV1OnuOnuStatePost>>>
-    export type GetStateApiV1OnuOnuStatePostMutationBody = PortTargetPayload
-    export type GetStateApiV1OnuOnuStatePostMutationError = ErrorType<HTTPValidationError>
-
-    /**
- * @summary Get State
- */
-export const useGetStateApiV1OnuOnuStatePost = <TError = ErrorType<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getStateApiV1OnuOnuStatePost>>, TError,{data: PortTargetPayload}, TContext>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof getStateApiV1OnuOnuStatePost>>,
-        TError,
-        {data: PortTargetPayload},
-        TContext
-      > => {
-
-      const mutationOptions = getGetStateApiV1OnuOnuStatePostMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    /**
- * @summary Get Rx
- */
-export const getRxApiV1OnuOnuRxPost = (
-    portTargetPayload: PortTargetPayload,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
-      
-      
-      return customInstance<OnuRxRespons>(
-      {url: `/api/v1/onu/onu-rx`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: portTargetPayload, signal
-    },
-      options);
-    }
-  
-
-
-export const getGetRxApiV1OnuOnuRxPostMutationOptions = <TError = ErrorType<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getRxApiV1OnuOnuRxPost>>, TError,{data: PortTargetPayload}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof getRxApiV1OnuOnuRxPost>>, TError,{data: PortTargetPayload}, TContext> => {
-
-const mutationKey = ['getRxApiV1OnuOnuRxPost'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof getRxApiV1OnuOnuRxPost>>, {data: PortTargetPayload}> = (props) => {
-          const {data} = props ?? {};
-
-          return  getRxApiV1OnuOnuRxPost(data,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type GetRxApiV1OnuOnuRxPostMutationResult = NonNullable<Awaited<ReturnType<typeof getRxApiV1OnuOnuRxPost>>>
-    export type GetRxApiV1OnuOnuRxPostMutationBody = PortTargetPayload
-    export type GetRxApiV1OnuOnuRxPostMutationError = ErrorType<HTTPValidationError>
-
-    /**
- * @summary Get Rx
- */
-export const useGetRxApiV1OnuOnuRxPost = <TError = ErrorType<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getRxApiV1OnuOnuRxPost>>, TError,{data: PortTargetPayload}, TContext>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof getRxApiV1OnuOnuRxPost>>,
-        TError,
-        {data: PortTargetPayload},
-        TContext
-      > => {
-
-      const mutationOptions = getGetRxApiV1OnuOnuRxPostMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    /**
- * @summary Reboot Onu
- */
-export const rebootOnuApiV1OnuRebootOnuPost = (
-    onuTargetPayload: OnuTargetPayload,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
-      
-      
-      return customInstance<RebootResponse>(
-      {url: `/api/v1/onu/reboot-onu`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: onuTargetPayload, signal
-    },
-      options);
-    }
-  
-
-
-export const getRebootOnuApiV1OnuRebootOnuPostMutationOptions = <TError = ErrorType<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rebootOnuApiV1OnuRebootOnuPost>>, TError,{data: OnuTargetPayload}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof rebootOnuApiV1OnuRebootOnuPost>>, TError,{data: OnuTargetPayload}, TContext> => {
-
-const mutationKey = ['rebootOnuApiV1OnuRebootOnuPost'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof rebootOnuApiV1OnuRebootOnuPost>>, {data: OnuTargetPayload}> = (props) => {
-          const {data} = props ?? {};
-
-          return  rebootOnuApiV1OnuRebootOnuPost(data,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type RebootOnuApiV1OnuRebootOnuPostMutationResult = NonNullable<Awaited<ReturnType<typeof rebootOnuApiV1OnuRebootOnuPost>>>
-    export type RebootOnuApiV1OnuRebootOnuPostMutationBody = OnuTargetPayload
-    export type RebootOnuApiV1OnuRebootOnuPostMutationError = ErrorType<HTTPValidationError>
-
-    /**
- * @summary Reboot Onu
- */
-export const useRebootOnuApiV1OnuRebootOnuPost = <TError = ErrorType<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rebootOnuApiV1OnuRebootOnuPost>>, TError,{data: OnuTargetPayload}, TContext>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof rebootOnuApiV1OnuRebootOnuPost>>,
-        TError,
-        {data: OnuTargetPayload},
-        TContext
-      > => {
-
-      const mutationOptions = getRebootOnuApiV1OnuRebootOnuPostMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    /**
- * @summary Remove Onu
- */
-export const removeOnuApiV1OnuNoOnuPost = (
-    noOnuPayload: NoOnuPayload,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
-      
-      
-      return customInstance<NoOnuResponse>(
-      {url: `/api/v1/onu/no-onu`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: noOnuPayload, signal
-    },
-      options);
-    }
-  
-
-
-export const getRemoveOnuApiV1OnuNoOnuPostMutationOptions = <TError = ErrorType<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof removeOnuApiV1OnuNoOnuPost>>, TError,{data: NoOnuPayload}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof removeOnuApiV1OnuNoOnuPost>>, TError,{data: NoOnuPayload}, TContext> => {
-
-const mutationKey = ['removeOnuApiV1OnuNoOnuPost'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof removeOnuApiV1OnuNoOnuPost>>, {data: NoOnuPayload}> = (props) => {
-          const {data} = props ?? {};
-
-          return  removeOnuApiV1OnuNoOnuPost(data,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type RemoveOnuApiV1OnuNoOnuPostMutationResult = NonNullable<Awaited<ReturnType<typeof removeOnuApiV1OnuNoOnuPost>>>
-    export type RemoveOnuApiV1OnuNoOnuPostMutationBody = NoOnuPayload
-    export type RemoveOnuApiV1OnuNoOnuPostMutationError = ErrorType<HTTPValidationError>
-
-    /**
- * @summary Remove Onu
- */
-export const useRemoveOnuApiV1OnuNoOnuPost = <TError = ErrorType<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof removeOnuApiV1OnuNoOnuPost>>, TError,{data: NoOnuPayload}, TContext>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof removeOnuApiV1OnuNoOnuPost>>,
-        TError,
-        {data: NoOnuPayload},
-        TContext
-      > => {
-
-      const mutationOptions = getRemoveOnuApiV1OnuNoOnuPostMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    /**
- * @summary Register Sn
- */
-export const registerSnApiV1OnuRegistSnPost = (
-    registSnPayload: RegistSnPayload,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
-      
-      
-      return customInstance<RegistSnResponse>(
-      {url: `/api/v1/onu/regist-sn`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: registSnPayload, signal
-    },
-      options);
-    }
-  
-
-
-export const getRegisterSnApiV1OnuRegistSnPostMutationOptions = <TError = ErrorType<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof registerSnApiV1OnuRegistSnPost>>, TError,{data: RegistSnPayload}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof registerSnApiV1OnuRegistSnPost>>, TError,{data: RegistSnPayload}, TContext> => {
-
-const mutationKey = ['registerSnApiV1OnuRegistSnPost'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof registerSnApiV1OnuRegistSnPost>>, {data: RegistSnPayload}> = (props) => {
-          const {data} = props ?? {};
-
-          return  registerSnApiV1OnuRegistSnPost(data,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type RegisterSnApiV1OnuRegistSnPostMutationResult = NonNullable<Awaited<ReturnType<typeof registerSnApiV1OnuRegistSnPost>>>
-    export type RegisterSnApiV1OnuRegistSnPostMutationBody = RegistSnPayload
-    export type RegisterSnApiV1OnuRegistSnPostMutationError = ErrorType<HTTPValidationError>
-
-    /**
- * @summary Register Sn
- */
-export const useRegisterSnApiV1OnuRegistSnPost = <TError = ErrorType<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof registerSnApiV1OnuRegistSnPost>>, TError,{data: RegistSnPayload}, TContext>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof registerSnApiV1OnuRegistSnPost>>,
-        TError,
-        {data: RegistSnPayload},
-        TContext
-      > => {
-
-      const mutationOptions = getRegisterSnApiV1OnuRegistSnPostMutationOptions(options);
+      const mutationOptions = getRunConfigurationApiV1OnuApiOltsOltNameConfigurePostMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }

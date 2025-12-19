@@ -25,8 +25,6 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
-  BatchConfigResult,
-  BatchConfigurationRequest,
   ConfigurationRequest,
   ConfigurationResponse,
   HTTPValidationError,
@@ -43,6 +41,7 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 /**
+ * Mengembalikan semua opsi yang dibutuhkan untuk form di frontend.
  * @summary Get Options
  */
 export const getOptionsApiV1ConfigApiOptionsGet = (
@@ -135,6 +134,7 @@ export function useGetOptionsApiV1ConfigApiOptionsGet<TData = Awaited<ReturnType
 
 
 /**
+ * Mendeteksi semua unconfigured ONT pada OLT yang dipilih.
  * @summary Detect Uncfg Onts
  */
 export const detectUncfgOntsApiV1ConfigApiOltsOltNameDetectOntsGet = (
@@ -227,6 +227,7 @@ export function useDetectUncfgOntsApiV1ConfigApiOltsOltNameDetectOntsGet<TData =
 
 
 /**
+ * Menjalankan proses konfigurasi untuk satu ONT.
  * @summary Run Configuration
  */
 export const runConfigurationApiV1ConfigApiOltsOltNameConfigurePost = (
@@ -288,71 +289,6 @@ export const useRunConfigurationApiV1ConfigApiOltsOltNameConfigurePost = <TError
       > => {
 
       const mutationOptions = getRunConfigurationApiV1ConfigApiOltsOltNameConfigurePostMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    /**
- * @summary Run Configuration Batch
- */
-export const runConfigurationBatchApiV1ConfigApiOltsOltNameConfigureBatchPost = (
-    oltName: string,
-    batchConfigurationRequest: BatchConfigurationRequest,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
-      
-      
-      return customInstance<BatchConfigResult>(
-      {url: `/api/v1/config/api/olts/${oltName}/configure-batch`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: batchConfigurationRequest, signal
-    },
-      options);
-    }
-  
-
-
-export const getRunConfigurationBatchApiV1ConfigApiOltsOltNameConfigureBatchPostMutationOptions = <TError = ErrorType<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof runConfigurationBatchApiV1ConfigApiOltsOltNameConfigureBatchPost>>, TError,{oltName: string;data: BatchConfigurationRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof runConfigurationBatchApiV1ConfigApiOltsOltNameConfigureBatchPost>>, TError,{oltName: string;data: BatchConfigurationRequest}, TContext> => {
-
-const mutationKey = ['runConfigurationBatchApiV1ConfigApiOltsOltNameConfigureBatchPost'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof runConfigurationBatchApiV1ConfigApiOltsOltNameConfigureBatchPost>>, {oltName: string;data: BatchConfigurationRequest}> = (props) => {
-          const {oltName,data} = props ?? {};
-
-          return  runConfigurationBatchApiV1ConfigApiOltsOltNameConfigureBatchPost(oltName,data,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type RunConfigurationBatchApiV1ConfigApiOltsOltNameConfigureBatchPostMutationResult = NonNullable<Awaited<ReturnType<typeof runConfigurationBatchApiV1ConfigApiOltsOltNameConfigureBatchPost>>>
-    export type RunConfigurationBatchApiV1ConfigApiOltsOltNameConfigureBatchPostMutationBody = BatchConfigurationRequest
-    export type RunConfigurationBatchApiV1ConfigApiOltsOltNameConfigureBatchPostMutationError = ErrorType<HTTPValidationError>
-
-    /**
- * @summary Run Configuration Batch
- */
-export const useRunConfigurationBatchApiV1ConfigApiOltsOltNameConfigureBatchPost = <TError = ErrorType<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof runConfigurationBatchApiV1ConfigApiOltsOltNameConfigureBatchPost>>, TError,{oltName: string;data: BatchConfigurationRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof runConfigurationBatchApiV1ConfigApiOltsOltNameConfigureBatchPost>>,
-        TError,
-        {oltName: string;data: BatchConfigurationRequest},
-        TContext
-      > => {
-
-      const mutationOptions = getRunConfigurationBatchApiV1ConfigApiOltsOltNameConfigureBatchPostMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }

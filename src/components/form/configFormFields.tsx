@@ -44,10 +44,12 @@ interface FormFieldProps {
     detectedOnts?: any[];
     onScan?: () => void;
     isScanning?: boolean;
+    psbList?: any[];
+    fiberList?: any[];
 }
 
 // 1. MANUAL FORM (Rich UI)
-export const ConfigFormManualFields = ({ oltOptions = [], detectedOnts = [], onScan, isScanning }: FormFieldProps) => (
+export const ConfigFormManualFields = ({ oltOptions = [], fiberList = [], detectedOnts = [], onScan, isScanning }: FormFieldProps) => (
     <div className="space-y-5 px-1">
         {/* NETWORK TARGET */}
         <div>
@@ -96,14 +98,14 @@ export const ConfigFormManualFields = ({ oltOptions = [], detectedOnts = [], onS
                                     name="onu_sn"
                                     component="Select"
                                     items={detectedOnts.map(ont => ({ value: ont.sn, label: ont.sn }))}
-                                    placeholder="Select Scanned Device"
+                                    placeholder="SN yang ditemukan"
                                     className="bg-white h-9 text-xs"
                                 />
                             ) : (
                                 <FieldWrapper
                                     name="onu_sn"
                                     component="Input"
-                                    placeholder="e.g. ZTEG12345678"
+                                    placeholder="Pilih SN"
                                     className="bg-white font-mono text-xs h-9"
                                 />
                             )}
@@ -182,7 +184,7 @@ export const ConfigFormManualFields = ({ oltOptions = [], detectedOnts = [], onS
 );
 
 // 2. AUTO FORM
-export const ConfigFormAutoFields = ({ oltOptions = [], detectedOnts = [], onScan, isScanning }: FormFieldProps) => (
+export const ConfigFormAutoFields = ({ oltOptions = [], psbList = [], detectedOnts = [], onScan, isScanning }: FormFieldProps) => (
     <div className="space-y-5 px-1">
         <div>
             <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">Target OLT</Label>
