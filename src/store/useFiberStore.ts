@@ -7,11 +7,7 @@ export interface FiberCustomer {
     name: string;
     user_pppoe: string;
     alamat: string;
-    onu_sn?: string;
-    olt_name?: string;
-    olt_port?: string;
     paket?: string;
-    // Add other fields as they appear in your DB
 }
 
 interface FiberStore {
@@ -54,9 +50,7 @@ export const useFiberStore = create<FiberStore>((set) => ({
                 user_pppoe: row.user_pppoe || '',
                 alamat: row.alamat || '',
                 onu_sn: row.onu_sn,
-                olt_name: row.olt_name,
-                olt_port: row.olt_port,
-                paket: row.paket || row.packet
+                paket: row.paket || ''
             }));
 
             set({ searchResults: mappedResults, isSearching: false });

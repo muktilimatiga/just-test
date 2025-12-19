@@ -110,17 +110,17 @@ export const ConfigModalTest = ({ isOpen, onClose, type }: ConfigModalProps) => 
     };
 
     const handleSelectPsb = (value: string) => { // Changed from (e: any)
-    const selectedId = value; // Use value directly
-    const selected = psbList?.find(p => p.user_pppoe === selectedId);
+        const selectedId = value; // Use value directly
+        const selected = psbList?.find(p => p.user_pppoe === selectedId);
 
-    if (selected) {
-      form.setFieldValue('name', selected.name || '');
-      form.setFieldValue('address', selected.address || '');
-      form.setFieldValue('user_pppoe', selected.user_pppoe || '');
-      form.setFieldValue('pass_pppoe', selected.pppoe_password || '');
-      if (selected.paket) form.setFieldValue('package', selected.paket);
-    }
-  };
+        if (selected) {
+            form.setFieldValue('name', selected.name || '');
+            form.setFieldValue('address', selected.address || '');
+            form.setFieldValue('user_pppoe', selected.user_pppoe || '');
+            form.setFieldValue('pass_pppoe', selected.pppoe_password || '');
+            if (selected.paket) form.setFieldValue('package', selected.paket);
+        }
+    };
 
 
     const handleScan = async () => {
@@ -161,19 +161,38 @@ export const ConfigModalTest = ({ isOpen, onClose, type }: ConfigModalProps) => 
                         children={(olt) => <EffectSync value={olt} onChange={setSelectedOlt} />}
                     />
                     <form.Subscribe
-                        selector={(state) => state.values.fiber_source_id}
-                        children={(val) => <EffectSync value={val} onChange={setSearchTerm} />}
+                        selector={(state) => state.values.data_psb}
+                        children={(selectedId) => {
+                            // This runs whenever 'data_psb' changes
+                            useEffect(() => {
+                                if (!selectedId || !psbList) return;
+
+                                // Find the full object from the ID
+                                const selectedPsb = psbList.find((p: any) => p.id === selectedId);
+
+                                if (selectedPsb) {
+                                    fillFormWithData(selectedPsb);
+                                }
+                            }, [selectedId, psbList]);
+
+                            return null; // Render nothing
+                        }}
                     />
                     {/* THE MAGIC: All complexity is hidden here */}
                     <FormFields
+                        mode={currentType}
                         detectedOnts={detectedOnts}
                         onScan={handleScan}
                         isScanning={isScanning}
                         psbList={psbList}
                         fetchPsbData={refetchPsb}
-                        isFetchingPSb={isRefetching}
+                        isFetchingPSB={isRefetching}
                         selectPSBList={handleSelectPsb}
-                        selectUser={handleSelectUser}
+                        selectUser={(fiberUser) => {
+                            fillFormWithData(fiberUser);
+                            // Optional: Clear search term to close dropdown
+                            // setSearchTerm(''); 
+                        }}
                         fiberList={searchResults}         // The Array of results
                         fiberSearchTerm={searchTerm}      // The Search Input String
                         setFiberSearchTerm={setSearchTerm}// Function to update input

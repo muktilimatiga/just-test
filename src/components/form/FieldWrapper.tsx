@@ -27,6 +27,7 @@ type FieldWrapperProps = {
   readOnly?: boolean;
   rows?: number;
   items?: { value: string; label: string }[];
+  onChange?: (value: any) => void;
 };
 
 export function FieldWrapper({
@@ -36,6 +37,7 @@ export function FieldWrapper({
   children,
   className,
   placeholder,
+  onChange,
   ...props
 }: FieldWrapperProps) {
   const form = useFormContext() as any;
@@ -68,6 +70,7 @@ export function FieldWrapper({
               } else {
                 field.handleChange(value.target.value);
               }
+              onChange?.(value);
             }}
             onBlur={field.handleBlur}
           >

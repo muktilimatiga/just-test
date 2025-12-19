@@ -1,15 +1,16 @@
 import { z } from 'zod';
-import { 
-    User, DownloadCloud, Settings, Unlock, Fingerprint, 
-    Scan, Router, Loader2, Database, Search 
+import {
+    User, DownloadCloud, Settings, Unlock, Fingerprint,
+    Scan, Router, Loader2, Database, Search, RefreshCw
 } from 'lucide-react';
 import { FieldWrapper } from '@/components/form/FieldWrapper';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 // ==========================================
-// 1. SCHEMAS (Used by the Strategy Hook)
+// 1. SCHEMAS
 // ==========================================
 
 export const BaseConfigSchema = z.object({
@@ -25,7 +26,7 @@ export const ConfigManualSchema = BaseConfigSchema.extend({
     address: z.string().optional(),
     user_pppoe: z.string().min(1, "PPPoE User is required"),
     pass_pppoe: z.string().min(1, "PPPoE Password is required"),
-    fiber_source_id: z.string().optional(), // Optional trigger field
+    fiber_source_id: z.string().optional(),
 });
 
 export const ConfigAutoSchema = BaseConfigSchema.extend({
@@ -46,106 +47,154 @@ export const ConfigBatchSchema = BaseConfigSchema.pick({
 // ==========================================
 
 const MODEM_ITEMS = ["C-DATA", "F609", "F670L"];
-const PACKAGE_ITEMS = ["50M", "100M", "200M"];
+const PACKAGE_ITEMS = ["50Mbps", "100Mbps", "200Mbps"];
 
 interface FormFieldProps {
     mode: 'manual' | 'auto' | 'batch' | 'bridge';
     oltOptions?: string[];
-    
-    // Scanner Props
+
+    // Scanner
     detectedOnts?: any[];
     onScan?: () => void;
     isScanning?: boolean;
 
-    // Auto Mode Props (PSB)
+    // Auto Mode (PSB)
     psbList?: any[];
-    
-    // Manual Mode Props (Fiber Search)
+    fetchPsbData?: () => void;
+    isFetchingPSB?: boolean;
+    selectPSBList?: (value: string) => void;
+    selectUser?: (value: any) => void;
+
+    // Manual Mode (Fiber Search)
     fiberList?: any[];
     fiberSearchTerm?: string;
     setFiberSearchTerm?: (value: string) => void;
     onFiberSearch?: () => void;
+    isSearchingFiber?: boolean;
 }
 
 // ==========================================
-// 3. SUB-COMPONENTS (Clean Layout)
+// 3. SECTIONS (Sub-Components)
 // ==========================================
 
-// Reusable Header for each Card
-const SectionHeader = ({ icon: Icon, title, color }: { icon: any, title: string, color: string }) => (
-    <div className={`flex items-center gap-2 mb-3 text-${color}-600`}>
-        <div className={`h-6 w-6 rounded bg-${color}-100 flex items-center justify-center`}>
-            <Icon className="h-3.5 w-3.5" />
+const SectionHeader = ({ icon: Icon, title, color, action }: { icon: any, title: string, color: string, action?: React.ReactNode }) => (
+    <div className={`flex items-center justify-between mb-3 text-${color}-600`}>
+        <div className="flex items-center gap-2">
+            <div className={`h-6 w-6 rounded bg-${color}-100 flex items-center justify-center`}>
+                <Icon className="h-3.5 w-3.5" />
+            </div>
+            <h3 className={`text-xs font-bold uppercase tracking-wide text-${color}-800`}>{title}</h3>
         </div>
-        <h3 className={`text-xs font-bold uppercase tracking-wide text-${color}-800`}>{title}</h3>
+        {action}
     </div>
 );
 
-// The Dynamic Part: Switches between "Pending List" (Auto) and "Search DB" (Manual)
-const SourceSelectionSection = ({ mode, psbList, fiberList, fiberSearchTerm, setFiberSearchTerm, onFiberSearch }: Partial<FormFieldProps>) => {
-    
-    // AUTO MODE: Dropdown for PSB Data
+// 🔍 SOURCE SELECTION (The part causing issues)
+const SourceSelectionSection = (props: Partial<FormFieldProps>) => {
+    const {
+        mode,
+        psbList, fetchPsbData, isFetchingPSB,
+        fiberList, fiberSearchTerm, setFiberSearchTerm, onFiberSearch, isSearchingFiber, selectUser
+    } = props;
+
+    // --- CASE A: AUTO MODE ---
     if (mode === 'auto') {
         return (
             <div className="p-4 bg-indigo-50/50 dark:bg-indigo-900/10 rounded-xl border border-indigo-100 shadow-sm transition-all">
-                <SectionHeader icon={DownloadCloud} title="Pending Registration" color="indigo" />
+                <SectionHeader
+                    icon={DownloadCloud}
+                    title="Pending Registration"
+                    color="indigo"
+                    action={
+                        <Button
+                            type="button" variant="ghost" size="icon"
+                            className="h-6 w-6 text-indigo-400 hover:text-indigo-600 hover:bg-indigo-100"
+                            onClick={fetchPsbData} disabled={isFetchingPSB}
+                        >
+                            <RefreshCw className={`h-3.5 w-3.5 ${isFetchingPSB ? "animate-spin" : ""}`} />
+                        </Button>
+                    }
+                />
                 <Label className="text-[10px] font-medium text-indigo-600/70 mb-1.5 block">Select Pending Customer</Label>
-                <FieldWrapper 
-                    name="data_psb" 
-                    component="Select" 
+                <FieldWrapper
+                    name="data_psb"
+                    component="Select"
                     items={psbList?.map(p => ({ value: p.id, label: `${p.name} - ${p.address}` })) || []}
-                    placeholder={psbList?.length === 0 ? "No pending data" : "-- Select Customer to Auto-Fill --"} 
-                    className="bg-white h-10 text-xs border-indigo-200" 
+                    placeholder={psbList?.length === 0 ? "No pending data" : "-- Select Customer to Auto-Fill --"}
+                    className="bg-white h-10 text-xs border-indigo-200"
                 />
             </div>
         );
     }
 
-    // MANUAL MODE: Search Bar + Optional Dropdown
+    // --- CASE B: MANUAL MODE (The Search Bar) ---
     if (mode === 'manual') {
         return (
-            <div className="p-4 bg-orange-50/50 dark:bg-orange-900/10 rounded-xl border border-orange-100 shadow-sm transition-all">
+            <div className="p-4 bg-orange-50/50 dark:bg-orange-900/10 rounded-xl border border-orange-100 shadow-sm transition-all overflow-visible">
                 <SectionHeader icon={Database} title="Database Search" color="orange" />
-                
-                {/* Search Input */}
-                <div className="relative mb-3">
-                    <Label className="text-[10px] font-medium text-orange-600/70 mb-1.5 block">Search Customer</Label>
-                    <div className="flex gap-2 relative">
-                        <Input 
-                            value={fiberSearchTerm}
-                            onChange={(e) => setFiberSearchTerm?.(e.target.value)}
-                            onKeyDown={(e) => e.key === 'Enter' && onFiberSearch?.()}
-                            placeholder="Name, SN, or PPPoE..." 
-                            className="bg-white h-9 text-xs pr-10 border-orange-200 focus-visible:ring-orange-200"
-                        />
-                        <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            className="absolute right-0 top-0 h-9 w-9 text-orange-400 hover:text-orange-600 hover:bg-orange-100 rounded-l-none"
-                            onClick={onFiberSearch}
-                        >
-                            <Search className="h-4 w-4" />
-                        </Button>
-                    </div>
-                </div>
 
-                {/* Search Results (Only visible if results exist) */}
-                {(fiberList?.length || 0) > 0 && (
-                    <div className="animate-in fade-in slide-in-from-top-2 duration-200">
-                        <Label className="text-[10px] font-medium text-orange-600/70 mb-1.5 block">Select Result to Pre-fill</Label>
-                        <FieldWrapper 
-                            name="fiber_source_id" 
-                            component="Select" 
-                            items={fiberList?.map(f => ({ 
-                                value: f.id, 
-                                label: `${f.customer_name} (${f.serial_number})` 
-                            })) || []}
-                            placeholder="-- Click to Select Data --" 
-                            className="bg-white h-9 text-xs border-orange-200" 
+                {/* Search Input Group */}
+                <div className="relative z-20">
+                    <div className="relative">
+                        <div className="absolute left-3 top-2.5 pointer-events-none text-slate-400">
+                            <Search className="h-4 w-4" />
+                        </div>
+
+                        {/* We use a standard Input here to handle the typing manually */}
+                        <Input
+                            placeholder="Search name, ID or address..."
+                            className="pl-9 bg-white dark:bg-zinc-950 h-10 text-xs pr-10"
+                            value={fiberSearchTerm} // Controlled value
+                            onChange={e => setFiberSearchTerm?.(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && onFiberSearch?.()}
                         />
+
+                        {/* Search Button (Inside Input) */}
+                        <div className="absolute right-1 top-1">
+                            <Button
+                                type="button"
+                                size="icon"
+                                variant="ghost"
+                                className="h-8 w-8 hover:bg-orange-100 text-orange-500"
+                                onClick={onFiberSearch}
+                            >
+                                <Search className="h-4 w-4" />
+                            </Button>
+                        </div>
                     </div>
-                )}
+
+                    {/* CUSTOM DROPDOWN RESULTS */}
+                    {(fiberList?.length || 0) > 0 && (
+                        <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-zinc-900 border border-slate-200 rounded-lg shadow-xl max-h-48 overflow-y-auto z-50 p-1">
+                            {fiberList?.map((u) => (
+                                <div
+                                    key={u.id} // Ensure 'id' exists
+                                    className="p-2 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded-md cursor-pointer flex items-center gap-3 transition-colors"
+                                    onClick={() => {
+                                        selectUser?.(u); // Pass the selected user up
+                                        setFiberSearchTerm?.(''); // Optional: Clear search after select
+                                    }}
+                                >
+                                    <Avatar className="h-8 w-8 border border-slate-100">
+                                        {/* Use u.customer_name or u.name based on your API */}
+                                        <AvatarImage src="" alt={u.customer_name || u.name} />
+                                        <AvatarFallback className="text-[10px] bg-orange-100 text-orange-600 font-bold">
+                                            {(u.customer_name || u.name || '?').charAt(0).toUpperCase()}
+                                        </AvatarFallback>
+                                    </Avatar>
+                                    <div className="overflow-hidden text-left">
+                                        <p className="text-xs font-bold truncate text-slate-700 dark:text-slate-200">
+                                            {u.customer_name || u.name}
+                                        </p>
+                                        <p className="text-[10px] text-slate-500 truncate">
+                                            {u.serial_number || u.user_pppoe || 'No ID'}
+                                        </p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
             </div>
         );
     }
@@ -153,7 +202,7 @@ const SourceSelectionSection = ({ mode, psbList, fiberList, fiberSearchTerm, set
     return null;
 };
 
-// Common Device Form (SN, Modem Type)
+// ... (Keep DeviceConfigSection, CustomerDataSection, BatchFormLayout unchanged) ...
 const DeviceConfigSection = ({ detectedOnts = [], onScan, isScanning }: Partial<FormFieldProps>) => (
     <div className="p-4 bg-blue-50/50 dark:bg-blue-900/10 rounded-xl border border-blue-100 shadow-sm relative group">
         <div className="absolute top-0 right-0 p-2 opacity-50">
@@ -210,11 +259,10 @@ const DeviceConfigSection = ({ detectedOnts = [], onScan, isScanning }: Partial<
     </div>
 );
 
-// Common Customer Data Form
 const CustomerDataSection = () => (
     <div className="p-5 bg-slate-50 dark:bg-zinc-800/50 rounded-xl border border-slate-200 shadow-sm">
         <SectionHeader icon={User} title="Customer Service" color="slate" />
-        
+
         <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
                 <div className="col-span-2 md:col-span-1">
@@ -246,7 +294,6 @@ const CustomerDataSection = () => (
     </div>
 );
 
-// Batch Mode Layout (Isolated)
 const BatchFormLayout = ({ oltOptions }: { oltOptions: string[] }) => (
     <div className="space-y-5 px-1">
         <div>
@@ -284,20 +331,21 @@ export const ConfigFormFields = (props: FormFieldProps) => {
     // B. Render Unified Layout (Auto / Manual)
     return (
         <div className="space-y-5 px-1">
-            
+
             {/* 1. Target OLT (Always First) */}
             <div>
                 <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">Target OLT</Label>
                 <FieldWrapper
                     name="olt_name"
                     component="Select"
+                    // ✅ FIXED: Now correctly maps OLT Options, not Modem items
                     items={oltOptions.map(opt => ({ value: opt, label: opt }))}
                     placeholder="-- Select OLT --"
                     className="bg-white h-10 text-xs font-medium w-full"
                 />
             </div>
 
-            {/* 2. Source Selection (Dynamic Header) */}
+            {/* 2. Source Selection (Search Bar appears here if mode='manual') */}
             <SourceSelectionSection {...props} />
 
             {/* 3. The Form Body (Shared) */}
