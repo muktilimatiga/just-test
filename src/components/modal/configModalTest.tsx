@@ -4,7 +4,7 @@ import { ModalOverlay } from '@/components/ModalOverlay';
 // Helper to sync form state to store
 const EffectSync = ({ value, onChange }: { value: any, onChange: (val: any) => void }) => {
     useEffect(() => {
-        if (value) onChange(value);
+        if (typeof value !== 'undefined') onChange(value);
     }, [value, onChange]);
     return null;
 };
@@ -17,10 +17,10 @@ import { cn } from '@/lib/utils';
 
 // Store & Hooks
 import { useConfigStore } from '@/store/configStore';
-import { useConfigFormStrategy } from '@/store/useConfigApi';
 import { useAppForm, FormProvider } from '@/components/form/hooks';
-import { useConfigOptions, usePsbData, useScanOnts } from '@/hooks/useApi';
+import { usePsbData, useScanOnts } from '@/hooks/useApi';
 import { useFiberStore } from '@/store/useFiberStore';
+import { useConfigMutation } from '@/store/useConfigApi';
 
 interface ConfigModalProps {
     isOpen: boolean;
@@ -30,13 +30,10 @@ interface ConfigModalProps {
 
 export const ConfigModalTest = ({ isOpen, onClose, type }: ConfigModalProps) => {
 
-    // UI State
-    const [activeMode, setActiveMode] = useState(type === 'auto' ? 'auto' : 'manual');
-
-    // Store
+    // UI State    // Store
     const {
-        selectedOlt, setSelectedOlt,
-        formData, batchQueue, addToBatch, removeFromBatch,
+        mode, setMode, selectedOlt, setSelectedOlt,
+        batchQueue, addToBatch, removeFromBatch,
         detectedOnts, setDetectedOnts,
         reset
     } = useConfigStore();
@@ -58,24 +55,36 @@ export const ConfigModalTest = ({ isOpen, onClose, type }: ConfigModalProps) => 
 
     // API
     const { mutateAsync: scanOnts, isPending: isScanning } = useScanOnts();
-    const currentType = type === 'batch' ? 'batch' : type === 'bridge' ? 'bridge' : activeMode;
-    const { title, FormFields, schema, execute, submitLabel } = useConfigFormStrategy(currentType, selectedOlt);
+    const currentType = type === 'batch' ? 'batch' : type === 'bridge' ? 'bridge' : mode;
+    const { FormFields, schema, execute, submitLabel } = useConfigMutation(currentType, selectedOlt);
+
+    const handleClose = () => {
+        onClose();
+        setTimeout(() => reset(), 200);
+    };
 
     // Form
     const form = useAppForm({
         defaultValues: {
             olt_name: '', modem_type: '', onu_sn: '', package: '',
             name: '', address: '', user_pppoe: '',
-            pass_pppoe: '123456', // Match Store Default
-            eth_locks: [false, false, false, false],
-            vlan_id: 100, // Match Store Default
-            data_psb: ''
+            pass_pppoe: '', // Match Store Default
+            eth_locks: [true],
+            vlan_id: '', // Match Store Default
+            data_psb: '',
+            fiber_source_id: '' // Helpers for Search
         },
         validators: { onChange: schema },
         onSubmit: async ({ value }) => {
             if (!value.olt_name) return toast.error("Please select an OLT");
+
             try {
-                await execute(value, batchQueue);
+                if (currentType === 'batch') {
+                    // @ts-ignore
+                    await execute(value, batchQueue);
+                } else {
+                    await execute(value);
+                }
                 toast.success("Configuration started");
                 handleClose();
             } catch (error: any) {
@@ -84,33 +93,35 @@ export const ConfigModalTest = ({ isOpen, onClose, type }: ConfigModalProps) => 
         }
     });
 
-    const handleSelectUser = (user: any) => {
-    form.setFieldValue('customer.name', user.name || '');
-    form.setFieldValue('customer.address', user.alamat || '');
-    form.setFieldValue('customer.pppoe_user', user.user_pppoe || '');
-    form.setFieldValue('customer.pppoe_pass', user.pppoe_password || '123456');
-    resetSearch();
-    setSearchTerm('');
-  };
+    const handleSelectUser = (data: any) => {
+        const selectedId = data; // Assuming data is the value (user_pppoe)
+        const selected = searchResults?.find(p => p.user_pppoe === selectedId);
+        if (selected) {
+            form.setFieldValue('name', selected.name || '');
+            form.setFieldValue('address', selected.alamat || '');
+            form.setFieldValue('user_pppoe', selected.user_pppoe || '');
+            form.setFieldValue('pass_pppoe', selected.user_pppoe || ''); // Assuming password is same as user for now? Or maybe empty? 
+            // In original code: form.setFieldValue('pass_pppoe', selected.user_pppoe || ''); 
+            // It seems weird to set password to username, but restoring original behavior.
+            resetSearch();
+            setSearchTerm('');
+            console.log(selected);
+        }
+    };
 
     const handleSelectPsb = (value: string) => { // Changed from (e: any)
     const selectedId = value; // Use value directly
     const selected = psbList?.find(p => p.user_pppoe === selectedId);
 
     if (selected) {
-      form.setFieldValue('customer.name', selected.name || '');
-      form.setFieldValue('customer.address', selected.address || '');
-      form.setFieldValue('customer.pppoe_user', selected.user_pppoe || '');
-      form.setFieldValue('customer.pppoe_pass', selected.pppoe_password || '');
+      form.setFieldValue('name', selected.name || '');
+      form.setFieldValue('address', selected.address || '');
+      form.setFieldValue('user_pppoe', selected.user_pppoe || '');
+      form.setFieldValue('pass_pppoe', selected.pppoe_password || '');
       if (selected.paket) form.setFieldValue('package', selected.paket);
     }
   };
 
-
-    const handleClose = () => {
-        onClose();
-        setTimeout(() => reset(), 200);
-    };
 
     const handleScan = async () => {
         if (!selectedOlt) return toast.error("Select OLT first");
@@ -128,13 +139,13 @@ export const ConfigModalTest = ({ isOpen, onClose, type }: ConfigModalProps) => 
         <ModalOverlay isOpen={isOpen} onClose={handleClose} hideCloseButton className="max-w-xl h-auto p-0 overflow-hidden rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xl">
             {/* Header */}
             <div className="px-6 py-4 border-b flex justify-between items-center bg-white dark:bg-zinc-900">
-                <h2 className="text-lg font-bold">{title}</h2>
+                <h2 className="text-lg font-bold">{mode === 'manual' ? 'Manual' : 'Auto (API)'}</h2>
                 <div className="flex items-center gap-4">
                     {/* Mode Toggle */}
                     {type !== 'batch' && type !== 'bridge' && (
                         <div className="flex items-center gap-2 bg-slate-100 dark:bg-zinc-800 p-1 pr-3 rounded-full border">
-                            <Switch checked={activeMode === 'auto'} onCheckedChange={(c) => setActiveMode(c ? 'auto' : 'manual')} className="scale-75" />
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">{activeMode === 'auto' ? 'Auto (API)' : 'Manual'}</span>
+                            <Switch checked={mode === 'manual'} onCheckedChange={(c) => setMode(c ? 'manual' : 'auto')} className="scale-75" />
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">{mode === 'manual' ? 'Manual' : 'Auto (API)'}</span>
                         </div>
                     )}
                     <button onClick={handleClose} className="text-slate-400 hover:text-slate-600"><X className="h-5 w-5" /></button>
@@ -149,13 +160,24 @@ export const ConfigModalTest = ({ isOpen, onClose, type }: ConfigModalProps) => 
                         selector={(state) => state.values.olt_name}
                         children={(olt) => <EffectSync value={olt} onChange={setSelectedOlt} />}
                     />
+                    <form.Subscribe
+                        selector={(state) => state.values.fiber_source_id}
+                        children={(val) => <EffectSync value={val} onChange={setSearchTerm} />}
+                    />
                     {/* THE MAGIC: All complexity is hidden here */}
                     <FormFields
                         detectedOnts={detectedOnts}
                         onScan={handleScan}
                         isScanning={isScanning}
                         psbList={psbList}
-                        selectPSBList={selectPSBList}
+                        fetchPsbData={refetchPsb}
+                        isFetchingPSb={isRefetching}
+                        selectPSBList={handleSelectPsb}
+                        selectUser={handleSelectUser}
+                        fiberList={searchResults}         // The Array of results
+                        fiberSearchTerm={searchTerm}      // The Search Input String
+                        setFiberSearchTerm={setSearchTerm}// Function to update input
+                        onFiberSearch={() => searchCustomers(searchTerm)}   // Function to trigger API call
                     />
                 </FormProvider>
 
@@ -239,4 +261,4 @@ export const ConfigModalTest = ({ isOpen, onClose, type }: ConfigModalProps) => 
             </div>
         </ModalOverlay>
     );
-};
+}

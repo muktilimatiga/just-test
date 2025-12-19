@@ -12,11 +12,9 @@ import type {
 
 // 2. Import UI & Schemas
 import {
-  ConfigFormManualFields,
-  ConfigFormAutoFields,
-  // ConfigBatchFields,
-  ConfigManualSchema,
-  ConfigAutoSchema,
+  ConfigFormFields,   // ✅ IMPORT THIS (Replaces AutoFields & ManualFields)
+  ConfigManualSchema, // ✅ Keep this
+  ConfigAutoSchema,   // ✅ Keep this
   // ConfigBatchSchema
 } from '@/components/form/configFormFields';
 
@@ -63,7 +61,7 @@ export const useConfigMutation = (mode: ConfigMode, selectedOlt: string) => {
       case 'auto':
         return {
           title: 'Auto Configuration',
-          FormFields: ConfigFormAutoFields,
+          FormFields: ConfigFormFields,
           // ✅ FIX: Cast to 'any'
           schema: ConfigAutoSchema as any,
           mutation: singleConfigMutation,
@@ -89,7 +87,7 @@ export const useConfigMutation = (mode: ConfigMode, selectedOlt: string) => {
       default:
         return {
           title: 'Manual Configuration',
-          FormFields: ConfigFormManualFields,
+          FormFields: ConfigFormFields,
           // ✅ FIX: Cast to 'any'
           schema: ConfigManualSchema as any,
           mutation: singleConfigMutation,

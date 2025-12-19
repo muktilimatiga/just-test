@@ -1,10 +1,16 @@
 import { z } from 'zod';
-import { User, DownloadCloud, Settings, Unlock, Box, Fingerprint, Scan, Router, Loader2 } from 'lucide-react';
+import { 
+    User, DownloadCloud, Settings, Unlock, Fingerprint, 
+    Scan, Router, Loader2, Database, Search 
+} from 'lucide-react';
 import { FieldWrapper } from '@/components/form/FieldWrapper';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
-// --- SCHEMAS ---
+// ==========================================
+// 1. SCHEMAS (Used by the Strategy Hook)
+// ==========================================
 
 export const BaseConfigSchema = z.object({
     olt_name: z.string().min(1, "OLT is required"),
@@ -19,6 +25,7 @@ export const ConfigManualSchema = BaseConfigSchema.extend({
     address: z.string().optional(),
     user_pppoe: z.string().min(1, "PPPoE User is required"),
     pass_pppoe: z.string().min(1, "PPPoE Password is required"),
+    fiber_source_id: z.string().optional(), // Optional trigger field
 });
 
 export const ConfigAutoSchema = BaseConfigSchema.extend({
@@ -34,209 +41,220 @@ export const ConfigBatchSchema = BaseConfigSchema.pick({
     package: z.string().min(1, "Package is required"),
 });
 
-// --- CONSTANTS ---
-const MODEM_ITEMS = ["ZTE", "HUAWEI", "NOKIA", "F609", "F670L"];
-const PACKAGE_ITEMS = ["50Mbps", "100Mbps", "200Mbps"];
+// ==========================================
+// 2. CONSTANTS & TYPES
+// ==========================================
 
-// --- INTERFACE ---
+const MODEM_ITEMS = ["C-DATA", "F609", "F670L"];
+const PACKAGE_ITEMS = ["50M", "100M", "200M"];
+
 interface FormFieldProps {
+    mode: 'manual' | 'auto' | 'batch' | 'bridge';
     oltOptions?: string[];
+    
+    // Scanner Props
     detectedOnts?: any[];
     onScan?: () => void;
     isScanning?: boolean;
+
+    // Auto Mode Props (PSB)
     psbList?: any[];
+    
+    // Manual Mode Props (Fiber Search)
     fiberList?: any[];
+    fiberSearchTerm?: string;
+    setFiberSearchTerm?: (value: string) => void;
+    onFiberSearch?: () => void;
 }
 
-// 1. MANUAL FORM (Rich UI)
-export const ConfigFormManualFields = ({ oltOptions = [], fiberList = [], detectedOnts = [], onScan, isScanning }: FormFieldProps) => (
-    <div className="space-y-5 px-1">
-        {/* NETWORK TARGET */}
-        <div>
-            <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">Target OLT</Label>
-            <FieldWrapper
-                name="olt_name"
-                component="Select"
-                items={oltOptions.map(opt => ({ value: opt, label: opt }))}
-                placeholder="-- Select OLT --"
-                className="bg-white h-10 text-xs font-medium w-full"
-            />
+// ==========================================
+// 3. SUB-COMPONENTS (Clean Layout)
+// ==========================================
+
+// Reusable Header for each Card
+const SectionHeader = ({ icon: Icon, title, color }: { icon: any, title: string, color: string }) => (
+    <div className={`flex items-center gap-2 mb-3 text-${color}-600`}>
+        <div className={`h-6 w-6 rounded bg-${color}-100 flex items-center justify-center`}>
+            <Icon className="h-3.5 w-3.5" />
         </div>
+        <h3 className={`text-xs font-bold uppercase tracking-wide text-${color}-800`}>{title}</h3>
+    </div>
+);
 
-        {/* DEVICE CARD (Blue) */}
-        <div className="p-4 bg-blue-50/50 dark:bg-blue-900/10 rounded-xl border border-blue-100 shadow-sm relative group">
-            <div className="absolute top-0 right-0 p-2 opacity-50">
-                <Router className="h-10 w-10 text-blue-200 dark:text-blue-900" />
+// The Dynamic Part: Switches between "Pending List" (Auto) and "Search DB" (Manual)
+const SourceSelectionSection = ({ mode, psbList, fiberList, fiberSearchTerm, setFiberSearchTerm, onFiberSearch }: Partial<FormFieldProps>) => {
+    
+    // AUTO MODE: Dropdown for PSB Data
+    if (mode === 'auto') {
+        return (
+            <div className="p-4 bg-indigo-50/50 dark:bg-indigo-900/10 rounded-xl border border-indigo-100 shadow-sm transition-all">
+                <SectionHeader icon={DownloadCloud} title="Pending Registration" color="indigo" />
+                <Label className="text-[10px] font-medium text-indigo-600/70 mb-1.5 block">Select Pending Customer</Label>
+                <FieldWrapper 
+                    name="data_psb" 
+                    component="Select" 
+                    items={psbList?.map(p => ({ value: p.id, label: `${p.name} - ${p.address}` })) || []}
+                    placeholder={psbList?.length === 0 ? "No pending data" : "-- Select Customer to Auto-Fill --"} 
+                    className="bg-white h-10 text-xs border-indigo-200" 
+                />
             </div>
+        );
+    }
 
-            <div className="flex items-center gap-2 mb-3">
-                <div className="h-6 w-6 rounded bg-blue-100 text-blue-600 flex items-center justify-center">
-                    <Fingerprint className="h-3.5 w-3.5" />
-                </div>
-                <h3 className="text-xs font-bold text-blue-800 uppercase tracking-wide">Device Configuration</h3>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <Label className="text-[10px] font-semibold text-blue-600/80 mb-1.5 block">Modem Type</Label>
-                    <FieldWrapper
-                        name="modem_type"
-                        component="Select"
-                        items={MODEM_ITEMS.map(opt => ({ value: opt, label: opt }))}
-                        placeholder="Select Type"
-                        className="bg-white h-9 text-xs"
-                    />
-                </div>
-
-                <div>
-                    <Label className="text-[10px] font-semibold text-blue-600/80 mb-1.5 block">Serial Number</Label>
-                    <div className="flex gap-2">
-                        {/* THE SMART SELECT LOGIC YOU REQUESTED */}
-                        <div className="flex-1">
-                            {detectedOnts.length > 0 ? (
-                                <FieldWrapper
-                                    name="onu_sn"
-                                    component="Select"
-                                    items={detectedOnts.map(ont => ({ value: ont.sn, label: ont.sn }))}
-                                    placeholder="SN yang ditemukan"
-                                    className="bg-white h-9 text-xs"
-                                />
-                            ) : (
-                                <FieldWrapper
-                                    name="onu_sn"
-                                    component="Input"
-                                    placeholder="Pilih SN"
-                                    className="bg-white font-mono text-xs h-9"
-                                />
-                            )}
-                        </div>
+    // MANUAL MODE: Search Bar + Optional Dropdown
+    if (mode === 'manual') {
+        return (
+            <div className="p-4 bg-orange-50/50 dark:bg-orange-900/10 rounded-xl border border-orange-100 shadow-sm transition-all">
+                <SectionHeader icon={Database} title="Database Search" color="orange" />
+                
+                {/* Search Input */}
+                <div className="relative mb-3">
+                    <Label className="text-[10px] font-medium text-orange-600/70 mb-1.5 block">Search Customer</Label>
+                    <div className="flex gap-2 relative">
+                        <Input 
+                            value={fiberSearchTerm}
+                            onChange={(e) => setFiberSearchTerm?.(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && onFiberSearch?.()}
+                            placeholder="Name, SN, or PPPoE..." 
+                            className="bg-white h-9 text-xs pr-10 border-orange-200 focus-visible:ring-orange-200"
+                        />
                         <Button
                             type="button"
-                            variant="outline"
+                            variant="ghost"
                             size="icon"
-                            className="h-9 w-9 bg-white border-blue-200 text-blue-600 hover:bg-blue-50 shrink-0"
-                            onClick={onScan}
-                            disabled={isScanning}
+                            className="absolute right-0 top-0 h-9 w-9 text-orange-400 hover:text-orange-600 hover:bg-orange-100 rounded-l-none"
+                            onClick={onFiberSearch}
                         >
-                            {isScanning ? <Loader2 className="h-4 w-4 animate-spin" /> : <Scan className="h-4 w-4" />}
+                            <Search className="h-4 w-4" />
                         </Button>
                     </div>
-                    {detectedOnts.length === 0 && !isScanning && (
-                        <p className="text-[9px] text-blue-400 mt-1 pl-1 italic">* Click scan to find devices</p>
-                    )}
                 </div>
-            </div>
-        </div>
 
-        {/* CUSTOMER CARD (Slate) */}
-        <div className="p-5 bg-slate-50 dark:bg-zinc-800/50 rounded-xl border border-slate-200 shadow-sm">
-            <div className="flex items-center gap-2 mb-4">
-                <div className="h-6 w-6 rounded bg-slate-200 text-slate-600 flex items-center justify-center">
-                    <User className="h-3.5 w-3.5" />
-                </div>
-                <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wide">Customer Service</h3>
-            </div>
-
-            <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                    <div className="col-span-2 md:col-span-1">
-                        <Label className="text-[10px] font-medium text-slate-500 mb-1 block">Full Name</Label>
-                        <FieldWrapper name="name" component="Input" className="bg-white h-9 text-xs font-semibold" placeholder="Customer Name" />
+                {/* Search Results (Only visible if results exist) */}
+                {(fiberList?.length || 0) > 0 && (
+                    <div className="animate-in fade-in slide-in-from-top-2 duration-200">
+                        <Label className="text-[10px] font-medium text-orange-600/70 mb-1.5 block">Select Result to Pre-fill</Label>
+                        <FieldWrapper 
+                            name="fiber_source_id" 
+                            component="Select" 
+                            items={fiberList?.map(f => ({ 
+                                value: f.id, 
+                                label: `${f.customer_name} (${f.serial_number})` 
+                            })) || []}
+                            placeholder="-- Click to Select Data --" 
+                            className="bg-white h-9 text-xs border-orange-200" 
+                        />
                     </div>
-                    <div className="col-span-2 md:col-span-1">
-                        <Label className="text-[10px] font-medium text-slate-500 mb-1 block">Internet Package</Label>
-                        <FieldWrapper name="package" component="Select" items={PACKAGE_ITEMS.map(opt => ({ value: opt, label: opt }))} placeholder="Select Package" className="bg-white h-9 text-xs" />
-                    </div>
-                </div>
-
-                <div>
-                    <Label className="text-[10px] font-medium text-slate-500 mb-1 block">Address</Label>
-                    <FieldWrapper name="address" component="Textarea" className="bg-white min-h-[50px] text-xs resize-none" placeholder="Installation address..." />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4 pt-2 border-t border-slate-200/60">
-                    <div>
-                        <Label className="text-[10px] font-medium text-slate-500 mb-1 block">PPPoE Username</Label>
-                        <FieldWrapper name="user_pppoe" component="Input" className="bg-white font-mono text-xs h-9" placeholder="user@net" />
-                    </div>
-                    <div>
-                        <Label className="text-[10px] font-medium text-slate-500 mb-1 block">PPPoE Password</Label>
-                        <FieldWrapper name="pass_pppoe" component="Input" className="bg-white font-mono text-xs h-9" placeholder="********" />
-                    </div>
-                </div>
+                )}
             </div>
-        </div>
+        );
+    }
 
-        {/* OPTIONS */}
-        <div className="flex items-center justify-between bg-white dark:bg-zinc-950 p-3 rounded-lg border border-slate-100 shadow-sm">
-            <div className="flex items-center gap-3">
-                <div className="p-1.5 rounded-md bg-orange-50 text-orange-600">
-                    <Unlock className="h-4 w-4" />
-                </div>
-                <div>
-                    <Label className="text-xs font-bold block">Port Security</Label>
-                    <p className="text-[10px] text-slate-400">Lock unused ethernet ports</p>
-                </div>
+    return null;
+};
+
+// Common Device Form (SN, Modem Type)
+const DeviceConfigSection = ({ detectedOnts = [], onScan, isScanning }: Partial<FormFieldProps>) => (
+    <div className="p-4 bg-blue-50/50 dark:bg-blue-900/10 rounded-xl border border-blue-100 shadow-sm relative group">
+        <div className="absolute top-0 right-0 p-2 opacity-50">
+            <Router className="h-10 w-10 text-blue-200 dark:text-blue-900" />
+        </div>
+        <SectionHeader icon={Fingerprint} title="Device Configuration" color="blue" />
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <Label className="text-[10px] font-semibold text-blue-600/80 mb-1.5 block">Modem Type</Label>
+                <FieldWrapper
+                    name="modem_type"
+                    component="Select"
+                    items={MODEM_ITEMS.map(opt => ({ value: opt, label: opt }))}
+                    placeholder="Select Type"
+                    className="bg-white h-9 text-xs"
+                />
             </div>
-            <FieldWrapper name="eth_locks" component="Checkbox" />
-        </div>
-    </div>
-);
 
-// 2. AUTO FORM
-export const ConfigFormAutoFields = ({ oltOptions = [], psbList = [], detectedOnts = [], onScan, isScanning }: FormFieldProps) => (
-    <div className="space-y-5 px-1">
-        <div>
-            <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">Target OLT</Label>
-            <FieldWrapper name="olt_name" component="Select" items={oltOptions.map(opt => ({ value: opt, label: opt }))} placeholder="-- Select OLT --" className="bg-white h-10 text-xs font-medium w-full" />
-        </div>
-
-        <div className="p-5 bg-indigo-50/50 dark:bg-indigo-900/10 rounded-xl border border-indigo-100 shadow-sm">
-            <div className="flex items-center gap-2 mb-3">
-                <div className="h-6 w-6 rounded bg-indigo-100 text-indigo-600 flex items-center justify-center">
-                    <DownloadCloud className="h-3.5 w-3.5" />
-                </div>
-                <h3 className="text-xs font-bold text-indigo-800 uppercase tracking-wide">Pending Registration</h3>
-            </div>
-            <Label className="text-[10px] font-medium text-indigo-600/70 mb-1.5 block">Select Customer Data</Label>
-            <FieldWrapper name="data_psb" component="Select" items={[]} placeholder="-- Select Pending Customer --" className="bg-white h-10 text-xs" />
-        </div>
-
-        <div className="p-5 bg-blue-50/50 dark:bg-blue-900/10 rounded-xl border border-blue-100 shadow-sm">
-            <div className="flex items-center gap-2 mb-3">
-                <div className="h-6 w-6 rounded bg-blue-100 text-blue-600 flex items-center justify-center">
-                    <Fingerprint className="h-3.5 w-3.5" />
-                </div>
-                <h3 className="text-xs font-bold text-blue-800 uppercase tracking-wide">Assign to Device</h3>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="md:col-span-2">
-                    <Label className="text-[10px] font-medium text-blue-600/70 mb-1.5 block">Serial Number</Label>
-                    <div className="flex gap-2">
-                        <div className="flex-1">
-                            <FieldWrapper name="onu_sn" component="Input" placeholder="Scan SN..." className="bg-white font-mono text-xs h-9" />
-                        </div>
-                        <Button type="button" variant="outline" size="icon" className="h-9 w-9 bg-white border-blue-200 text-blue-600 hover:bg-blue-50 shrink-0">
-                            <Scan className="h-4 w-4" />
-                        </Button>
+            <div>
+                <Label className="text-[10px] font-semibold text-blue-600/80 mb-1.5 block">Serial Number</Label>
+                <div className="flex gap-2">
+                    <div className="flex-1">
+                        {detectedOnts.length > 0 ? (
+                            <FieldWrapper
+                                name="onu_sn"
+                                component="Select"
+                                items={detectedOnts.map(ont => ({ value: ont.sn, label: `${ont.sn} (Port ${ont.pon_port})` }))}
+                                placeholder="Select Scanned Device"
+                                className="bg-white h-9 text-xs"
+                            />
+                        ) : (
+                            <FieldWrapper
+                                name="onu_sn"
+                                component="Input"
+                                placeholder="e.g. ZTEG12345678"
+                                className="bg-white font-mono text-xs h-9"
+                            />
+                        )}
                     </div>
+                    <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        className="h-9 w-9 bg-white border-blue-200 text-blue-600 hover:bg-blue-50 shrink-0"
+                        onClick={onScan}
+                        disabled={isScanning}
+                    >
+                        {isScanning ? <Loader2 className="h-4 w-4 animate-spin" /> : <Scan className="h-4 w-4" />}
+                    </Button>
                 </div>
             </div>
         </div>
     </div>
 );
 
-// 3. BATCH FORM
-export const ConfigBatchFields = ({ oltOptions = [] }: FormFieldProps) => (
+// Common Customer Data Form
+const CustomerDataSection = () => (
+    <div className="p-5 bg-slate-50 dark:bg-zinc-800/50 rounded-xl border border-slate-200 shadow-sm">
+        <SectionHeader icon={User} title="Customer Service" color="slate" />
+        
+        <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-2 md:col-span-1">
+                    <Label className="text-[10px] font-medium text-slate-500 mb-1 block">Full Name</Label>
+                    <FieldWrapper name="name" component="Input" className="bg-white h-9 text-xs font-semibold" placeholder="Customer Name" />
+                </div>
+                <div className="col-span-2 md:col-span-1">
+                    <Label className="text-[10px] font-medium text-slate-500 mb-1 block">Internet Package</Label>
+                    <FieldWrapper name="package" component="Select" items={PACKAGE_ITEMS.map(opt => ({ value: opt, label: opt }))} placeholder="Select Package" className="bg-white h-9 text-xs" />
+                </div>
+            </div>
+
+            <div>
+                <Label className="text-[10px] font-medium text-slate-500 mb-1 block">Address</Label>
+                <FieldWrapper name="address" component="Textarea" className="bg-white min-h-[50px] text-xs resize-none" placeholder="Installation address..." />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 pt-2 border-t border-slate-200/60">
+                <div>
+                    <Label className="text-[10px] font-medium text-slate-500 mb-1 block">PPPoE Username</Label>
+                    <FieldWrapper name="user_pppoe" component="Input" className="bg-white font-mono text-xs h-9" placeholder="user@net" />
+                </div>
+                <div>
+                    <Label className="text-[10px] font-medium text-slate-500 mb-1 block">PPPoE Password</Label>
+                    <FieldWrapper name="pass_pppoe" component="Input" className="bg-white font-mono text-xs h-9" placeholder="********" />
+                </div>
+            </div>
+        </div>
+    </div>
+);
+
+// Batch Mode Layout (Isolated)
+const BatchFormLayout = ({ oltOptions }: { oltOptions: string[] }) => (
     <div className="space-y-5 px-1">
         <div>
             <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">Target OLT</Label>
             <FieldWrapper name="olt_name" component="Select" items={oltOptions.map(opt => ({ value: opt, label: opt }))} placeholder="-- Select OLT --" className="bg-white h-10 text-xs font-medium w-full" />
         </div>
         <div className="bg-amber-50/50 p-5 rounded-xl border border-amber-200/60 shadow-sm mt-4">
-            <h3 className="font-bold text-amber-800 text-[10px] uppercase tracking-wider mb-3 flex items-center gap-2">
-                <Settings className="h-3 w-3" /> Global Configuration
-            </h3>
+            <SectionHeader icon={Settings} title="Global Configuration" color="amber" />
             <div className="grid grid-cols-2 gap-4">
                 <div>
                     <Label className="text-[10px] font-medium text-amber-700/70 mb-1.5 block">Modem Model</Label>
@@ -250,3 +268,55 @@ export const ConfigBatchFields = ({ oltOptions = [] }: FormFieldProps) => (
         </div>
     </div>
 );
+
+// ==========================================
+// 4. MAIN EXPORTED COMPONENT
+// ==========================================
+
+export const ConfigFormFields = (props: FormFieldProps) => {
+    const { mode, oltOptions = [] } = props;
+
+    // A. Render Batch Mode
+    if (mode === 'batch') {
+        return <BatchFormLayout oltOptions={oltOptions} />;
+    }
+
+    // B. Render Unified Layout (Auto / Manual)
+    return (
+        <div className="space-y-5 px-1">
+            
+            {/* 1. Target OLT (Always First) */}
+            <div>
+                <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">Target OLT</Label>
+                <FieldWrapper
+                    name="olt_name"
+                    component="Select"
+                    items={oltOptions.map(opt => ({ value: opt, label: opt }))}
+                    placeholder="-- Select OLT --"
+                    className="bg-white h-10 text-xs font-medium w-full"
+                />
+            </div>
+
+            {/* 2. Source Selection (Dynamic Header) */}
+            <SourceSelectionSection {...props} />
+
+            {/* 3. The Form Body (Shared) */}
+            <DeviceConfigSection {...props} />
+            <CustomerDataSection />
+
+            {/* 4. Footer Options */}
+            <div className="flex items-center justify-between bg-white dark:bg-zinc-950 p-3 rounded-lg border border-slate-100 shadow-sm">
+                <div className="flex items-center gap-3">
+                    <div className="p-1.5 rounded-md bg-orange-50 text-orange-600">
+                        <Unlock className="h-4 w-4" />
+                    </div>
+                    <div>
+                        <Label className="text-xs font-bold block">Port Security</Label>
+                        <p className="text-[10px] text-slate-400">Lock unused ethernet ports</p>
+                    </div>
+                </div>
+                <FieldWrapper name="eth_locks" component="Checkbox" />
+            </div>
+        </div>
+    );
+};

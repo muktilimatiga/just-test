@@ -1,5 +1,5 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
-import type { OnuTargetPayload } from '@/services/generated/model';
+import type { ConfigurationRequest, OnuTargetPayload } from '@/services/generated/model';
 
 import {
   useGetFastCustomerDetailsApiV1CustomerInvoicesGet,
@@ -9,11 +9,13 @@ import {
 
 import {
   // useGetOptionsApiV1ConfigApiOptionsGet,
-  detectUncfgOntsApiV1ConfigApiOltsOltNameDetectOntsGet
+  detectUncfgOntsApiV1ConfigApiOltsOltNameDetectOntsGet,
+  runConfigurationApiV1ConfigApiOltsOltNameConfigurePost,
 } from "@/services/generated/config/config";
 
 // Re-export types if needed by consumers
 export type { OnuTargetPayload };
+export type { ConfigurationRequest };
 
 export const useCustomerInvoices = (query: string) => {
   return useGetFastCustomerDetailsApiV1CustomerInvoicesGet(
@@ -32,7 +34,7 @@ export const useCustomerInvoices = (query: string) => {
 
 export const usePsbData = (enabled: boolean = true) => {
   return useGetPsbDataApiV1CustomerPsbGet({
-    query: { enabled }
+    query: { enabled : enabled }
   });
 };
 
@@ -42,3 +44,10 @@ export const useScanOnts = () => {
   });
 };
 
+export const configMutation = () => {
+  return useMutation({
+    mutationFn: ({ oltName, data }: { oltName: string; data: ConfigurationRequest }) =>
+      runConfigurationApiV1ConfigApiOltsOltNameConfigurePost(oltName, data),
+  }
+  );
+};

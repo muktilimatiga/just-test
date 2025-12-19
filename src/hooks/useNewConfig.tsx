@@ -4,9 +4,9 @@ import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useAppForm } from '@/components/form/hooks';
 // Assuming useConfigOptions is the React Query hook we defined in api.ts
-import { useConfigOptions } from './useApi'
 import { AXIOS_INSTANCE as axios } from '@/services/api';
 // --- Schema matches your ConfigurationRequest interface ---
+
 const ConfigurationSchema = z.object({
   sn: z.string().min(1, "Serial number is required"),
   customer: z.object({
@@ -23,7 +23,6 @@ const ConfigurationSchema = z.object({
 type UserFormValues = z.infer<typeof ConfigurationSchema>;
 
 export const useConfigurationForm = (oltName: string = 'default') => {
-  const { data: configOptions, isLoading: isLoadingOptions } = useConfigOptions();
 
   // --- MUTATION uses ApiService ---
   const mutation = useMutation({
@@ -60,8 +59,5 @@ export const useConfigurationForm = (oltName: string = 'default') => {
     mutation,
     isSubmitting: form.state.isSubmitting || mutation.isPending,
     fieldRules: ConfigurationSchema.shape,
-    modemOptions: configOptions?.modem_options ?? [],
-    packageOptions: configOptions?.package_options ?? [],
-    isLoadingOptions,
   };
 };

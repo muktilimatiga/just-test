@@ -8,7 +8,7 @@ import { supabase } from '@/lib/supabaseClient';
 import { useConfigurationForm } from '@/hooks/useNewConfig';
 
 // Import React Query Hooks
-import { useConfigOptions, usePsbData, useScanOnts } from '@/hooks/useApi';
+import {  usePsbData, useScanOnts } from '@/hooks/useApi';
 
 // Import Form Components
 import { FormInput } from '@/components/form/FormInput';
@@ -32,8 +32,6 @@ export const ConfigModal = ({ isOpen, onClose, type }: { isOpen: boolean, onClos
   const [batchQueue, setBatchQueue] = useState<BatchItem[]>([]);
 
   // 1. React Query: Global Options
-  const { data: optionsData } = useConfigOptions();
-  const oltOptions = optionsData?.olt_options || [];
 
   // 2. React Query: PSB Data (Fetches automatically when mode === 'auto')
   const {
