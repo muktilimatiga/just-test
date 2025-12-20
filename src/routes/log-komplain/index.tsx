@@ -1,8 +1,8 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { createFileRoute } from '@tanstack/react-router';
 import type { ColumnDef } from '@tanstack/react-table';
 import { AutoTanStackTable } from '@/components/AutoTable';
-import { Button } from '@/components/ui'
+import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import type { Ticket } from '@/types';
 import {
@@ -14,17 +14,16 @@ import {
   Plus,
   Filter
 } from 'lucide-react';
+import { useTicketStore, type TicketMode } from '@/store/ticketStore';
 
 // Custom Hooks
 import { useSupabaseTickets } from '@/hooks/supabase/useSupabaeTicket';
 import { ColumnFilter } from '@/components/ColumnFilter';
 
-// 1. IMPORT THE UNIFIED MODAL & TYPE
+// Unified Modal
 import { TicketModal } from '@/components/modal/openTicketModal';
-// Adjust this path if your type is exported from elsewhere (e.g. hooks/useTicketFormStrategy)
-import { type TicketMode } from '@/store/ticketStore';
-// --- Helper Components ---
 
+// --- Helper Components ---
 const StatusBadge = ({ status }: { status: string }) => {
   const styles: Record<string, string> = {
     open: "bg-red-100 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-300 dark:border-red-900/50",
@@ -49,8 +48,11 @@ const LogTicketPage = () => {
   // 1. Data Fetching
   const { data: tickets = [], isLoading, isFetching, refetch } = useSupabaseTickets();
 
-  // 2. UNIFIED MODAL STATE
-  // Instead of 3 separate states, we track one "Configuration"
+  // 2. Store Actions
+  const initializeFromTicket = useTicketStore((state) => state.initializeFromTicket);
+  const resetStore = useTicketStore((state) => state.reset);
+
+  // 3. Local Modal State
   const [modalConfig, setModalConfig] = useState<{
     isOpen: boolean;
     mode: TicketMode;
@@ -61,16 +63,31 @@ const LogTicketPage = () => {
     ticketData: undefined
   });
 
-  // Helper to open the unified modal
-  const openModal = (mode: TicketMode, ticket?: Ticket) => {
-    setModalConfig({ isOpen: true, mode, ticketData: ticket });
-  };
+  // 4. Modal Handlers
+  const openModal = useCallback((mode: TicketMode, ticket?: Ticket) => {
+    // 1. Prepare Store Data
+    if (ticket) {
+      // Load existing ticket data into the generic store
+      initializeFromTicket(ticket);
+    } else {
+      // Clear store for a new ticket
+      resetStore();
+    }
+
+    // 2. Open Modal with the Data attached
+    setModalConfig({
+      isOpen: true,
+      mode,
+      ticketData: ticket
+    });
+
+  }, [initializeFromTicket, resetStore]);
 
   const closeModal = () => {
     setModalConfig((prev) => ({ ...prev, isOpen: false }));
   };
 
-  // 3. Column Definitions
+  // 5. Column Definitions
   const columnOverrides = useMemo<Partial<Record<keyof Ticket | 'actions', ColumnDef<Ticket>>>>(() => ({
     status: {
       accessorKey: "status",
@@ -109,6 +126,14 @@ const LogTicketPage = () => {
       header: () => <div className="text-right">Actions</div>,
       cell: ({ row }: any) => {
         const t = row.original as Ticket;
+
+        // Handler defined inside cell to access 'row'
+        const handleAction = (e: React.MouseEvent, mode: TicketMode) => {
+          e.preventDefault();
+          e.stopPropagation();
+          openModal(mode, t);
+        };
+
         return (
           <div className="flex items-center justify-end gap-2">
 
@@ -117,11 +142,8 @@ const LogTicketPage = () => {
               <Button
                 size="sm"
                 variant="outline"
-                className="h-7 px-2 text-[10px] gap-1 text-indigo-600 border-indigo-200 hover:bg-indigo-50 dark:border-indigo-900 dark:text-indigo-400 dark:hover:bg-indigo-900/20"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  openModal('open', t); // <--- Opens Unified Modal in 'open' mode
-                }}
+                className="relative z-50 h-7 px-2 text-[10px] gap-1 text-indigo-600 border-indigo-200 hover:bg-indigo-50 dark:border-indigo-900 dark:text-indigo-400 dark:hover:bg-indigo-900/20"
+                onClick={(e) => handleAction(e, 'open')}
               >
                 Process <ArrowRight className="h-3 w-3" />
               </Button>
@@ -132,11 +154,8 @@ const LogTicketPage = () => {
               <Button
                 size="sm"
                 variant="outline"
-                className="h-7 px-2 text-[10px] gap-1 text-blue-600 border-blue-200 hover:bg-blue-50 dark:border-blue-900 dark:text-blue-400 dark:hover:bg-blue-900/20"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  openModal('forward', t); // <--- Opens Unified Modal in 'forward' mode
-                }}
+                className="relative z-50 h-7 px-2 text-[10px] gap-1 text-blue-600 border-blue-200 hover:bg-blue-50 dark:border-blue-900 dark:text-blue-400 dark:hover:bg-blue-900/20"
+                onClick={(e) => handleAction(e, 'forward')}
               >
                 Forward <Forward className="h-3 w-3" />
               </Button>
@@ -147,11 +166,8 @@ const LogTicketPage = () => {
               <Button
                 size="sm"
                 variant="ghost"
-                className="h-4 px-2 text-[10px] gap-1 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  openModal('close', t); // <--- Opens Unified Modal in 'close' mode
-                }}
+                className="relative z-50 h-4 px-2 text-[10px] gap-1 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+                onClick={(e) => handleAction(e, 'close')}
               >
                 Close
               </Button>
@@ -167,19 +183,17 @@ const LogTicketPage = () => {
         );
       }
     }
-  }), []);
+  }), [openModal]);
 
   return (
     <div className="animate-in fade-in duration-500 px-8 py-8 space-y-4">
 
       {/* --- THE UNIFIED MODAL --- */}
-      {/* This single component handles Create, Process, Forward, and Close */}
       <TicketModal
         isOpen={modalConfig.isOpen}
         onClose={closeModal}
         mode={modalConfig.mode}
         ticketData={modalConfig.ticketData}
-        
       />
 
       {/* --- Header / Toolbar --- */}

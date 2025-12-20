@@ -9,7 +9,7 @@ import { useAppForm, FormProvider } from '@/components/form/hooks';
 import { useActionSuccess, useActionError } from '@/hooks/useActionLog';
 import { toast } from 'sonner';
 
-// Import the Strategy Hook we just created
+// Import the Strategy Hook
 import { useTicketForm, type TicketMode } from '@/store/useTicketForm';
 
 interface TicketModalProps {
@@ -21,7 +21,7 @@ interface TicketModalProps {
 
 export const TicketModal = ({ isOpen, onClose, mode, ticketData }: TicketModalProps) => {
 
-    // 1. Get Store Data (Your Database)
+    // 1. Get Store Data
     const {
         step, setStep, selectUser, selectedUser,
         formData, initializeFromTicket, reset: resetStore
@@ -31,7 +31,7 @@ export const TicketModal = ({ isOpen, onClose, mode, ticketData }: TicketModalPr
         searchTerm, setSearchTerm, searchResults, isSearching, searchCustomers, resetSearch
     } = useFiberStore();
 
-    // 2. PARSE STRATEGY (This loads the specific Form + API for the current mode)
+    // 2. PARSE STRATEGY (Determines which fields are shown based on 'mode')
     const { title, FormFields, schema, mutation, submitLabel, variant, execute } = useTicketForm(mode);
     const onSuccessAction = useActionSuccess();
     const onErrorAction = useActionError();
@@ -49,6 +49,7 @@ export const TicketModal = ({ isOpen, onClose, mode, ticketData }: TicketModalPr
             interface: '',
             ticketRef: '',
             type: 'FREE',
+            // these must exist for TypeScript, even if empty
             action_ticket: '',
             action_close: '',
             last_action: '',
@@ -65,10 +66,9 @@ export const TicketModal = ({ isOpen, onClose, mode, ticketData }: TicketModalPr
             try {
                 await execute(value);
                 toast.success(submitLabel + " successful");
-                console.log(value);
                 onSuccessAction(value, {
                     title,
-                    action: mode === 'create' ? "create" : "update", // Dynamic action logging
+                    action: mode === 'create' ? "create" : "update",
                     target: "ticket",
                     onDone: handleClose,
                 });
@@ -80,19 +80,52 @@ export const TicketModal = ({ isOpen, onClose, mode, ticketData }: TicketModalPr
         }
     });
 
-    // 4. Lifecycle & Init
+    // 4. LIFECYCLE: DATA INITIALIZATION (THE CRITICAL FIX)
     useEffect(() => {
         if (isOpen) {
-            resetStore();
-            resetSearch();
-            form.reset();
-
+            // SCENARIO A: OPEN TICKET (Clean Slate)
             if (mode === 'create') {
+                resetStore();
+                resetSearch();
+                form.reset();
                 setStep(1);
-            } else if (ticketData) {
-                // If Open/Forward/Close, pre-fill store
+            }
+            // SCENARIO B: PROCESS / FORWARD / CLOSE (Existing Data)
+            else if (ticketData) {
+                // 1. Load data into the Store
                 initializeFromTicket(ticketData);
-                // Try to fetch deeper data (Address, SN, etc.) from data_fiber
+
+                // 2. Load data into the Form (CRITICAL for Validation)
+                // We use "|| '-'" to ensure hidden fields aren't empty strings, 
+                // which would break validation for "Close" or "Forward" actions.
+                form.reset({
+                    // Visible Identity Fields
+                    name: ticketData.nama || ticketData.name || "",
+                    address: ticketData.alamat || ticketData.address || "",
+                    description: ticketData.kendala || ticketData.description || "",
+                    priority: ticketData.priority || "Low",
+                    ticketRef: ticketData.id || ticketData.ticketId || "",
+
+                    // Technical Fields
+                    olt_name: ticketData.olt_name || "",
+                    user_pppoe: ticketData.user_pppoe || "",
+                    onu_sn: ticketData.sn_modem || ticketData.onu_sn || "",
+                    interface: ticketData.interface || "",
+                    type: ticketData.type || "FREE",
+
+                    // Hidden/Action Fields (Populate with Defaults so Validation Passes!)
+                    action_ticket: "-",
+                    action_close: ticketData.action_close || "-",
+                    last_action: ticketData.last_action || "-",
+                    service_impact: ticketData.service_impact || "-",
+                    root_cause: ticketData.root_cause || "-",
+                    network_impact: ticketData.network_impact || "-",
+                    person_in_charge: ticketData.person_in_charge || "-",
+                    recomended_action: ticketData.recomended_action || "-",
+                    PIC: ticketData.PIC || "-"
+                });
+
+                // 3. Attempt to fetch richer data (optional)
                 if (ticketData.nama || ticketData.name) {
                     useTicketStore.getState().fetchCustomerByName(ticketData.nama || ticketData.name);
                 }
@@ -100,12 +133,15 @@ export const TicketModal = ({ isOpen, onClose, mode, ticketData }: TicketModalPr
         }
     }, [isOpen, mode, ticketData]);
 
-    // Keep form synced with store
+    // Keep form synced if Store updates (e.g., after fetchCustomerByName finishes)
     useEffect(() => {
-        if (step === 2 && formData) form.reset(formData);
+        if (step === 2 && formData && formData.name) {
+            // Only update if we actually have data, to prevent overwriting with empties
+            form.reset(formData);
+        }
     }, [step, formData]);
 
-    // Search Debounce (Create Mode Only)
+    // Search Debounce (Only for Create Mode)
     useEffect(() => {
         const timer = setTimeout(() => {
             if (isOpen && mode === 'create' && step === 1) searchCustomers(searchTerm);
@@ -119,11 +155,10 @@ export const TicketModal = ({ isOpen, onClose, mode, ticketData }: TicketModalPr
     };
 
     const handleChangeUser = () => {
-  resetStore();   // clears selectedUser + formData + step
-  resetSearch();  // clears searchTerm & results
-  setStep(1);     // explicit, readable
-};
-
+        resetStore();
+        resetSearch();
+        setStep(1);
+    };
 
     const handleSelectCustomer = (c: any) => {
         selectUser({
@@ -139,7 +174,7 @@ export const TicketModal = ({ isOpen, onClose, mode, ticketData }: TicketModalPr
             </div>
 
             <div className="flex-1 overflow-y-auto">
-                {/* Search Step (Create Only) */}
+                {/* Step 1: Search (Only for Open Ticket) */}
                 {step === 1 && mode === 'create' && (
                     <div className="p-6 space-y-4">
                         <div className="space-y-2">
@@ -161,31 +196,52 @@ export const TicketModal = ({ isOpen, onClose, mode, ticketData }: TicketModalPr
                     </div>
                 )}
 
-                {/* Unified Form Step */}
-                {step === 2 && (
+                {/* Step 2: The Unified Form (Process, Forward, Close, or Create Step 2) */}
+                {(step === 2 || mode !== 'create') && (
                     <div className="animate-in fade-in slide-in-from-right-4 duration-300">
-                        {selectedUser && <CustomerCard
-  user={selectedUser}
-  onChangeUser={mode === 'create' ? handleChangeUser : undefined}
-/>}
+                        {selectedUser && (
+                            <CustomerCard
+                                user={selectedUser}
+                                onChangeUser={mode === 'create' ? handleChangeUser : undefined}
+                            />
+                        )}
                         <FormProvider value={form}>
-                            {/* Renders OpenFields, CloseFields, etc. dynamically */}
+                            {/* This component dynamically changes inputs based on 'mode' */}
                             <FormFields />
                         </FormProvider>
                     </div>
                 )}
             </div>
 
-            {/* Footer */}
-            {step === 2 && (
+            {/* Footer Actions */}
+            {(step === 2 || mode !== 'create') && (
                 <div className="flex justify-end gap-2 p-6 pt-4 border-t sticky bottom-0 bg-background shadow-lg">
-                    <Button variant="outline" onClick={handleClose} disabled={mutation.isPending}>Cancel</Button>
                     <Button
-                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); form.handleSubmit(); }}
+                        variant="outline"
+                        onClick={handleClose}
                         disabled={mutation.isPending}
+                    >
+                        Cancel
+                    </Button>
+
+                    <Button
+                        onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            form.handleSubmit();
+                        }}
+                        disabled={mutation.isPending} // 1. Disable button while loading
                         variant={variant}
                     >
-                        {mutation.isPending ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Processing...</> : submitLabel}
+                        {/* 2. Show Loader if processing, otherwise show Label */}
+                        {mutation.isPending ? (
+                            <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Processing...
+                            </>
+                        ) : (
+                            submitLabel
+                        )}
                     </Button>
                 </div>
             )}
