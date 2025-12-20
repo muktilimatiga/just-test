@@ -10,13 +10,26 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TemplateIndexRouteImport } from './routes/template/index'
+import { Route as LogsIndexRouteImport } from './routes/logs/index'
 import { Route as LogKomplainIndexRouteImport } from './routes/log-komplain/index'
 import { Route as LauncherIndexRouteImport } from './routes/launcher/index'
+import { Route as BroadbandIndexRouteImport } from './routes/broadband/index'
 import { Route as LauncherRealIndexRouteImport } from './routes/launcher/realIndex'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TemplateIndexRoute = TemplateIndexRouteImport.update({
+  id: '/template/',
+  path: '/template/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LogsIndexRoute = LogsIndexRouteImport.update({
+  id: '/logs/',
+  path: '/logs/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LogKomplainIndexRoute = LogKomplainIndexRouteImport.update({
@@ -29,6 +42,11 @@ const LauncherIndexRoute = LauncherIndexRouteImport.update({
   path: '/launcher/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BroadbandIndexRoute = BroadbandIndexRouteImport.update({
+  id: '/broadband/',
+  path: '/broadband/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LauncherRealIndexRoute = LauncherRealIndexRouteImport.update({
   id: '/launcher/realIndex',
   path: '/launcher/realIndex',
@@ -38,35 +56,69 @@ const LauncherRealIndexRoute = LauncherRealIndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/launcher/realIndex': typeof LauncherRealIndexRoute
+  '/broadband': typeof BroadbandIndexRoute
   '/launcher': typeof LauncherIndexRoute
   '/log-komplain': typeof LogKomplainIndexRoute
+  '/logs': typeof LogsIndexRoute
+  '/template': typeof TemplateIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/launcher/realIndex': typeof LauncherRealIndexRoute
+  '/broadband': typeof BroadbandIndexRoute
   '/launcher': typeof LauncherIndexRoute
   '/log-komplain': typeof LogKomplainIndexRoute
+  '/logs': typeof LogsIndexRoute
+  '/template': typeof TemplateIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/launcher/realIndex': typeof LauncherRealIndexRoute
+  '/broadband/': typeof BroadbandIndexRoute
   '/launcher/': typeof LauncherIndexRoute
   '/log-komplain/': typeof LogKomplainIndexRoute
+  '/logs/': typeof LogsIndexRoute
+  '/template/': typeof TemplateIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/launcher/realIndex' | '/launcher' | '/log-komplain'
+  fullPaths:
+    | '/'
+    | '/launcher/realIndex'
+    | '/broadband'
+    | '/launcher'
+    | '/log-komplain'
+    | '/logs'
+    | '/template'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/launcher/realIndex' | '/launcher' | '/log-komplain'
-  id: '__root__' | '/' | '/launcher/realIndex' | '/launcher/' | '/log-komplain/'
+  to:
+    | '/'
+    | '/launcher/realIndex'
+    | '/broadband'
+    | '/launcher'
+    | '/log-komplain'
+    | '/logs'
+    | '/template'
+  id:
+    | '__root__'
+    | '/'
+    | '/launcher/realIndex'
+    | '/broadband/'
+    | '/launcher/'
+    | '/log-komplain/'
+    | '/logs/'
+    | '/template/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LauncherRealIndexRoute: typeof LauncherRealIndexRoute
+  BroadbandIndexRoute: typeof BroadbandIndexRoute
   LauncherIndexRoute: typeof LauncherIndexRoute
   LogKomplainIndexRoute: typeof LogKomplainIndexRoute
+  LogsIndexRoute: typeof LogsIndexRoute
+  TemplateIndexRoute: typeof TemplateIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -76,6 +128,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/template/': {
+      id: '/template/'
+      path: '/template'
+      fullPath: '/template'
+      preLoaderRoute: typeof TemplateIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/logs/': {
+      id: '/logs/'
+      path: '/logs'
+      fullPath: '/logs'
+      preLoaderRoute: typeof LogsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/log-komplain/': {
@@ -92,6 +158,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LauncherIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/broadband/': {
+      id: '/broadband/'
+      path: '/broadband'
+      fullPath: '/broadband'
+      preLoaderRoute: typeof BroadbandIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/launcher/realIndex': {
       id: '/launcher/realIndex'
       path: '/launcher/realIndex'
@@ -105,8 +178,11 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LauncherRealIndexRoute: LauncherRealIndexRoute,
+  BroadbandIndexRoute: BroadbandIndexRoute,
   LauncherIndexRoute: LauncherIndexRoute,
   LogKomplainIndexRoute: LogKomplainIndexRoute,
+  LogsIndexRoute: LogsIndexRoute,
+  TemplateIndexRoute: TemplateIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -9,6 +9,7 @@ export function FormSelect({
     className, // 1. Destructure className
     onChange,  // 2. Destructure onChange
     field,
+    placeholder,
     ...props
 }: FormControlProps & {
     children?: ReactNode,
@@ -16,6 +17,7 @@ export function FormSelect({
     className?: string,                  // 3. Add Type Definition
     onChange?: (value: string) => void   // 4. Add Type Definition
     field: any
+    placeholder?: string
 }) {
     // 1. Remove context logic as it throws
     // const contextField = useFieldContext<string>()
@@ -41,7 +43,7 @@ export function FormSelect({
                     name={field.name}
                     onBlur={field.handleBlur}
                 >
-                    <SelectValue />
+                    <SelectValue placeholder={placeholder} />
                 </SelectTrigger>
                 <SelectContent>
                     {children}

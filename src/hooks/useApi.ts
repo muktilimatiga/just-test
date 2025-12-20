@@ -32,9 +32,9 @@ export const useCustomerInvoices = (query: string) => {
 
 // --- NEW HOOKS ---
 
-export const usePsbData = (enabled: boolean = true) => {
+export const usePsbData = () => {
   return useGetPsbDataApiV1CustomerPsbGet({
-    query: { enabled : enabled }
+    query: { staleTime: Infinity, enabled: false }
   });
 };
 

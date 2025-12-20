@@ -17,7 +17,7 @@ export const BaseConfigSchema = z.object({
     olt_name: z.string().min(1, "OLT is required"),
     modem_type: z.string().min(1, "Modem Type is required"),
     onu_sn: z.string().min(1, "Serial Number is required"),
-    eth_locks: z.array(z.boolean()).default([false, false, false, false]),
+    eth_locks: z.boolean().default(true),
 });
 
 export const ConfigManualSchema = BaseConfigSchema.extend({
@@ -47,7 +47,8 @@ export const ConfigBatchSchema = BaseConfigSchema.pick({
 // ==========================================
 
 const MODEM_ITEMS = ["C-DATA", "F609", "F670L"];
-const PACKAGE_ITEMS = ["50Mbps", "100Mbps", "200Mbps"];
+const PACKAGE_ITEMS = ["10M", "15M", "20M", "25M", "30M", "35M", "40M", "50M", "75M", "100M"];
+const OLT_ITEMS = ["BOYOLANGU", "GANDUSARI", "KAUMAN", "BEJI", "DURENAN", "KALIDAWIR", "BLITAR", "CAMPUR BARU"];
 
 interface FormFieldProps {
     mode: 'manual' | 'auto' | 'batch' | 'bridge';
@@ -120,7 +121,7 @@ const SourceSelectionSection = (props: Partial<FormFieldProps>) => {
                     name="data_psb"
                     component="Select"
                     items={psbList?.map(p => ({ value: p.id, label: `${p.name} - ${p.address}` })) || []}
-                    placeholder={psbList?.length === 0 ? "No pending data" : "-- Select Customer to Auto-Fill --"}
+                    placeholder={psbList?.length === 0 ? "No pending data" : "-- Pilih Pelanggan PSB --"}
                     className="bg-white h-10 text-xs border-indigo-200"
                 />
             </div>
@@ -217,7 +218,7 @@ const DeviceConfigSection = ({ detectedOnts = [], onScan, isScanning }: Partial<
                     name="modem_type"
                     component="Select"
                     items={MODEM_ITEMS.map(opt => ({ value: opt, label: opt }))}
-                    placeholder="Select Type"
+                    placeholder="Pilih Modem"
                     className="bg-white h-9 text-xs"
                 />
             </div>
@@ -237,8 +238,9 @@ const DeviceConfigSection = ({ detectedOnts = [], onScan, isScanning }: Partial<
                         ) : (
                             <FieldWrapper
                                 name="onu_sn"
-                                component="Input"
-                                placeholder="e.g. ZTEG12345678"
+                                component="Select"
+                                items={detectedOnts.map(ont => ({ value: ont.sn, label: `${ont.sn} (Port ${ont.pon_port})` }))}
+                                placeholder="SN Terdeteksi"
                                 className="bg-white font-mono text-xs h-9"
                             />
                         )}
@@ -271,34 +273,33 @@ const CustomerDataSection = () => (
                 </div>
                 <div className="col-span-2 md:col-span-1">
                     <Label className="text-[10px] font-medium text-slate-500 mb-1 block">Internet Package</Label>
-                    <FieldWrapper name="package" component="Select" items={PACKAGE_ITEMS.map(opt => ({ value: opt, label: opt }))} placeholder="Select Package" className="bg-white h-9 text-xs" />
+                    <FieldWrapper name="package" component="Select" items={PACKAGE_ITEMS.map(opt => ({ value: opt, label: opt }))} placeholder="Pilih Package" className="bg-white h-9 text-xs" />
                 </div>
             </div>
 
             <div>
                 <Label className="text-[10px] font-medium text-slate-500 mb-1 block">Address</Label>
-                <FieldWrapper name="address" component="Textarea" className="bg-white min-h-[50px] text-xs resize-none" placeholder="Installation address..." />
+                <FieldWrapper name="address" component="Textarea" className="bg-white min-h-[50px] text-xs resize-none" placeholder="Alamat" />
             </div>
-
             <div className="grid grid-cols-2 gap-4 pt-2 border-t border-slate-200/60">
                 <div>
                     <Label className="text-[10px] font-medium text-slate-500 mb-1 block">PPPoE Username</Label>
-                    <FieldWrapper name="user_pppoe" component="Input" className="bg-white font-mono text-xs h-9" placeholder="user@net" />
+                    <FieldWrapper name="user_pppoe" component="Input" className="bg-white font-mono text-xs h-9" placeholder="PPPoE" />
                 </div>
                 <div>
                     <Label className="text-[10px] font-medium text-slate-500 mb-1 block">PPPoE Password</Label>
-                    <FieldWrapper name="pass_pppoe" component="Input" className="bg-white font-mono text-xs h-9" placeholder="********" />
+                    <FieldWrapper name="pass_pppoe" component="Input" className="bg-white font-mono text-xs h-9" placeholder="PPPoE Pass" />
                 </div>
             </div>
         </div>
     </div>
 );
 
-const BatchFormLayout = ({ oltOptions }: { oltOptions: string[] }) => (
+const BatchFormLayout = () => (
     <div className="space-y-5 px-1">
         <div>
             <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">Target OLT</Label>
-            <FieldWrapper name="olt_name" component="Select" items={oltOptions.map(opt => ({ value: opt, label: opt }))} placeholder="-- Select OLT --" className="bg-white h-10 text-xs font-medium w-full" />
+            <FieldWrapper name="olt_name" component="Select" items={OLT_ITEMS.map(opt => ({ value: opt, label: opt }))} placeholder="-- Select OLT --" className="bg-white h-10 text-xs font-medium w-full" />
         </div>
         <div className="bg-amber-50/50 p-5 rounded-xl border border-amber-200/60 shadow-sm mt-4">
             <SectionHeader icon={Settings} title="Global Configuration" color="amber" />
@@ -321,11 +322,11 @@ const BatchFormLayout = ({ oltOptions }: { oltOptions: string[] }) => (
 // ==========================================
 
 export const ConfigFormFields = (props: FormFieldProps) => {
-    const { mode, oltOptions = [] } = props;
+    const { mode } = props;
 
     // A. Render Batch Mode
     if (mode === 'batch') {
-        return <BatchFormLayout oltOptions={oltOptions} />;
+        return <BatchFormLayout />;
     }
 
     // B. Render Unified Layout (Auto / Manual)
@@ -338,8 +339,7 @@ export const ConfigFormFields = (props: FormFieldProps) => {
                 <FieldWrapper
                     name="olt_name"
                     component="Select"
-                    // ✅ FIXED: Now correctly maps OLT Options, not Modem items
-                    items={oltOptions.map(opt => ({ value: opt, label: opt }))}
+                    items={OLT_ITEMS.map(opt => ({ value: opt, label: opt }))}
                     placeholder="-- Select OLT --"
                     className="bg-white h-10 text-xs font-medium w-full"
                 />
@@ -360,7 +360,7 @@ export const ConfigFormFields = (props: FormFieldProps) => {
                     </div>
                     <div>
                         <Label className="text-xs font-bold block">Port Security</Label>
-                        <p className="text-[10px] text-slate-400">Lock unused ethernet ports</p>
+                        <p className="text-[10px] text-slate-400 gap-90">Lock unused ethernet ports</p>
                     </div>
                 </div>
                 <FieldWrapper name="eth_locks" component="Checkbox" />
