@@ -48,9 +48,7 @@ export const ConfigModal = ({ isOpen, onClose, type }: { isOpen: boolean, onClos
   const {
     form,
     isSubmitting,
-    modemOptions,
-    packageOptions,
-    isLoadingOptions
+
   } = useConfigurationForm(selectedOlt || 'default');
 
   const {

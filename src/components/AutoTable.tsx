@@ -11,7 +11,7 @@ import {
   type SortingState,
   type ColumnMeta,
 } from '@tanstack/react-table';
-import { Button } from '@/components/ui/button'; // Assuming you have shadcn/ui
+import { Button } from '@/components/ui/button'; 
 import { ChevronLeft, ChevronRight, ArrowUpDown } from 'lucide-react';
 
 type FilterType = "text" | "select" | "date";
@@ -23,16 +23,19 @@ declare module '@tanstack/react-table' {
   }
 }
 
+// 1. Add enableSearch to the props interface
 interface AutoTanStackTableProps<T> {
   data: T[];
   pageSize?: number;
   columnOverrides?: Partial<Record<keyof T | 'actions', ColumnDef<T>>>;
+  enableSearch?: boolean; 
 }
 
 export function AutoTanStackTable<T extends object>({
   data,
-  pageSize = 10,
-  columnOverrides = {}
+  pageSize = 20,
+  columnOverrides = {},
+  enableSearch = true // 2. Default it to true so existing tables don't break
 }: AutoTanStackTableProps<T>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState('');
@@ -40,11 +43,8 @@ export function AutoTanStackTable<T extends object>({
 
   const columns = useMemo(() => {
     if (!data || data.length === 0) return [];
-
-    // 1. Get all keys from the first row
     const keys = Object.keys(data[0]);
 
-    // 2. Generate Auto Columns
     const generatedColumns: ColumnDef<T>[] = keys.map((key) => {
       if (columnOverrides[key as keyof T]) {
         return columnOverrides[key as keyof T]!;
@@ -72,8 +72,6 @@ export function AutoTanStackTable<T extends object>({
       };
     });
 
-
-    // 3. Check for special "actions" override that isn't in the data keys
     if (columnOverrides['actions']) {
       generatedColumns.push(columnOverrides['actions'] as any);
     }
@@ -90,7 +88,6 @@ export function AutoTanStackTable<T extends object>({
     }
     return {};
   }
-
 
   const table = useReactTable({
     data,
@@ -110,30 +107,30 @@ export function AutoTanStackTable<T extends object>({
 
   return (
     <div className="space-y-4">
-      {/* Search Bar */}
-      <div className="flex items-center justify-between">
-        <input
-          value={globalFilter ?? ''}
-          onChange={e => setGlobalFilter(e.target.value)}
-          placeholder="Search..."
-          className="max-w-sm px-3 py-2 border rounded-md text-sm w-64 bg-background"
-        />
-        <div className="text-xs text-muted-foreground">
-          {table.getFilteredRowModel().rows.length} Records
+      {/* 3. Wrap the Search Bar in a conditional check */}
+      {enableSearch && (
+        <div className="flex items-center justify-between">
+          <input
+            value={globalFilter ?? ''}
+            onChange={e => setGlobalFilter(e.target.value)}
+            placeholder="Search..."
+            className="max-w-sm px-3 py-2 border rounded-md text-sm w-64 bg-background"
+          />
+          <div className="text-xs text-muted-foreground">
+            {table.getFilteredRowModel().rows.length} Records
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Table */}
       <div className="rounded-md border">
         <table className="w-full text-sm text-left">
           <thead className="bg-muted/50">
-            {/* Header row */}
             {table.getHeaderGroups().map(headerGroup => (
               <tr key={headerGroup.id} className="border-b">
                 {headerGroup.headers.map(header => (
                   <th key={header.id} className="px-4 py-2 text-muted-foreground">
                     <div className="flex items-center gap-2">
-                      {/* Header label + sorting */}
                       <div
                         className="flex items-center gap-1 cursor-pointer"
                         onClick={header.column.getToggleSortingHandler()}
@@ -141,16 +138,12 @@ export function AutoTanStackTable<T extends object>({
                         {flexRender(header.column.columnDef.header, header.getContext())}
                         {header.column.getCanSort() && <ArrowUpDown className="h-3 w-3" />}
                       </div>
-
                     </div>
                   </th>
-
                 ))}
               </tr>
             ))}
-
           </thead>
-
           <tbody>
             {table.getRowModel().rows.map(row => (
               <tr
@@ -169,7 +162,6 @@ export function AutoTanStackTable<T extends object>({
             ))}
           </tbody>
         </table>
-
       </div>
 
       {/* Pagination */}

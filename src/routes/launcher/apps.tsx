@@ -48,7 +48,7 @@ export const APPS_CONFIG: AppItem[] = [
     title: 'Broadband',
     subtitle: 'Network status',
     icon: Wifi,
-    to: '/monitor',
+    to: '/broadband',
     color: 'bg-card border border-border shadow-sm hover:border-primary/50 hover:shadow-md transition-all',
     iconColor: 'text-zinc-500'
   },

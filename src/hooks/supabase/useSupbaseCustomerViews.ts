@@ -1,22 +1,34 @@
-
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabaseClient';
 import { toast } from 'sonner';
 import type { Customer } from '@/types';
 
-
-export const useSupabaseCustomerViews = () => {
+// 1. Accept a search term (default to empty string)
+export const useSupabaseCustomerViews = (searchTerm: string = '') => {
     return useQuery({
-        queryKey: ['customers_view'],
+        // 2. Add searchTerm to the queryKey so it auto-refetches when you type
+        queryKey: ['customers_view', searchTerm],
+        
         queryFn: async (): Promise<Customer[]> => {
-            const { data: rows, error } = await supabase
+            let query = supabase
                 .from("customers_view")
                 .select("*")
-                .order("id", { ascending: false })
-                .limit(50);
+                .order("id", { ascending: false });
+
+            // 3. Dynamic Logic:
+            if (searchTerm) {
+                // If searching: Look in name, pppoe, address, or SN. Remove the limit!
+                // Using .ilike for case-insensitive search
+                query = query.or(`name.ilike.%${searchTerm}%,user_pppoe.ilike.%${searchTerm}%,alamat.ilike.%${searchTerm}%,onu_sn.ilike.%${searchTerm}%`);
+            } else {
+                // If NOT searching: Just get the latest 50 to save data
+                query = query.limit(50);
+            }
+
+            const { data: rows, error } = await query;
 
             if (error) {
-                toast.error("Failed to fetch tickets");
+                toast.error("Failed to fetch customers");
                 return [];
             }
 
@@ -24,13 +36,10 @@ export const useSupabaseCustomerViews = () => {
                 id: row.id,
                 name: row.name,
                 user_pppoe: row.user_pppoe,
-                pass_pppoe: row.pass_pppoe,
                 alamat: row.alamat,
                 onu_sn: row.onu_sn,
                 olt_name: row.olt_name,
-                olt_port: row.olt_port,
                 interface: row.interface,
-                paket: row.paket,
                 snmp_status: row.snmp_status,
                 rx_power_str: row.rx_power_str,
                 modem_type: row.modem_type,
@@ -45,7 +54,7 @@ export const useSupabaseCustomerViews = () => {
                         : new Date().toISOString(),
             }));
         },
-        staleTime: 1000 * 30, // 30s Cache
+        staleTime: 1000 * 30, 
         refetchOnWindowFocus: true,
     })
 };

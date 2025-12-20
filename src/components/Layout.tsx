@@ -297,15 +297,17 @@ export const Navbar = ({ onOpenMobileMenu }: { onOpenMobileMenu: () => void }) =
   const currentPath = routerState.location.pathname;
   const [users, setUsers] = useState<User[]>([]);
 
-  useEffect(() => {
+useEffect(() => {
     // Fetch users for switcher
     const loadUsers = async () => {
       const { data } = await supabase.from('users').select('*').limit(10);
       if (data) {
         setUsers(data.map((u: User) => ({
-          name: u.full_name || u.username || 'User',
-          email: u.username || '',
+          id: String(u.id),
+          name: u.name || '',
+          username: u.username,
           role: u.role || 'user',
+          password: u.password || '' // <--- ADD THIS LINE
         })));
       }
     };
@@ -395,7 +397,6 @@ export const Navbar = ({ onOpenMobileMenu }: { onOpenMobileMenu: () => void }) =
           <DropdownMenu>
             <DropdownMenuTrigger className="outline-none">
               <Avatar className="h-8 w-8 cursor-pointer ring-2 ring-transparent hover:ring-indigo-500/20 transition-all">
-                <AvatarImage src={user?.avatarUrl} />
                 <AvatarFallback>{user?.name?.charAt(0) || 'U'}</AvatarFallback>
               </Avatar>
             </DropdownMenuTrigger>
@@ -403,7 +404,6 @@ export const Navbar = ({ onOpenMobileMenu }: { onOpenMobileMenu: () => void }) =
               <DropdownMenuLabel className="font-normal p-3 bg-slate-50 dark:bg-white/5 border-b border-slate-100 dark:border-white/5 mb-1">
                 <div className="flex flex-col space-y-1">
                   <p className="text-sm font-bold leading-none">{user?.name}</p>
-                  <p className="text-xs leading-none text-muted-foreground">{user?.email}</p>
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuLabel className="text-xs text-muted-foreground uppercase tracking-wider px-2 pt-2">Switch Account</DropdownMenuLabel>
@@ -411,8 +411,7 @@ export const Navbar = ({ onOpenMobileMenu }: { onOpenMobileMenu: () => void }) =
                 <DropdownMenuItem key={u.id} onClick={() => login(u)}>
                   <div className="flex items-center gap-3 w-full cursor-pointer py-1">
                     <Avatar className="h-6 w-6 text-[10px]">
-                      <AvatarImage src={u.avatarUrl} />
-                      <AvatarFallback>{u.name.charAt(0)}</AvatarFallback>
+                      <AvatarFallback>{u.name?.charAt(0) || 'U'}</AvatarFallback>
                     </Avatar>
                     <span className="text-sm font-medium flex-1 truncate">{u.name}</span>
                     {user?.id === u.id && <Check className="h-3.5 w-3.5 text-indigo-600" />}

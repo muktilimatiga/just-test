@@ -11,7 +11,6 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TemplateIndexRouteImport } from './routes/template/index'
-import { Route as LogsIndexRouteImport } from './routes/logs/index'
 import { Route as LogKomplainIndexRouteImport } from './routes/log-komplain/index'
 import { Route as LauncherIndexRouteImport } from './routes/launcher/index'
 import { Route as BroadbandIndexRouteImport } from './routes/broadband/index'
@@ -25,11 +24,6 @@ const IndexRoute = IndexRouteImport.update({
 const TemplateIndexRoute = TemplateIndexRouteImport.update({
   id: '/template/',
   path: '/template/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LogsIndexRoute = LogsIndexRouteImport.update({
-  id: '/logs/',
-  path: '/logs/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LogKomplainIndexRoute = LogKomplainIndexRouteImport.update({
@@ -59,7 +53,6 @@ export interface FileRoutesByFullPath {
   '/broadband': typeof BroadbandIndexRoute
   '/launcher': typeof LauncherIndexRoute
   '/log-komplain': typeof LogKomplainIndexRoute
-  '/logs': typeof LogsIndexRoute
   '/template': typeof TemplateIndexRoute
 }
 export interface FileRoutesByTo {
@@ -68,7 +61,6 @@ export interface FileRoutesByTo {
   '/broadband': typeof BroadbandIndexRoute
   '/launcher': typeof LauncherIndexRoute
   '/log-komplain': typeof LogKomplainIndexRoute
-  '/logs': typeof LogsIndexRoute
   '/template': typeof TemplateIndexRoute
 }
 export interface FileRoutesById {
@@ -78,7 +70,6 @@ export interface FileRoutesById {
   '/broadband/': typeof BroadbandIndexRoute
   '/launcher/': typeof LauncherIndexRoute
   '/log-komplain/': typeof LogKomplainIndexRoute
-  '/logs/': typeof LogsIndexRoute
   '/template/': typeof TemplateIndexRoute
 }
 export interface FileRouteTypes {
@@ -89,7 +80,6 @@ export interface FileRouteTypes {
     | '/broadband'
     | '/launcher'
     | '/log-komplain'
-    | '/logs'
     | '/template'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -98,7 +88,6 @@ export interface FileRouteTypes {
     | '/broadband'
     | '/launcher'
     | '/log-komplain'
-    | '/logs'
     | '/template'
   id:
     | '__root__'
@@ -107,7 +96,6 @@ export interface FileRouteTypes {
     | '/broadband/'
     | '/launcher/'
     | '/log-komplain/'
-    | '/logs/'
     | '/template/'
   fileRoutesById: FileRoutesById
 }
@@ -117,7 +105,6 @@ export interface RootRouteChildren {
   BroadbandIndexRoute: typeof BroadbandIndexRoute
   LauncherIndexRoute: typeof LauncherIndexRoute
   LogKomplainIndexRoute: typeof LogKomplainIndexRoute
-  LogsIndexRoute: typeof LogsIndexRoute
   TemplateIndexRoute: typeof TemplateIndexRoute
 }
 
@@ -135,13 +122,6 @@ declare module '@tanstack/react-router' {
       path: '/template'
       fullPath: '/template'
       preLoaderRoute: typeof TemplateIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/logs/': {
-      id: '/logs/'
-      path: '/logs'
-      fullPath: '/logs'
-      preLoaderRoute: typeof LogsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/log-komplain/': {
@@ -181,7 +161,6 @@ const rootRouteChildren: RootRouteChildren = {
   BroadbandIndexRoute: BroadbandIndexRoute,
   LauncherIndexRoute: LauncherIndexRoute,
   LogKomplainIndexRoute: LogKomplainIndexRoute,
-  LogsIndexRoute: LogsIndexRoute,
   TemplateIndexRoute: TemplateIndexRoute,
 }
 export const routeTree = rootRouteImport

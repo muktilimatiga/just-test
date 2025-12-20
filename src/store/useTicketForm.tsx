@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import type { TicketFormData } from '@/store/ticketStore';
-// Import the GENERATED payload types to ensure safety
 import type {
     TicketCreateAndProcessPayload,
     TicketProcessPayload,
@@ -24,23 +23,27 @@ import { useAppStore } from '@/store';
 export type TicketMode = 'create' | 'open' | 'forward' | 'close';
 
 export const useTicketForm = (mode: TicketMode) => {
-    // API Hooks
+    // 1. API Hooks
     const createMutation = useCreateAndProcessTicketApiV1TicketCreateAndProcessPost();
     const openMutation = useProcessTicketOnlyApiV1TicketProcessPost();
     const forwardMutation = useForwardTicketApiV1TicketForwardPost();
     const closeMutation = useCloseTicketApiV1TicketClosePost();
 
-    // Credentials
+    // 2. Credentials
+    // FIX: Fallback to '' if user is undefined to satisfy API 'string' requirement
     const user = useAppStore(state => state.user);
+    console.log("Current Redux/Store User:", user);
     const commonProps = {
-        noc_username: user?.email || 'system',
-        noc_password: user?.password || 'password'
+        noc_username: user?.username || '', 
+        noc_password: user?.password || '' 
     };
 
     return useMemo(() => {
         switch (mode) {
-            // Procces Ticket Only -> sending user pppoe only
-            case 'open':
+            // ---------------------------------------------------------
+            // 1. PROCESS TICKET (Open)
+            // ---------------------------------------------------------
+        case 'open':
                 return {
                     title: 'Process Ticket',
                     FormFields: OpenTicketFormFields,
@@ -49,17 +52,19 @@ export const useTicketForm = (mode: TicketMode) => {
                     submitLabel: 'Process Ticket',
                     variant: 'default' as const,
                     execute: async (data: TicketFormData) => {
-                        // Explicitly map Store Data -> API Payload
                         const payload: TicketProcessPayload = {
-                            query: data.user_pppoe,
+                            // Logic: Use PPPOE if available, otherwise Name
+                            query: data.user_pppoe || data.name || '', 
                             ...commonProps
                         };
                         return openMutation.mutateAsync({ data: payload });
                     }
                 };
 
+            // ---------------------------------------------------------
+            // 2. FORWARD TICKET
+            // ---------------------------------------------------------
             case 'forward':
-                // Forward Ticket -> Forward to Technician
                 return {
                     title: 'Forward Ticket',
                     FormFields: ForwardTicketFormFields,
@@ -68,26 +73,31 @@ export const useTicketForm = (mode: TicketMode) => {
                     submitLabel: 'Forward Ticket',
                     variant: 'default' as const,
                     execute: async (data: TicketFormData) => {
+                        // Safety: Construct ONU Index only if interface exists
+                        const iface = data.interface?.trim();
+                        const onuIndex = iface ? `gpon-onu_${iface}` : '';
+
                         const payload: TicketForwardPayload = {
-                            query: data.ticketRef,
-                            service_impact: data.service_impact,
-                            root_cause: data.root_cause,
-                            network_impact: data.network_impact,
-                            recomended_action: data.recomended_action,
-                            // FIX: Map "interface" to "onu_index" add gpon-onu in front of interface
-                            onu_index: `gpon-onu_${data.interface}`,
-                            // FIX: Map "onu_sn" to "sn_modem"
-                            sn_modem: data.onu_sn,
-                            priority: data.priority,
-                            person_in_charge: data.person_in_charge || 'ALL TECHNICIAN',  // By Default we ALL TECHNICIAN
+                            query: data.ticketRef || '', 
+                            service_impact: data.service_impact || '-',
+                            root_cause: data.root_cause || '-',
+                            network_impact: data.network_impact || '-',
+                            recomended_action: data.recomended_action || '-',
+                            onu_index: onuIndex,
+                            sn_modem: data.onu_sn || '',
+                            // Cast these strictly to match the Enum strings expected by API
+                            priority: (data.priority as 'HIGH'|'MEDIUM'|'LOW') || 'MEDIUM',
+                            person_in_charge: data.person_in_charge || 'ALL TECHNICIAN',
                             ...commonProps
                         };
                         return forwardMutation.mutateAsync({ data: payload });
                     }
                 };
 
+            // ---------------------------------------------------------
+            // 3. CLOSE TICKET
+            // ---------------------------------------------------------
             case 'close':
-                // Close Ticket -> sending query as ticketRef and close_reason from form
                 return {
                     title: 'Close Ticket',
                     FormFields: CloseTicketFormFields,
@@ -97,18 +107,20 @@ export const useTicketForm = (mode: TicketMode) => {
                     variant: 'destructive' as const,
                     execute: async (data: TicketFormData) => {
                         const payload: TicketClosePayload = {
-                            query: data.ticketRef,
-                            close_reason: data.action_close,
-                            onu_sn: data.onu_sn,
+                            query: data.ticketRef || '',
+                            close_reason: data.action_close || 'Ticket Closed by System',
+                            onu_sn: data.onu_sn || '',
                             ...commonProps
                         };
                         return closeMutation.mutateAsync({ data: payload });
                     }
                 };
 
+            // ---------------------------------------------------------
+            // 4. CREATE TICKET (Default)
+            // ---------------------------------------------------------
             case 'create':
             default:
-                //  Create Ticket -> sending query as user_pppoe or name and description for kendala use occur from form
                 return {
                     title: 'Create New Ticket',
                     FormFields: CreateTicketFormFields,
@@ -118,15 +130,16 @@ export const useTicketForm = (mode: TicketMode) => {
                     variant: 'default' as const,
                     execute: async (data: TicketFormData) => {
                         const payload: TicketCreateAndProcessPayload = {
-                            query: data.user_pppoe || data.name,
-                            description: data.description, // Kendala User
-                            priority: data.priority || 'LOW', // By default its "LOW"
-                            jenis: data.type || 'FREE', // By Default its 'FREE"
+                            query: data.user_pppoe || data.name || '', 
+                            description: data.description || 'No description provided',
+                            // Ensure these match your API Enum values exactly
+                            priority: (data.priority as 'HIGH'|'MEDIUM'|'LOW') || 'LOW', 
+                            jenis: (data.type as 'CHARGED'|'FREE') || 'FREE', 
                             ...commonProps
                         };
                         return createMutation.mutateAsync({ data: payload });
                     }
                 };
         }
-    }, [mode, createMutation, openMutation, forwardMutation, closeMutation, user]);
+    }, [mode, createMutation, openMutation, forwardMutation, closeMutation, user, commonProps]);
 };

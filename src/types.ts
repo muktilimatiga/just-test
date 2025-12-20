@@ -53,14 +53,9 @@ import * as React from 'react';
 export const UserSchema = z.object({
   id: z.string().uuid(),
   name: z.string(),
-  email: z.string().email(),
+  username:z.string(),
   role: z.enum(['admin', 'noc', 'manager']),
   password: z.string(),
-  avatarUrl: z.string().optional(),
-  coordinates: z.object({
-    lat: z.number(),
-    lng: z.number(),
-  }).optional(),
 });
 
 export const CustomerSchema = z.object({

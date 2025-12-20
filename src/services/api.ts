@@ -2,7 +2,7 @@ import axios from 'axios';
 import type { AxiosRequestConfig, AxiosError } from 'axios';
 
 // Base API configuration
-export const API_BASE_URL = 'http://localhost:8002';
+export const API_BASE_URL = 'http://172.16.121.11:8002';
 
 export const AXIOS_INSTANCE = axios.create({
   baseURL: API_BASE_URL
