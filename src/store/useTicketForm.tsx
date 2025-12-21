@@ -92,7 +92,8 @@ export const useTicketForm = (mode: TicketMode) => {
               sn_modem: data.onu_sn || '',
               // Cast these strictly to match the Enum strings expected by API
               priority:
-                (data.priority as 'HIGH' | 'MEDIUM' | 'LOW') || 'MEDIUM',
+                (data.priority as 'HIGH' | 'MEDIUM' | 'LOW' | 'CRITICAL') ||
+                'HIGH', // Should be always high
               person_in_charge: data.person_in_charge || 'ALL TECHNICIAN',
               ...commonProps,
             }
