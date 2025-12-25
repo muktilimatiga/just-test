@@ -46,7 +46,7 @@ const StatusBadge = ({ status }: { status: string }) => {
 
 const LogTicketPage = () => {
   // 1. Data Fetching
-  const { data: tickets = [], isLoading, isFetching, refetch } = useSupabaseTickets();
+  const { data: tickets = [], isFetching, refetch } = useSupabaseTickets();
 
   // 2. Store Actions
   const initializeFromTicket = useTicketStore((state) => state.initializeFromTicket);

@@ -1,6 +1,6 @@
 
 import { createClient } from '@supabase/supabase-js';
-import type { BackendService, Ticket, TicketLog, DashboardStats, TrafficData, User, Device, SystemLog } from '../types';
+import type { BackendService, Ticket, TicketLog, User, Device, SystemLog } from '../types';
 
 // --- CONFIGURATION ---
 // Replace these with your actual Project URL and Anon Key from Supabase Dashboard -> Settings -> API
@@ -65,7 +65,7 @@ export const ApiService: BackendService = {
     // Transform data to match expected TrafficData format
     // This is a simplified example - in a real implementation you would group by day
     const ticketCount = data?.length || 0;
-    
+
     return [
       { name: 'Mon', value: Math.floor(ticketCount * 0.1) },
       { name: 'Tue', value: Math.floor(ticketCount * 0.15) },
@@ -81,7 +81,7 @@ export const ApiService: BackendService = {
     // Ideally, create a Postgres View for this: "create view ticket_stats as select status, count(*) ..."
     // This is a client-side approximation:
     const { data } = await supabase.from('tickets').select('status');
-    
+
     const stats = data?.reduce((acc: any, curr) => {
       acc[curr.status] = (acc[curr.status] || 0) + 1;
       return acc;
@@ -102,7 +102,7 @@ export const ApiService: BackendService = {
       .select('*') // If you need user names, use: .select('*, assignee:users(name)')
       .order('createdAt', { ascending: false })
       .limit(5);
-      
+
     if (error) throw error;
     return data as Ticket[];
   },
@@ -112,7 +112,7 @@ export const ApiService: BackendService = {
       .from('tickets')
       .select('*')
       .order('createdAt', { ascending: false });
-      
+
     if (error) throw error;
     return data as Ticket[];
   },
@@ -133,7 +133,7 @@ export const ApiService: BackendService = {
   getTicketLogs: async (ticketId?: string) => {
     let query = supabase.from('ticket_logs').select('*').order('timestamp', { ascending: false });
     if (ticketId) query = query.eq('ticket_id', ticketId);
-    
+
     const { data, error } = await query;
     if (error) throw error;
     return data as TicketLog[];
@@ -153,7 +153,7 @@ export const ApiService: BackendService = {
       .from('users')
       .select('*')
       .ilike('name', `%${query}%`); // Case-insensitive search
-      
+
     if (error) throw error;
     return data as User[];
   },
@@ -167,7 +167,7 @@ export const ApiService: BackendService = {
     return {
       users: (users.data || []) as User[],
       tickets: (tickets.data || []) as any[],
-      pages: [] 
+      pages: []
     };
   },
 

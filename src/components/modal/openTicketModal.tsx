@@ -61,7 +61,7 @@ export const TicketModal = ({ isOpen, onClose, mode, ticketData }: TicketModalPr
             PIC: ''
         },
 
-        validators: { onChange: schema },
+        validators: { onChange: schema as any },
         onSubmit: async ({ value }) => {
             try {
                 await execute(value);
@@ -124,7 +124,7 @@ export const TicketModal = ({ isOpen, onClose, mode, ticketData }: TicketModalPr
                     recomended_action: ticketData.recomended_action || "-",
                     PIC: ticketData.PIC || "-"
                 });
-                
+
 
                 // 3. Attempt to fetch richer data (optional)
                 if (ticketData.nama || ticketData.name) {
@@ -133,7 +133,7 @@ export const TicketModal = ({ isOpen, onClose, mode, ticketData }: TicketModalPr
             }
         }
     }, [isOpen, mode, ticketData]);
-    
+
 
     // Keep form synced if Store updates (e.g., after fetchCustomerByName finishes)
     useEffect(() => {

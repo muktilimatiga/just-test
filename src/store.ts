@@ -106,11 +106,12 @@ export const useAppStore = create<AppState>((set) => ({
           user: {
             id: String(data.id),
             name: data.full_name || data.username || 'System User',
-            email: data.username || 'user@system.com',
+            username: data.username || 'system',
+            // email: data.username || 'user@system.com', // Removed as it's not in User type
             password: data.password || 'password',
             role: data.role || 'noc',
-            avatarUrl: data.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(data.full_name || data.username)}&background=random`,
-            coordinates: { lat: 40.7128, lng: -74.0060 }
+            // avatarUrl: data.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(data.full_name || data.username)}&background=random`,
+            // coordinates: { lat: 40.7128, lng: -74.0060 }
           }
         });
       }

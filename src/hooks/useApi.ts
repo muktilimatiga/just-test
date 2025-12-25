@@ -1,4 +1,4 @@
-import { useQuery, useMutation, keepPreviousData } from '@tanstack/react-query'
+import { useMutation, keepPreviousData } from '@tanstack/react-query'
 import type {
   ConfigurationRequest,
   OnuTargetPayload,

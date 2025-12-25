@@ -8,13 +8,18 @@ import { supabase } from '@/lib/supabaseClient';
 import { useConfigurationForm } from '@/hooks/useNewConfig';
 
 // Import React Query Hooks
-import {  usePsbData, useScanOnts } from '@/hooks/useApi';
+import { usePsbData, useScanOnts } from '@/hooks/useApi';
 
 // Import Form Components
 import { FormInput } from '@/components/form/FormInput';
 import { FormTextarea } from '@/components/form/FormTextarea';
 import { cn } from '@/lib/utils';
 import { ModalOverlay } from '../ModalOverlay';
+import { OLT_ITEMS, MODEM_ITEMS, PACKAGE_ITEMS } from '@/components/configFormFields';
+
+const oltOptions = OLT_ITEMS;
+const modemOptions = MODEM_ITEMS;
+const packageOptions = PACKAGE_ITEMS;
 
 interface BatchItem {
   sn: string;
@@ -39,7 +44,7 @@ export const ConfigModal = ({ isOpen, onClose, type }: { isOpen: boolean, onClos
     isLoading: isPsbLoading,
     refetch: refetchPsb,
     isRefetching: isPsbRefetching
-  } = usePsbData(mode === 'auto' && type === 'basic');
+  } = usePsbData(); // remove argument, it doesn't accept any
 
   // 3. React Query: Scan Mutation
   const { mutateAsync: scanOnts, isPending: isScanLoading } = useScanOnts();
@@ -259,7 +264,7 @@ export const ConfigModal = ({ isOpen, onClose, type }: { isOpen: boolean, onClos
 
                   <SelectContent>
                     {/* 3. Use SelectItem instead of <option> */}
-                    {oltOptions.map((opt) => (
+                    {oltOptions.map((opt: string) => (
                       <SelectItem key={opt} value={opt}>
                         {opt}
                       </SelectItem>
@@ -283,7 +288,7 @@ export const ConfigModal = ({ isOpen, onClose, type }: { isOpen: boolean, onClos
 
                   <SelectContent>
                     {/* 3. Use SelectItem instead of <option> */}
-                    {modemOptions.map((m) => (
+                    {modemOptions.map((m: string) => (
                       <SelectItem key={m} value={m}>
                         {m}
                       </SelectItem>
@@ -307,7 +312,7 @@ export const ConfigModal = ({ isOpen, onClose, type }: { isOpen: boolean, onClos
 
                   <SelectContent>
                     {/* 3. Use SelectItem instead of <option> */}
-                    {packageOptions.map((pkg) => (
+                    {packageOptions.map((pkg: string) => (
                       <SelectItem key={pkg} value={pkg}>
                         {pkg}
                       </SelectItem>

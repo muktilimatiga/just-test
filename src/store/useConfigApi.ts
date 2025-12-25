@@ -16,7 +16,7 @@ import {
   ConfigManualSchema, // ✅ Keep this
   ConfigAutoSchema,   // ✅ Keep this
   // ConfigBatchSchema
-} from '@/components/form/configFormFields';
+} from '@/components/configFormFields';
 
 export type ConfigMode = 'manual' | 'auto' | 'bridge' | 'batch';
 

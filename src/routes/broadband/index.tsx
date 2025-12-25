@@ -4,50 +4,15 @@ import { AutoTanStackTable } from '@/components/AutoTable'
 import { useSupabaseCustomerViews } from '@/hooks/supabase/useSupbaseCustomerViews'
 import type { Customer } from '@/types'
 import { toast } from 'sonner'
-import { Badge } from '@/components/ui/badge'
+
 import { Input, Button } from '@/components/ui'
 import { useDebounce } from 'use-debounce'
 import { Copy, MapPin, KeyRound } from 'lucide-react'
 import type { ColumnDef } from '@tanstack/react-table'
 import { InvoicePaymentModal } from '@/components/modal/invoicesModal'
-import { CustomerDetailModal } from '@/components/modal/custonerCardModal'
 
 
 
-const StatusBadge = ({ status }: { status: string | null }) => {
-  if (!status) {
-    return (
-      <Badge variant="outline" className="text-gray-500 border-gray-200">
-        Checking...
-      </Badge>
-    )
-  }
-
-  const styles: Record<string, string> = {
-    online:
-      'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-300 dark:border-green-900/50',
-    offline:
-      'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-300 dark:border-red-900/50',
-    los: 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/20 dark:text-red-300 dark:border-red-900/50',
-    dyinggasp:
-      'text-orange-700 border-orange-200 dark:bg-orange-900/20 dark:text-orange-300 dark:border-orange-900/50',
-  }
-
-  const normalizedStatus = status.toLowerCase().replace(/\s+/g, '_')
-  const style =
-    styles[normalizedStatus] ||
-    'bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-300'
-  const label = status.replace(/_/g, ' ')
-
-  return (
-    <Badge
-      variant="outline"
-      className={`capitalize font-normal border ${style}`}
-    >
-      {label}
-    </Badge>
-  )
-}
 
 const copyText = (text: string) => {
   navigator.clipboard.writeText(text)

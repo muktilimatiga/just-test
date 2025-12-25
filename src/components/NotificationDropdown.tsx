@@ -1,4 +1,4 @@
-import { Bell, Check, Trash2, Info, AlertTriangle, CheckCircle, XCircle, CheckCheck, Clock } from 'lucide-react';
+import { Bell, Trash2, Info, AlertTriangle, CheckCircle, XCircle, CheckCheck, Clock } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, Button } from './ui';
 import { Badge } from './ui/badge';

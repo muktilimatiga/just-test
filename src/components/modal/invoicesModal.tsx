@@ -26,12 +26,6 @@ interface InvoicePaymentModalProps {
   user: Customer | null
 }
 
-interface StatusPaymentProps {
-  pending: string
-  unpaid: string
-  paid: string
-}
-
 
 export const InvoicePaymentModal = ({
   isOpen,
@@ -55,10 +49,10 @@ export const InvoicePaymentModal = ({
     const invoices = (customer.invoices as unknown as InvoiceItem[]) || []
     const sortedInvoices = invoices
       ? [...invoices].sort((a, b) => {
-          if ((b.year ?? 0) !== (a.year ?? 0))
-            return (b.year ?? 0) - (a.year ?? 0)
-          return (b.month ?? 0) - (a.month ?? 0)
-        })
+        if ((b.year ?? 0) !== (a.year ?? 0))
+          return (b.year ?? 0) - (a.year ?? 0)
+        return (b.month ?? 0) - (a.month ?? 0)
+      })
       : []
 
     return {
@@ -165,7 +159,7 @@ export const InvoicePaymentModal = ({
                 <div className="space-y-2">
                   <Label>Status Tagihan Bulan Ini</Label>
                   <Input
-                    value={invoiceData?.currentInvoice?.status}
+                    value={invoiceData?.currentInvoice?.status || ''}
                     readOnly
                     className="bg-slate-50 text-slate-500 font-mono"
                   />

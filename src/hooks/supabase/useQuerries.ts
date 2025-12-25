@@ -1,7 +1,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ApiService } from '@/lib/supabaseClient';
-import type { Ticket, User, TicketLog, DashboardStats, TrafficData, Device, SystemLog } from '@/types'
+import type { SystemLog } from '@/types'
 
 // --- Query Keys ---
 export const queryKeys = {
@@ -82,9 +82,9 @@ export const useTicketLogs = (ticketId?: string) => {
 export const useUpdateTicketStatus = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, status }: { id: string; status: string }) => 
+    mutationFn: ({ id, status }: { id: string; status: string }) =>
       ApiService.updateTicketStatus(id, status),
-    onSuccess: (_, variables) => {
+    onSuccess: () => {
       // Invalidate relevant queries to refetch data
       queryClient.invalidateQueries({ queryKey: queryKeys.tickets.recent() });
       queryClient.invalidateQueries({ queryKey: queryKeys.tickets.list() });

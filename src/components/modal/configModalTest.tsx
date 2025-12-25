@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { ModalOverlay } from '@/components/ModalOverlay';
 
 // Helper to sync form state to store
@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 
 import { toast } from "sonner"
-import { X, RefreshCw, Trash2, Layers, Scan } from 'lucide-react';
+import { X, RefreshCw, Trash2, Layers } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 // Store & Hooks
@@ -40,7 +40,7 @@ export const ConfigModalTest = ({ isOpen, onClose, type }: ConfigModalProps) => 
 
     const {
         data: psbList,
-        isLoading: isPsbLoading,
+
         refetch: refetchPsb,
         isRefetching: isRefetching,
     } = usePsbData();
@@ -171,7 +171,7 @@ export const ConfigModalTest = ({ isOpen, onClose, type }: ConfigModalProps) => 
                                 const selectedPsb = psbList.find((p: any) => p.id === selectedId);
 
                                 if (selectedPsb) {
-                                    fillFormWithData(selectedPsb);
+                                    handleSelectPsb(selectedId);
                                 }
                             }, [selectedId, psbList]);
 
@@ -189,7 +189,7 @@ export const ConfigModalTest = ({ isOpen, onClose, type }: ConfigModalProps) => 
                         isFetchingPSB={isRefetching}
                         selectPSBList={handleSelectPsb}
                         selectUser={(fiberUser) => {
-                            fillFormWithData(fiberUser);
+                            handleSelectUser(fiberUser);
                             // Optional: Clear search term to close dropdown
                             // setSearchTerm(''); 
                         }}

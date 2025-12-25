@@ -30,7 +30,6 @@ import {
   TooltipTrigger,
   TooltipContent,
   Avatar,
-  AvatarImage,
   AvatarFallback,
   DropdownMenu,
   DropdownMenuTrigger,
@@ -292,12 +291,12 @@ export const Sidebar = () => {
 };
 
 export const Navbar = ({ onOpenMobileMenu }: { onOpenMobileMenu: () => void }) => {
-  const { theme, toggleTheme, toggleCli, toggleAIChat, isCliOpen, user, setCreateTicketModalOpen, login, logout } = useAppStore();
+  const { theme, toggleTheme, toggleCli, toggleAIChat, isCliOpen, user, setCreateTicketModalOpen, login } = useAppStore();
   const routerState = useRouterState();
   const currentPath = routerState.location.pathname;
   const [users, setUsers] = useState<User[]>([]);
 
-useEffect(() => {
+  useEffect(() => {
     // Fetch users for switcher
     const loadUsers = async () => {
       const { data } = await supabase.from('users').select('*').limit(10);
@@ -428,7 +427,7 @@ useEffect(() => {
 };
 
 export const AppLayout = () => {
-  const { theme, isCreateTicketModalOpen, setCreateTicketModalOpen, fetchUser } = useAppStore();
+  const { theme, fetchUser } = useAppStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
