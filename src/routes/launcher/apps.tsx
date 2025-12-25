@@ -6,8 +6,8 @@ import {
   LayoutTemplate,
   Plus,
   Loader2,
-  Activity,
-  Ticket
+  Image,
+  Tag
 } from 'lucide-react';
 
 export interface AppItem {
@@ -34,11 +34,11 @@ export const APPS_CONFIG: AppItem[] = [
     isAction: true
   },
   {
-    id: 'analytics',
-    title: 'Overview',
-    subtitle: 'Traffic & Stats',
-    icon: Activity,
-    to: '/overview',
+    id: 'ocr',
+    title: 'Images to Text',
+    subtitle: 'Convert images to text',
+    icon: Image,
+    to: '/ocr',
     // Solid card
     color: 'bg-card border border-border shadow-sm hover:border-primary/50 hover:shadow-md transition-all',
     iconColor: 'text-blue-600'
@@ -81,9 +81,9 @@ export const APPS_CONFIG: AppItem[] = [
   },
   {
     id: 'tickets',
-    title: 'Transactions',
+    title: 'Log Ticket',
     subtitle: 'Ticket management',
-    icon: Ticket,
+    icon: Tag,
     to: '/log-komplain',
     color: 'bg-card border border-border shadow-sm hover:border-primary/50 hover:shadow-md transition-all',
     iconColor: 'text-blue-600'

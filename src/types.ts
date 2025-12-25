@@ -53,7 +53,7 @@ import * as React from 'react';
 export const UserSchema = z.object({
   id: z.string().uuid(),
   name: z.string(),
-  username:z.string(),
+  username: z.string(),
   role: z.enum(['admin', 'noc', 'manager']),
   password: z.string(),
 });
@@ -163,6 +163,18 @@ export interface Notification {
   timestamp: string;
   read: boolean;
   link?: string;
+}
+
+export interface ImageFile {
+  file: File;
+  previewUrl: string;
+  base64: string;
+  mimeType: string;
+}
+
+export interface ApiError {
+  message: string;
+  code?: string;
 }
 
 // --- App Types ---

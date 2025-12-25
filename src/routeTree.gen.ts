@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TemplateIndexRouteImport } from './routes/template/index'
+import { Route as OcrIndexRouteImport } from './routes/ocr/index'
 import { Route as LogsIndexRouteImport } from './routes/logs/index'
 import { Route as LogKomplainIndexRouteImport } from './routes/log-komplain/index'
 import { Route as LauncherIndexRouteImport } from './routes/launcher/index'
@@ -25,6 +26,11 @@ const IndexRoute = IndexRouteImport.update({
 const TemplateIndexRoute = TemplateIndexRouteImport.update({
   id: '/template/',
   path: '/template/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OcrIndexRoute = OcrIndexRouteImport.update({
+  id: '/ocr/',
+  path: '/ocr/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LogsIndexRoute = LogsIndexRouteImport.update({
@@ -60,6 +66,7 @@ export interface FileRoutesByFullPath {
   '/launcher': typeof LauncherIndexRoute
   '/log-komplain': typeof LogKomplainIndexRoute
   '/logs': typeof LogsIndexRoute
+  '/ocr': typeof OcrIndexRoute
   '/template': typeof TemplateIndexRoute
 }
 export interface FileRoutesByTo {
@@ -69,6 +76,7 @@ export interface FileRoutesByTo {
   '/launcher': typeof LauncherIndexRoute
   '/log-komplain': typeof LogKomplainIndexRoute
   '/logs': typeof LogsIndexRoute
+  '/ocr': typeof OcrIndexRoute
   '/template': typeof TemplateIndexRoute
 }
 export interface FileRoutesById {
@@ -79,6 +87,7 @@ export interface FileRoutesById {
   '/launcher/': typeof LauncherIndexRoute
   '/log-komplain/': typeof LogKomplainIndexRoute
   '/logs/': typeof LogsIndexRoute
+  '/ocr/': typeof OcrIndexRoute
   '/template/': typeof TemplateIndexRoute
 }
 export interface FileRouteTypes {
@@ -90,6 +99,7 @@ export interface FileRouteTypes {
     | '/launcher'
     | '/log-komplain'
     | '/logs'
+    | '/ocr'
     | '/template'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -99,6 +109,7 @@ export interface FileRouteTypes {
     | '/launcher'
     | '/log-komplain'
     | '/logs'
+    | '/ocr'
     | '/template'
   id:
     | '__root__'
@@ -108,6 +119,7 @@ export interface FileRouteTypes {
     | '/launcher/'
     | '/log-komplain/'
     | '/logs/'
+    | '/ocr/'
     | '/template/'
   fileRoutesById: FileRoutesById
 }
@@ -118,6 +130,7 @@ export interface RootRouteChildren {
   LauncherIndexRoute: typeof LauncherIndexRoute
   LogKomplainIndexRoute: typeof LogKomplainIndexRoute
   LogsIndexRoute: typeof LogsIndexRoute
+  OcrIndexRoute: typeof OcrIndexRoute
   TemplateIndexRoute: typeof TemplateIndexRoute
 }
 
@@ -135,6 +148,13 @@ declare module '@tanstack/react-router' {
       path: '/template'
       fullPath: '/template'
       preLoaderRoute: typeof TemplateIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ocr/': {
+      id: '/ocr/'
+      path: '/ocr'
+      fullPath: '/ocr'
+      preLoaderRoute: typeof OcrIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/logs/': {
@@ -182,6 +202,7 @@ const rootRouteChildren: RootRouteChildren = {
   LauncherIndexRoute: LauncherIndexRoute,
   LogKomplainIndexRoute: LogKomplainIndexRoute,
   LogsIndexRoute: LogsIndexRoute,
+  OcrIndexRoute: OcrIndexRoute,
   TemplateIndexRoute: TemplateIndexRoute,
 }
 export const routeTree = rootRouteImport
