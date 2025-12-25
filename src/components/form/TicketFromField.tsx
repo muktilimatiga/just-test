@@ -139,7 +139,7 @@ export function OpenTicketFormFields() {
                 <FieldWrapper name="olt_name" label="OLT Name" component="Input" />
                 <FieldWrapper name="interface" label="Interface" component="Input" />
             </div>
-            <FieldWrapper name="action_ticket" label="Action Ticket" component="Input" />
+            <FieldWrapper name="action_ticket" label="Action Ticket" component="Input" placeholder='cek' />
             <FieldWrapper name="description" label="Description" component="Textarea" />
         </div>
     );

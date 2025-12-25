@@ -11,7 +11,7 @@ import {
   type SortingState,
   type ColumnMeta,
 } from '@tanstack/react-table';
-import { Button } from '@/components/ui/button'; 
+import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, ArrowUpDown } from 'lucide-react';
 
 type FilterType = "text" | "select" | "date";
@@ -23,19 +23,21 @@ declare module '@tanstack/react-table' {
   }
 }
 
-// 1. Add enableSearch to the props interface
 interface AutoTanStackTableProps<T> {
   data: T[];
   pageSize?: number;
   columnOverrides?: Partial<Record<keyof T | 'actions', ColumnDef<T>>>;
-  enableSearch?: boolean; 
+  enableSearch?: boolean;
+  // 1. New Prop to control which columns appear
+  visibleColumns?: (keyof T)[];
 }
 
 export function AutoTanStackTable<T extends object>({
   data,
   pageSize = 20,
   columnOverrides = {},
-  enableSearch = true // 2. Default it to true so existing tables don't break
+  enableSearch = true,
+  visibleColumns // 2. Destructure it
 }: AutoTanStackTableProps<T>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState('');
@@ -43,18 +45,25 @@ export function AutoTanStackTable<T extends object>({
 
   const columns = useMemo(() => {
     if (!data || data.length === 0) return [];
-    const keys = Object.keys(data[0]);
+
+    // 3. LOGIC CHANGE: 
+    // If visibleColumns is provided, use it. Otherwise, use all keys.
+    const allKeys = Object.keys(data[0]) as (keyof T)[];
+    const keys = visibleColumns
+      ? visibleColumns.filter(k => allKeys.includes(k))
+      : allKeys;
 
     const generatedColumns: ColumnDef<T>[] = keys.map((key) => {
-      if (columnOverrides[key as keyof T]) {
-        return columnOverrides[key as keyof T]!;
+      // Use override if it exists
+      if (columnOverrides[key]) {
+        return columnOverrides[key]!;
       }
 
       const sampleValue = (data[0] as any)[key];
 
       return {
-        accessorKey: key,
-        header: key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, " "),
+        accessorKey: key as string,
+        header: (key as string).charAt(0).toUpperCase() + (key as string).slice(1).replace(/_/g, " "),
         enableColumnFilter: false,
         filterFn: "includesString",
         meta: detectFilterMeta(sampleValue),
@@ -72,12 +81,15 @@ export function AutoTanStackTable<T extends object>({
       };
     });
 
+    // Always append 'actions' if it exists in overrides
     if (columnOverrides['actions']) {
       generatedColumns.push(columnOverrides['actions'] as any);
     }
 
     return generatedColumns;
-  }, [data, columnOverrides]);
+  }, [data, columnOverrides, visibleColumns]); // Add visibleColumns to dependency
+
+  // ... (Rest of the file remains the same: detectFilterMeta, useReactTable, return JSX) ...
 
   function detectFilterMeta(value: unknown): ColumnMeta<any, any> {
     if (typeof value === "string") {
@@ -107,7 +119,6 @@ export function AutoTanStackTable<T extends object>({
 
   return (
     <div className="space-y-4">
-      {/* 3. Wrap the Search Bar in a conditional check */}
       {enableSearch && (
         <div className="flex items-center justify-between">
           <input
@@ -122,7 +133,6 @@ export function AutoTanStackTable<T extends object>({
         </div>
       )}
 
-      {/* Table */}
       <div className="rounded-md border">
         <table className="w-full text-sm text-left">
           <thead className="bg-muted/50">
@@ -164,7 +174,6 @@ export function AutoTanStackTable<T extends object>({
         </table>
       </div>
 
-      {/* Pagination */}
       <div className="flex items-center justify-end space-x-2 py-4">
         <Button variant="outline" size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
           <ChevronLeft className="h-4 w-4" />

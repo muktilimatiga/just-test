@@ -27,19 +27,22 @@ export const useFiberStore = create<FiberStore>((set) => ({
 
     setSearchTerm: (term) => set({ searchTerm: term }),
 
-    searchCustomers: async (query) => {
-        if (!query || query.length <= 1) {
+    searchCustomers: async (queryStr: string) => {
+        if (!queryStr || queryStr.length <= 1) {
             set({ searchResults: [], isSearching: false });
             return;
         }
 
         set({ isSearching: true });
         try {
-            const { data, error } = await supabase
-                .from('data_fiber')
-                .select('*')
-                .or(`name.ilike.%${query}%,user_pppoe.ilike.%${query}%,alamat.ilike.%${query}%`)
-                .limit(10);
+            let query = supabase.from('data_fiber').select('*');
+            const tokens = queryStr.split(/\s+/).filter(t => t.length > 0);
+
+            tokens.forEach(token => {
+                query = query.or(`name.ilike.%${token}%,user_pppoe.ilike.%${token}%,alamat.ilike.%${token}%`);
+            });
+
+            const { data, error } = await query.limit(10);
 
             if (error) throw error;
 

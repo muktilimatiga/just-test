@@ -6,22 +6,24 @@ import type { Customer } from '@/types';
 // 1. Accept a search term (default to empty string)
 export const useSupabaseCustomerViews = (searchTerm: string = '') => {
     return useQuery({
-        // 2. Add searchTerm to the queryKey so it auto-refetches when you type
         queryKey: ['customers_view', searchTerm],
-        
+
         queryFn: async (): Promise<Customer[]> => {
             let query = supabase
                 .from("customers_view")
                 .select("*")
                 .order("id", { ascending: false });
 
-            // 3. Dynamic Logic:
             if (searchTerm) {
-                // If searching: Look in name, pppoe, address, or SN. Remove the limit!
-                // Using .ilike for case-insensitive search
-                query = query.or(`name.ilike.%${searchTerm}%,user_pppoe.ilike.%${searchTerm}%,alamat.ilike.%${searchTerm}%,onu_sn.ilike.%${searchTerm}%`);
+                // 1. Split search term by spaces (e.g., "budi kedungwaru" -> ["budi", "kedungwaru"])
+                const tokens = searchTerm.split(/\s+/).filter(t => t.length > 0);
+
+                // 2. Loop through each word and add a filter
+                // This creates logic: (Name/Addr has "budi") AND (Name/Addr has "kedungwaru")
+                tokens.forEach(token => {
+                    query = query.or(`name.ilike.%${token}%,user_pppoe.ilike.%${token}%,alamat.ilike.%${token}%,onu_sn.ilike.%${token}%`);
+                });
             } else {
-                // If NOT searching: Just get the latest 50 to save data
                 query = query.limit(50);
             }
 
@@ -33,9 +35,11 @@ export const useSupabaseCustomerViews = (searchTerm: string = '') => {
             }
 
             return (rows || []).map((row: any) => ({
+                // ... keep your existing mapping logic ...
                 id: row.id,
                 name: row.name,
                 user_pppoe: row.user_pppoe,
+                pppoe_password: row.pppoe_password,
                 alamat: row.alamat,
                 onu_sn: row.onu_sn,
                 olt_name: row.olt_name,
@@ -54,7 +58,7 @@ export const useSupabaseCustomerViews = (searchTerm: string = '') => {
                         : new Date().toISOString(),
             }));
         },
-        staleTime: 1000 * 30, 
+        staleTime: 1000 * 30,
         refetchOnWindowFocus: true,
     })
 };

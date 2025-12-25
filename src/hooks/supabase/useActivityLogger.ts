@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAppStore } from '@/store';
 import { supabase } from '@/lib/supabaseClient';
 
@@ -9,6 +9,13 @@ export type LogEntry = {
     details?: string;
     status: 'SUCCESS' | 'ERROR' | 'INFO';
 };
+
+export type LogRecord = LogEntry & {
+    id: number;
+    user_id: string;
+    timestamp: string;
+    created_at: string;
+}
 
 export const useActivityLogger = () => {
     const { user } = useAppStore();
@@ -43,3 +50,19 @@ export const useActivityLogger = () => {
         ...mutation,
     };
 };
+
+export const useActivityLog = () => {
+    return useQuery({
+        queryKey: ['log_activity'],
+        queryFn: async () => {
+            const { data, error } = await supabase
+                .from("log_activity")
+                .select('*')
+                .order('timestamp', { ascending: false })
+                .limit(100);
+
+            if (error) throw error;
+            return data as LogRecord[];
+        },
+    })
+}

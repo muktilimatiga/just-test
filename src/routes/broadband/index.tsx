@@ -3,11 +3,16 @@ import { createFileRoute } from '@tanstack/react-router'
 import { AutoTanStackTable } from '@/components/AutoTable'
 import { useSupabaseCustomerViews } from '@/hooks/supabase/useSupbaseCustomerViews'
 import type { Customer } from '@/types'
+import { toast } from 'sonner'
 import { Badge } from '@/components/ui/badge'
 import { Input, Button } from '@/components/ui'
 import { useDebounce } from 'use-debounce'
+import { Copy, MapPin, KeyRound } from 'lucide-react'
 import type { ColumnDef } from '@tanstack/react-table'
 import { InvoicePaymentModal } from '@/components/modal/invoicesModal'
+import { CustomerDetailModal } from '@/components/modal/custonerCardModal'
+
+
 
 const StatusBadge = ({ status }: { status: string | null }) => {
   if (!status) {
@@ -44,6 +49,11 @@ const StatusBadge = ({ status }: { status: string | null }) => {
   )
 }
 
+const copyText = (text: string) => {
+  navigator.clipboard.writeText(text)
+  toast.success('Copied!')
+}
+
 export function BroadbandPage() {
   const [search, setSearch] = useState('')
   const [debouncedSearch] = useDebounce(search, 500)
@@ -54,30 +64,54 @@ export function BroadbandPage() {
   const { data: customers = [], isLoading } =
     useSupabaseCustomerViews(debouncedSearch)
   const columnOverrides = useMemo(() => {
-    const overrides: Partial<
-      Record<keyof Customer | 'actions', ColumnDef<Customer>>
-    > = {
-      snmp_status: {
-        accessorKey: 'snmp_status',
-        header: 'Status',
-        cell: ({ getValue }) => <StatusBadge status={getValue() as string} />,
-      },
-      rx_power_str: {
-        accessorKey: 'rx_power_str',
-        header: 'Signal (dBm)',
-        cell: ({ getValue }) => {
-          const val = getValue() as string
-          if (!val) return '-'
-          const num = parseFloat(val)
-          let color = 'text-gray-700'
+    const overrides: Partial<Record<keyof Customer | 'actions', ColumnDef<Customer>>> = {
 
-          if (!isNaN(num)) {
-            if (num < -27) color = 'text-red-500 font-bold'
-            else if (num < -25) color = 'text-orange-500'
-            else color = 'text-green-600'
-          }
-          return <span className={color}>{val}</span>
-        },
+      // 1. CUSTOM NAME COLUMN (Name + Alamat)
+      name: {
+        header: 'Name',
+        // 'row.original' gives you access to HIDDEN fields like 'alamat'
+        cell: ({ row }) => (
+          <div className="flex flex-col max-w-[200px]">
+            <span className="font-bold text-sm text-slate-900 dark:text-slate-100">
+              {row.original.name}
+            </span>
+            <div className="flex items-center gap-1 mt-0.5 text-xs text-muted-foreground truncate">
+              <MapPin className="h-3 w-3 shrink-0 opacity-50" />
+              <span className="truncate" title={row.original.alamat}>
+                {row.original.alamat || 'No Address'}
+              </span>
+            </div>
+          </div>
+        ),
+      },
+
+      // 2. CUSTOM PPPOE COLUMN (User | Pass)
+      user_pppoe: {
+        header: 'PPPoE Credentials',
+        cell: ({ row }) => (
+          <div className="flex flex-col gap-1">
+            {/* Username */}
+            <div
+              className="flex items-center gap-2 cursor-pointer group"
+              onClick={() => copyText(row.original.user_pppoe as string)}
+            >
+              <span className="font-mono text-xs font-medium text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20 px-1.5 py-0.5 rounded">
+                {row.original.user_pppoe}
+              </span>
+              <Copy className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+            </div>
+
+            {/* Password (Optional: only show if you really want it exposed on the table) */}
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground pl-1">
+              <KeyRound className="h-3 w-3 opacity-50" />
+              {/* Check if pppoe_pass exists in your type/data */}
+              <span className="font-mono">
+                {/* @ts-ignore: Assuming pppoe_pass exists in your data even if not in type */}
+                {row.original.pppoe_password}
+              </span>
+            </div>
+          </div>
+        ),
       },
       actions: {
         id: 'actions',
@@ -125,6 +159,7 @@ export function BroadbandPage() {
         columnOverrides={columnOverrides}
         pageSize={20}
         enableSearch={false}
+        visibleColumns={['name', 'user_pppoe', 'snmp_status']}
       />
 
       {selectedCustomer && (
