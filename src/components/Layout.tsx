@@ -31,6 +31,7 @@ import {
   TooltipContent,
   Avatar,
   AvatarFallback,
+  AvatarImage,
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
@@ -58,7 +59,6 @@ const Tooltip = ({ text, children }: { text: React.ReactNode; children: React.Re
 // --- Sidebar Icon / Item Component ---
 interface SidebarIconProps {
   icon: any;
-
   label: string;
   to?: string;
   isActive?: boolean;
@@ -292,26 +292,11 @@ export const Sidebar = () => {
 
 export const Navbar = ({ onOpenMobileMenu }: { onOpenMobileMenu: () => void }) => {
   const { theme, toggleTheme, toggleCli, toggleAIChat, isCliOpen, user, setCreateTicketModalOpen, login } = useAppStore();
-  const routerState = useRouterState();
+const routerState = useRouterState();
   const currentPath = routerState.location.pathname;
-  const [users, setUsers] = useState<User[]>([]);
 
-  useEffect(() => {
-    // Fetch users for switcher
-    const loadUsers = async () => {
-      const { data } = await supabase.from('users').select('*').limit(10);
-      if (data) {
-        setUsers(data.map((u: User) => ({
-          id: String(u.id),
-          name: u.name || '',
-          username: u.username,
-          role: u.role || 'user',
-          password: u.password || '' // <--- ADD THIS LINE
-        })));
-      }
-    };
-    loadUsers();
-  }, []);
+  // FIX 2: Create a temporary list for the "Switch Account" menu since we don't have a list in the store yet
+  const users = user ? [user] : [];
 
   const pageTitle = () => {
     const path = currentPath.split('/')[1] || 'Dashboard';
@@ -334,6 +319,7 @@ export const Navbar = ({ onOpenMobileMenu }: { onOpenMobileMenu: () => void }) =
       </div>
 
       <div className="flex items-center gap-2 md:gap-3">
+        {/* Search Bar */}
         <div className="relative hidden lg:block mr-2">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
           <input
@@ -396,23 +382,34 @@ export const Navbar = ({ onOpenMobileMenu }: { onOpenMobileMenu: () => void }) =
           <DropdownMenu>
             <DropdownMenuTrigger className="outline-none">
               <Avatar className="h-8 w-8 cursor-pointer ring-2 ring-transparent hover:ring-indigo-500/20 transition-all">
-                <AvatarFallback>{user?.name?.charAt(0) || 'U'}</AvatarFallback>
+                {/* FIX 3: Added AvatarImage so the picture displays */}
+                <AvatarImage src={user?.avatarUrl} alt={user?.username} />
+                
+                {/* Fallback uses Username now */}
+                <AvatarFallback className="bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300">
+                  {user?.username ? user.username.charAt(0).toUpperCase() : 'U'}
+                </AvatarFallback>
               </Avatar>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56 mt-2">
               <DropdownMenuLabel className="font-normal p-3 bg-slate-50 dark:bg-white/5 border-b border-slate-100 dark:border-white/5 mb-1">
                 <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-bold leading-none">{user?.name}</p>
+                  {/* Using Username here */}
+                  <p className="text-sm font-bold leading-none">{user?.username || "Guest"}</p>
+                  <p className="text-xs text-muted-foreground">{user?.role || "Viewer"}</p>
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuLabel className="text-xs text-muted-foreground uppercase tracking-wider px-2 pt-2">Switch Account</DropdownMenuLabel>
+              
               {users.map((u) => (
                 <DropdownMenuItem key={u.id} onClick={() => login(u)}>
                   <div className="flex items-center gap-3 w-full cursor-pointer py-1">
                     <Avatar className="h-6 w-6 text-[10px]">
-                      <AvatarFallback>{u.name?.charAt(0) || 'U'}</AvatarFallback>
+                      {/* Using Username for small avatar too */}
+                      <AvatarFallback>{u.username?.charAt(0).toUpperCase() || 'U'}</AvatarFallback>
                     </Avatar>
-                    <span className="text-sm font-medium flex-1 truncate">{u.name}</span>
+                    {/* Using Username for list */}
+                    <span className="text-sm font-medium flex-1 truncate">{u.username}</span>
                     {user?.id === u.id && <Check className="h-3.5 w-3.5 text-indigo-600" />}
                   </div>
                 </DropdownMenuItem>
@@ -430,14 +427,17 @@ export const AppLayout = () => {
   const { theme, fetchUser } = useAppStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  // Effect 1: Handle Theme (runs when theme changes)
   useEffect(() => {
     const root = window.document.documentElement;
     root.classList.remove('light', 'dark');
     root.classList.add(theme);
-
-    // Initialize user session from Supabase
-    fetchUser();
   }, [theme]);
+
+  // Effect 2: Initialize User (runs ONLY once on mount)
+  useEffect(() => {
+    fetchUser();
+  }, [fetchUser]);
 
   return (
     <div className="min-h-screen bg-slate-50/50 dark:bg-black text-slate-900 dark:text-white font-sans selection:bg-indigo-500/20">
@@ -448,8 +448,8 @@ export const AppLayout = () => {
       <main
         className={cn(
           "min-h-screen transition-all duration-300 ease-in-out",
-          "pt-24 pb-12 px-4 md:px-8", // Increased padding top/bottom and responsiveness
-          "pl-4 md:pl-[88px]" // Responsive left padding for sidebar
+          "pt-24 pb-12 px-4 md:px-8",
+          "pl-4 md:pl-[88px]"
         )}
       >
         <Outlet />
