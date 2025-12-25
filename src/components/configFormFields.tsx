@@ -165,15 +165,15 @@ const SourceSelectionSection = (props: Partial<FormFieldProps>) => {
           </div>
 
           {/* CUSTOM DROPDOWN RESULTS */}
-          {(fiberList?.length || 0) > 0 && (
+          {(props.fiberList?.length || 0) > 0 && (
             <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-zinc-900 border border-slate-200 rounded-lg shadow-xl max-h-48 overflow-y-auto z-50 p-1">
-              {fiberList?.map((u) => (
+              {props.fiberList?.map((u) => (
                 <div
                   key={u.id} // Ensure 'id' exists
                   className="p-2 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded-md cursor-pointer flex items-center gap-3 transition-colors"
                   onClick={() => {
-                    selectUser?.(u); // Pass the selected user up
-                    setFiberSearchTerm?.(''); // Optional: Clear search after select
+                    props.selectUser?.(u); // Pass the selected user up
+                    props.setFiberSearchTerm?.(''); // Optional: Clear search after select
                   }}
                 >
                   <Avatar className="h-8 w-8 border border-slate-100">

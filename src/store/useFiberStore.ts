@@ -51,8 +51,8 @@ export const useFiberStore = create<FiberStore>((set) => ({
                 id: row.user_pppoe || row.id || `fiber-${Math.random()}`,
                 name: row.name || 'Unknown',
                 user_pppoe: row.user_pppoe || '',
+                pppoe_password: row.pppoe_password || '',
                 alamat: row.alamat || '',
-                onu_sn: row.onu_sn,
                 paket: row.paket || ''
             }));
 

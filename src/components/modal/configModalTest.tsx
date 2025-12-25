@@ -94,18 +94,23 @@ export const ConfigModalTest = ({ isOpen, onClose, type }: ConfigModalProps) => 
     });
 
     const handleSelectUser = (data: any) => {
-        const selectedId = data; // Assuming data is the value (user_pppoe)
-        const selected = searchResults?.find(p => p.user_pppoe === selectedId);
+        // Fix: logic to handle both object (from custom dropdown) and ID (fallback)
+        let selected: any = null;
+
+        if (typeof data === 'object' && data !== null) {
+            selected = data;
+        } else {
+            selected = searchResults?.find(p => p.user_pppoe === data);
+        }
+
         if (selected) {
             form.setFieldValue('name', selected.name || '');
             form.setFieldValue('address', selected.alamat || '');
             form.setFieldValue('user_pppoe', selected.user_pppoe || '');
-            form.setFieldValue('pass_pppoe', selected.user_pppoe || ''); // Assuming password is same as user for now? Or maybe empty? 
-            // In original code: form.setFieldValue('pass_pppoe', selected.user_pppoe || ''); 
-            // It seems weird to set password to username, but restoring original behavior.
+            form.setFieldValue('pass_pppoe', selected.pppoe_password || '');
+
             resetSearch();
             setSearchTerm('');
-            console.log(selected);
         }
     };
 
